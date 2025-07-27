@@ -109,6 +109,8 @@ class WP_Bottom_Navigation_Pro {
         add_action('wp_ajax_wpbnp_reset_settings', array($this, 'reset_settings'));
         add_action('wp_ajax_wpbnp_export_settings', array($this, 'export_settings'));
         add_action('wp_ajax_wpbnp_import_settings', array($this, 'import_settings'));
+        add_action('wp_ajax_wpbnp_get_cart_count', array($this, 'get_cart_count'));
+        add_action('wp_ajax_nopriv_wpbnp_get_cart_count', array($this, 'get_cart_count'));
         
         // Footer hook for navigation display
         add_action('wp_footer', array($this, 'display_navigation'), 999);
@@ -355,6 +357,17 @@ class WP_Bottom_Navigation_Pro {
         }
         
         do_action('wpbnp_activate');
+    }
+    
+    /**
+     * Get cart count via AJAX
+     */
+    public function get_cart_count() {
+        check_ajax_referer('wpbnp_nonce', 'nonce');
+        
+        $count = wpbnp_get_cart_count();
+        
+        wp_send_json_success($count);
     }
     
     /**

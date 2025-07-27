@@ -94,81 +94,55 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+    transition: border-color 0.3s ease;
 }
 
 .wpbnp-field input:focus,
 .wpbnp-field select:focus,
 .wpbnp-field textarea:focus {
     border-color: #0073aa;
-    box-shadow: 0 0 0 1px #0073aa;
     outline: none;
+    box-shadow: 0 0 0 1px #0073aa;
 }
 
-/* Items Management */
+/* Navigation Items List */
 .wpbnp-sortable-list {
-    margin: 20px 0;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 15px;
 }
 
 .wpbnp-nav-item-row {
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
+    background: #fff;
+    border: 1px solid #ddd;
     border-radius: 6px;
-    margin-bottom: 10px;
     padding: 15px;
+    margin-bottom: 15px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.wpbnp-nav-item-row:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.wpbnp-nav-item-row:last-child {
+    margin-bottom: 0;
 }
 
 .wpbnp-drag-handle {
+    color: #999;
     cursor: move;
-    color: #666;
-    padding: 5px;
-    margin-top: 5px;
+    font-size: 16px;
+    flex-shrink: 0;
 }
 
-.wpbnp-item-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-left: auto;
-}
-
-.wpbnp-toggle-item {
-    padding: 4px 8px;
-    border: 1px solid #ddd;
-    background: #fff;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.wpbnp-toggle-item.enabled {
-    background: #46b450;
-    color: #fff;
-    border-color: #46b450;
-}
-
-.wpbnp-toggle-item.disabled {
-    background: #dc3232;
-    color: #fff;
-    border-color: #dc3232;
-}
-
-.wpbnp-remove-item {
-    padding: 4px 8px;
-    border: 1px solid #dc3232;
-    background: #dc3232;
-    color: #fff;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.wpbnp-drag-handle:hover {
+    color: #333;
 }
 
 .wpbnp-item-fields {
@@ -178,36 +152,87 @@
     gap: 15px;
 }
 
-.wpbnp-icon-picker {
+.wpbnp-item-controls {
+    flex-shrink: 0;
     display: flex;
+    flex-direction: column;
     gap: 8px;
 }
 
-.wpbnp-icon-picker input {
+.wpbnp-toggle-item {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wpbnp-toggle-item.enabled {
+    background: #22c55e;
+    color: white;
+}
+
+.wpbnp-toggle-item.disabled {
+    background: #ef4444;
+    color: white;
+}
+
+.wpbnp-remove-item {
+    padding: 6px 12px;
+    border: 1px solid #dc3545;
+    background: transparent;
+    color: #dc3545;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wpbnp-remove-item:hover {
+    background: #dc3545;
+    color: white;
+}
+
+/* Icon Picker */
+.wpbnp-icon-picker {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.wpbnp-icon-input {
     flex: 1;
 }
 
-/* Icon Picker Modal */
+.wpbnp-pick-icon {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* Modal Styles */
 .wpbnp-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100000;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 100000;
 }
 
 .wpbnp-modal-content {
-    background: #fff;
+    background: white;
     border-radius: 8px;
     width: 90%;
     max-width: 600px;
-    max-height: 80%;
+    max-height: 80vh;
     overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .wpbnp-modal-header {
@@ -216,39 +241,63 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: #f8f9fa;
 }
 
 .wpbnp-modal-header h3 {
     margin: 0;
+    font-size: 18px;
     color: #1d2327;
 }
 
 .wpbnp-modal-close {
     font-size: 24px;
-    cursor: pointer;
     color: #666;
-    line-height: 1;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease;
+}
+
+.wpbnp-modal-close:hover {
+    color: #333;
 }
 
 .wpbnp-modal-body {
     padding: 20px;
-    max-height: 400px;
+    max-height: 60vh;
     overflow-y: auto;
 }
 
+/* Icon Search */
+.wpbnp-icon-search {
+    margin-bottom: 20px;
+}
+
+.wpbnp-icon-search input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Icon Grid */
 .wpbnp-icon-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
 }
 
 .wpbnp-icon-option {
-    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 10px;
     border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    text-align: center;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-align: center;
 }
 
 .wpbnp-icon-option:hover {
@@ -259,22 +308,112 @@
 .wpbnp-icon-option.selected {
     border-color: #0073aa;
     background: #0073aa;
-    color: #fff;
+    color: white;
 }
 
 .wpbnp-icon-option .dashicons {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.wpbnp-icon-option .icon-name {
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+/* Preset Grid */
+.wpbnp-preset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.wpbnp-preset-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.wpbnp-preset-card:hover {
+    border-color: #0073aa;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.wpbnp-preset-card.active {
+    border-color: #0073aa;
+    background: #f0f8ff;
+}
+
+.wpbnp-preset-preview {
+    margin-bottom: 15px;
+}
+
+.wpbnp-preset-demo {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    border-radius: 4px;
+    margin: 0 auto 15px;
+    max-width: 200px;
+}
+
+.wpbnp-preset-demo span {
     font-size: 20px;
+}
+
+.wpbnp-preset-card h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: #1d2327;
+}
+
+.wpbnp-preset-card p {
+    margin: 0 0 15px 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.wpbnp-apply-preset {
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 4px;
 }
 
 /* Form Actions */
 .wpbnp-form-actions {
     background: #f8f9fa;
     border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 20px;
+    margin-top: 30px;
     display: flex;
-    gap: 10px;
+    gap: 15px;
     flex-wrap: wrap;
+}
+
+.wpbnp-form-actions .button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.wpbnp-form-actions .button-primary {
+    background: #0073aa;
+    border-color: #0073aa;
+}
+
+.wpbnp-form-actions .button-primary:hover {
+    background: #005a87;
+    border-color: #005a87;
 }
 
 /* Notifications */
@@ -282,96 +421,102 @@
     position: fixed;
     top: 32px;
     right: 20px;
-    z-index: 999999;
-    max-width: 300px;
+    z-index: 100001;
+    max-width: 400px;
 }
 
 .wpbnp-notification {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: white;
+    border-left: 4px solid #22c55e;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     border-radius: 4px;
-    padding: 12px 16px;
+    padding: 15px 20px;
     margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    position: relative;
-}
-
-.wpbnp-notification.success {
-    border-left: 4px solid #46b450;
-    background: #f7fff7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: wpbnp-notification-appear 0.3s ease;
 }
 
 .wpbnp-notification.error {
-    border-left: 4px solid #dc3232;
-    background: #fff7f7;
+    border-left-color: #ef4444;
 }
 
 .wpbnp-notification.warning {
-    border-left: 4px solid #ffb900;
-    background: #fffef7;
+    border-left-color: #f59e0b;
 }
 
-/* Presets */
-.wpbnp-preset-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    margin: 20px 0;
+.wpbnp-notification.info {
+    border-left-color: #3b82f6;
 }
 
-.wpbnp-preset-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+@keyframes wpbnp-notification-appear {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
-.wpbnp-preset-card:hover {
-    border-color: #0073aa;
-    box-shadow: 0 2px 8px rgba(0,115,170,0.1);
-}
-
-.wpbnp-preset-card h4 {
-    margin: 0 0 8px 0;
+.wpbnp-notification-message {
+    flex: 1;
+    font-size: 14px;
     color: #1d2327;
 }
 
-.wpbnp-preset-card p {
-    margin: 0 0 12px 0;
+.wpbnp-notification-close {
+    background: none;
+    border: none;
+    font-size: 18px;
     color: #666;
-    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 15px;
+    line-height: 1;
 }
 
-.wpbnp-preset-preview {
-    height: 30px;
-    border-radius: 4px;
-    margin-bottom: 10px;
+.wpbnp-notification-close:hover {
+    color: #333;
 }
 
-/* Device Settings */
-.wpbnp-device-section {
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
+/* Color Picker Overrides */
+.wp-picker-container {
+    position: relative;
+}
+
+.wp-picker-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Checkbox Styling */
+.wpbnp-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: normal;
+}
+
+.wpbnp-checkbox-label input[type="checkbox"] {
+    margin: 0;
+}
+
+/* Sort Placeholder */
+.wpbnp-sort-placeholder {
+    background: #f0f8ff;
+    border: 2px dashed #0073aa;
     border-radius: 6px;
-    padding: 15px;
+    height: 60px;
     margin-bottom: 15px;
 }
 
-.wpbnp-device-section h3 {
-    margin: 0 0 15px 0;
-    color: #1d2327;
-    font-size: 16px;
-}
-
-/* Loading States */
-.wpbnp-save-settings:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive Admin */
+@media (max-width: 1200px) {
     .wpbnp-admin-container {
         flex-direction: column;
     }
@@ -394,8 +539,18 @@
     .wpbnp-tab:last-child {
         border-right: none;
     }
+}
+
+@media (max-width: 768px) {
+    .wpbnp-admin-wrap {
+        padding: 15px;
+    }
     
     .wpbnp-field-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .wpbnp-item-fields {
         grid-template-columns: 1fr;
     }
     
@@ -406,7 +561,138 @@
     
     .wpbnp-item-controls {
         flex-direction: row;
-        margin-left: 0;
-        margin-top: 10px;
+        justify-content: center;
+    }
+    
+    .wpbnp-preset-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .wpbnp-form-actions {
+        flex-direction: column;
+    }
+    
+    .wpbnp-form-actions .button {
+        width: 100%;
+        text-align: center;
+    }
+    
+    #wpbnp-notifications {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* Loading States */
+.wpbnp-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.wpbnp-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #0073aa;
+    border-radius: 50%;
+    animation: wpbnp-spin 1s linear infinite;
+}
+
+@keyframes wpbnp-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Help Text */
+.wpbnp-help-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Toggle Switch */
+.wpbnp-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.wpbnp-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.wpbnp-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.wpbnp-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .wpbnp-toggle-slider {
+    background-color: #0073aa;
+}
+
+input:checked + .wpbnp-toggle-slider:before {
+    transform: translateX(26px);
+}
+
+/* Accessibility */
+.wpbnp-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus Styles */
+.wpbnp-tab:focus,
+.wpbnp-preset-card:focus,
+.wpbnp-icon-option:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+    .wpbnp-section,
+    .wpbnp-nav-item-row,
+    .wpbnp-preset-card {
+        border-width: 2px;
+    }
+    
+    .wpbnp-tab.active {
+        border: 2px solid #000;
     }
 }

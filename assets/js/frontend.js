@@ -7,19 +7,141 @@
 
     var WPBNP_Frontend = {
         
+        settings: {},
+        
         /**
          * Initialize frontend functionality
          */
         init: function() {
+            // Get settings from localized data
+            if (typeof wpbnp_frontend !== 'undefined' && wpbnp_frontend.settings) {
+                this.settings = wpbnp_frontend.settings;
+            }
+            
             this.bindEvents();
             this.updateBadges();
             this.addRippleEffect();
             this.handleKeyboardNavigation();
+            this.initializeAnimations();
             
             // Update badges periodically if WooCommerce is active
             if (typeof wc_cart_fragments_params !== 'undefined') {
                 setInterval(this.updateBadges.bind(this), 30000); // Every 30 seconds
             }
+            
+            // Add touch support improvements
+            this.enhanceTouchSupport();
+            
+            // Initialize visibility based on device settings
+            this.handleDeviceVisibility();
+        },
+        
+        /**
+         * Initialize animations based on settings
+         */
+        initializeAnimations: function() {
+            if (!this.settings.animations || !this.settings.animations.enabled) {
+                return;
+            }
+            
+            const animationType = this.settings.animations.type;
+            const duration = this.settings.animations.duration || 300;
+            
+            // Add animation classes to navigation items
+            $('.wpbnp-nav-item').each(function() {
+                $(this).addClass('wpbnp-animated').data('animation-type', animationType);
+            });
+            
+            // Apply animation-specific classes
+            this.applyAnimationClasses(animationType, duration);
+        },
+        
+        /**
+         * Apply animation-specific CSS classes
+         */
+        applyAnimationClasses: function(type, duration) {
+            const $nav = $('.wpbnp-bottom-nav');
+            const $items = $('.wpbnp-nav-item');
+            
+            // Remove existing animation classes
+            $nav.removeClass(function(index, className) {
+                return (className.match(/(^|\s)wpbnp-anim-\S+/g) || []).join(' ');
+            });
+            
+            // Add animation type class
+            $nav.addClass(`wpbnp-anim-${type}`);
+            
+            // Set animation duration
+            $items.css('transition-duration', duration + 'ms');
+        },
+        
+        /**
+         * Handle device-specific visibility
+         */
+        handleDeviceVisibility: function() {
+            if (!this.settings.devices) {
+                return;
+            }
+            
+            const updateVisibility = () => {
+                const windowWidth = $(window).width();
+                const devices = this.settings.devices;
+                let shouldShow = false;
+                
+                // Check mobile
+                if (windowWidth <= devices.mobile.breakpoint && devices.mobile.enabled) {
+                    shouldShow = true;
+                }
+                // Check tablet
+                else if (windowWidth <= devices.tablet.breakpoint && windowWidth > devices.mobile.breakpoint && devices.tablet.enabled) {
+                    shouldShow = true;
+                }
+                // Check desktop
+                else if (windowWidth > devices.tablet.breakpoint && devices.desktop.enabled) {
+                    shouldShow = true;
+                }
+                
+                $('.wpbnp-bottom-nav').toggle(shouldShow);
+            };
+            
+            // Check on load and resize
+            updateVisibility();
+            $(window).on('resize', updateVisibility);
+        },
+        
+        /**
+         * Enhanced touch support
+         */
+        enhanceTouchSupport: function() {
+            if (!('ontouchstart' in window)) {
+                return;
+            }
+            
+            let touchStartTime = 0;
+            
+            $('.wpbnp-nav-item').on('touchstart', function(e) {
+                touchStartTime = Date.now();
+                $(this).addClass('wpbnp-touching');
+                
+                // Prevent default touch behavior for better UX
+                e.preventDefault();
+            });
+            
+            $('.wpbnp-nav-item').on('touchend', function(e) {
+                const $item = $(this);
+                const touchDuration = Date.now() - touchStartTime;
+                
+                // Only trigger click if it was a quick touch (not a scroll)
+                if (touchDuration < 500) {
+                    setTimeout(() => {
+                        $item.click();
+                    }, 10);
+                }
+                
+                setTimeout(() => {
+                    $item.removeClass('wpbnp-touching');
+                }, 150);
+            });
         },
         
         /**
@@ -29,7 +151,7 @@
             var self = this;
             
             // Handle navigation item clicks
-            $('.wpbnp-nav-item').on('click', this.handleItemClick);
+            $('.wpbnp-nav-item').on('click', this.handleItemClick.bind(this));
             
             // Handle keyboard navigation
             $('.wpbnp-nav-item').on('keydown', this.handleKeyDown);
@@ -42,11 +164,12 @@
             // Handle active state based on current page
             this.setActiveItem();
             
-            // Add touch support for mobile devices
-            if ('ontouchstart' in window) {
-                $('.wpbnp-nav-item').on('touchstart', this.handleTouchStart);
-                $('.wpbnp-nav-item').on('touchend', this.handleTouchEnd);
-            }
+            // Handle orientation change for mobile devices
+            $(window).on('orientationchange', function() {
+                setTimeout(() => {
+                    self.handleDeviceVisibility();
+                }, 100);
+            });
         },
         
         /**
@@ -57,7 +180,7 @@
             var href = $item.attr('href');
             
             // Add click animation
-            WPBNP_Frontend.addClickAnimation($item);
+            this.addClickAnimation($item);
             
             // Handle special URLs
             if (href === '#' || href === '') {
@@ -69,8 +192,43 @@
             $('.wpbnp-nav-item').removeClass('active');
             $item.addClass('active');
             
+            // Add loading state for navigation
+            $item.addClass('wpbnp-loading');
+            
             // Trigger custom event for developers
             $(document).trigger('wpbnp_item_clicked', [$item, href]);
+            
+            // Handle external links
+            if (href.startsWith('http') && !href.includes(window.location.hostname)) {
+                window.open(href, '_blank');
+                e.preventDefault();
+                $item.removeClass('wpbnp-loading');
+            }
+        },
+        
+        /**
+         * Add click animation based on animation type
+         */
+        addClickAnimation: function($item) {
+            if (!this.settings.animations || !this.settings.animations.enabled) {
+                return;
+            }
+            
+            const animationType = this.settings.animations.type;
+            const duration = this.settings.animations.duration || 300;
+            
+            // Remove existing animation classes
+            $item.removeClass(function(index, className) {
+                return (className.match(/(^|\s)wpbnp-click-\S+/g) || []).join(' ');
+            });
+            
+            // Add click animation class
+            $item.addClass(`wpbnp-click-${animationType}`);
+            
+            // Remove animation class after duration
+            setTimeout(() => {
+                $item.removeClass(`wpbnp-click-${animationType}`);
+            }, duration);
         },
         
         /**
@@ -97,7 +255,7 @@
                 case 13: // Enter
                 case 32: // Space
                     e.preventDefault();
-                    $current.click();
+                    $current.trigger('click');
                     break;
                     
                 case 27: // Escape
@@ -107,28 +265,38 @@
         },
         
         /**
-         * Handle touch start for mobile
+         * Set active navigation item based on current page
          */
-        handleTouchStart: function(e) {
-            $(this).addClass('wpbnp-touching');
-        },
-        
-        /**
-         * Handle touch end for mobile
-         */
-        handleTouchEnd: function(e) {
-            var $item = $(this);
-            setTimeout(function() {
-                $item.removeClass('wpbnp-touching');
-            }, 150);
+        setActiveItem: function() {
+            const currentUrl = window.location.href;
+            const currentPath = window.location.pathname;
+            
+            $('.wpbnp-nav-item').each(function() {
+                const $item = $(this);
+                const href = $item.attr('href');
+                
+                if (href && href !== '#') {
+                    // Check for exact match or path match
+                    if (href === currentUrl || href === currentPath || 
+                        (currentPath === '/' && href === window.location.origin)) {
+                        $item.addClass('active');
+                    }
+                }
+            });
         },
         
         /**
          * Add ripple effect to navigation items
          */
         addRippleEffect: function() {
-            $('.wpbnp-nav-item').on('click', function(e) {
+            $('.wpbnp-nav-item').on('click touchstart', function(e) {
                 var $item = $(this);
+                
+                // Only add ripple if animations are enabled
+                if (!WPBNP_Frontend.settings.animations || !WPBNP_Frontend.settings.animations.enabled) {
+                    return;
+                }
+                
                 var $ripple = $('<span class="wpbnp-ripple"></span>');
                 
                 // Remove existing ripples
@@ -137,8 +305,15 @@
                 // Calculate ripple position
                 var rect = this.getBoundingClientRect();
                 var size = Math.max(rect.width, rect.height);
-                var x = e.clientX - rect.left - size / 2;
-                var y = e.clientY - rect.top - size / 2;
+                var x, y;
+                
+                if (e.type === 'touchstart' && e.originalEvent.touches) {
+                    x = e.originalEvent.touches[0].clientX - rect.left - size / 2;
+                    y = e.originalEvent.touches[0].clientY - rect.top - size / 2;
+                } else {
+                    x = e.clientX - rect.left - size / 2;
+                    y = e.clientY - rect.top - size / 2;
+                }
                 
                 // Set ripple styles
                 $ripple.css({
@@ -152,98 +327,69 @@
                 $item.append($ripple);
                 
                 // Remove ripple after animation
-                setTimeout(function() {
+                setTimeout(() => {
                     $ripple.remove();
                 }, 600);
             });
         },
         
         /**
-         * Add click animation
-         */
-        addClickAnimation: function($item) {
-            var settings = wpbnp_frontend.settings;
-            
-            if (!settings.animations || !settings.animations.enabled) {
-                return;
-            }
-            
-            var animationType = settings.animations.type;
-            var duration = settings.animations.duration || 300;
-            
-            $item.addClass('wpbnp-animating');
-            
-            switch (animationType) {
-                case 'bounce':
-                    $item.addClass('wpbnp-bounce-animation');
-                    break;
-                case 'zoom':
-                    $item.addClass('wpbnp-zoom-animation');
-                    break;
-                case 'pulse':
-                    $item.addClass('wpbnp-pulse-animation');
-                    break;
-            }
-            
-            setTimeout(function() {
-                $item.removeClass('wpbnp-animating wpbnp-bounce-animation wpbnp-zoom-animation wpbnp-pulse-animation');
-            }, duration);
-        },
-        
-        /**
          * Update notification badges
          */
         updateBadges: function() {
-            var self = this;
+            if (!this.settings.badges || !this.settings.badges.enabled) {
+                return;
+            }
             
             $('.wpbnp-nav-item').each(function() {
-                var $item = $(this);
-                var itemId = $item.data('item-id');
-                var $badge = $item.find('.wpbnp-badge');
+                const $item = $(this);
+                const itemId = $item.data('item-id');
                 
-                // Get badge count for specific items
-                var badgeCount = self.getBadgeCount(itemId);
-                
-                if (badgeCount > 0) {
-                    var displayCount = badgeCount > 99 ? '99+' : badgeCount.toString();
-                    
-                    if ($badge.length) {
-                        $badge.text(displayCount);
-                    } else {
-                        // Create new badge
-                        var $newBadge = $('<span class="wpbnp-badge" aria-label="' + badgeCount + ' notifications">' + displayCount + '</span>');
-                        $item.find('.wpbnp-nav-icon').append($newBadge);
-                    }
-                    
-                    $badge.show();
-                } else {
-                    $badge.hide();
+                if (itemId) {
+                    WPBNP_Frontend.getBadgeCount(itemId, function(count) {
+                        const $badge = $item.find('.wpbnp-badge');
+                        
+                        if (count > 0) {
+                            const displayCount = count > 99 ? '99+' : count;
+                            if ($badge.length) {
+                                $badge.text(displayCount);
+                            } else {
+                                // Create new badge
+                                const badgeHtml = `<span class="wpbnp-badge">${displayCount}</span>`;
+                                $item.find('.wpbnp-nav-icon').append(badgeHtml);
+                            }
+                            $badge.show();
+                        } else {
+                            $badge.hide();
+                        }
+                    });
                 }
             });
-            
-            // Trigger custom event for developers
-            $(document).trigger('wpbnp_badges_updated');
         },
         
         /**
          * Get badge count for specific item
          */
-        getBadgeCount: function(itemId) {
+        getBadgeCount: function(itemId, callback) {
+            // Handle built-in badge types
             switch (itemId) {
                 case 'cart':
                 case 'shop':
-                    return this.getWooCommerceCartCount();
-                    
-                case 'notifications':
-                    return this.getBuddyPressNotificationCount();
-                    
-                case 'messages':
-                    return this.getBuddyPressMessageCount();
+                    if (typeof wc_cart_fragments_params !== 'undefined' && window.wp && window.wp.hooks) {
+                        // Use WooCommerce hooks if available
+                        const count = this.getWooCommerceCartCount();
+                        callback(count);
+                    } else {
+                        // Fallback AJAX call
+                        this.fetchCartCount(callback);
+                    }
+                    break;
                     
                 default:
-                    // Allow custom badge counts via filter
-                    var customCount = $(document).triggerHandler('wpbnp_get_badge_count', [itemId]);
-                    return parseInt(customCount) || 0;
+                    // Allow custom badge counts via hooks
+                    const customCount = $(document).triggerHandler('wpbnp_get_badge_count', [itemId]);
+                    callback(customCount || 0);
+                    break;
             }
         },
         
@@ -251,184 +397,97 @@
          * Get WooCommerce cart count
          */
         getWooCommerceCartCount: function() {
-            var count = 0;
-            
-            // Try to get from cart fragments
-            if (typeof wc_cart_fragments_params !== 'undefined') {
-                var cartFragments = sessionStorage.getItem('wc_fragments');
+            try {
+                const cartFragments = sessionStorage.getItem('wc_fragments');
                 if (cartFragments) {
-                    try {
-                        var fragments = JSON.parse(cartFragments);
-                        var cartCountFragment = fragments['span.count'] || fragments['.cart-contents-count'];
-                        if (cartCountFragment) {
-                            var matches = cartCountFragment.match(/\d+/);
-                            count = matches ? parseInt(matches[0]) : 0;
-                        }
-                    } catch (e) {
-                        console.warn('Error parsing cart fragments:', e);
+                    const fragments = JSON.parse(cartFragments);
+                    const cartCountElement = fragments['span.woocommerce-cart-contents-count'];
+                    if (cartCountElement) {
+                        const count = parseInt($(cartCountElement).text()) || 0;
+                        return count;
                     }
                 }
+            } catch (e) {
+                console.warn('Error getting cart count from fragments:', e);
             }
-            
-            // Fallback: check cart count elements in DOM
-            if (count === 0) {
-                var $cartCount = $('.cart-contents-count, .cart-count, .woocommerce-cart-count');
-                if ($cartCount.length) {
-                    count = parseInt($cartCount.first().text()) || 0;
-                }
-            }
-            
-            return count;
+            return 0;
         },
         
         /**
-         * Get BuddyPress notification count
+         * Fetch cart count via AJAX
          */
-        getBuddyPressNotificationCount: function() {
-            var count = 0;
-            var $notificationCount = $('#bp-notifications-count, .bp-notification-count');
-            
-            if ($notificationCount.length) {
-                count = parseInt($notificationCount.text()) || 0;
+        fetchCartCount: function(callback) {
+            if (typeof wpbnp_frontend === 'undefined') {
+                callback(0);
+                return;
             }
             
-            return count;
-        },
-        
-        /**
-         * Get BuddyPress message count
-         */
-        getBuddyPressMessageCount: function() {
-            var count = 0;
-            var $messageCount = $('#bp-messages-count, .bp-message-count');
-            
-            if ($messageCount.length) {
-                count = parseInt($messageCount.text()) || 0;
-            }
-            
-            return count;
-        },
-        
-        /**
-         * Set active navigation item based on current page
-         */
-        setActiveItem: function() {
-            var currentUrl = window.location.href;
-            var currentPath = window.location.pathname;
-            
-            $('.wpbnp-nav-item').each(function() {
-                var $item = $(this);
-                var itemUrl = $item.attr('href');
-                
-                if (!itemUrl || itemUrl === '#') {
-                    return;
-                }
-                
-                // Exact URL match
-                if (itemUrl === currentUrl) {
-                    $item.addClass('active');
-                    return;
-                }
-                
-                // Path match
-                if (itemUrl === currentPath) {
-                    $item.addClass('active');
-                    return;
-                }
-                
-                // Home page special case
-                if (itemUrl === wpbnp_frontend.home_url && (currentPath === '/' || currentUrl === wpbnp_frontend.home_url)) {
-                    $item.addClass('active');
-                    return;
-                }
-                
-                // Partial match for parent pages
-                if (currentPath.indexOf(itemUrl) === 0 && itemUrl.length > 1) {
-                    $item.addClass('active');
+            $.ajax({
+                url: wpbnp_frontend.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_get_cart_count',
+                    nonce: wpbnp_frontend.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        callback(parseInt(response.data) || 0);
+                    } else {
+                        callback(0);
+                    }
+                },
+                error: function() {
+                    callback(0);
                 }
             });
         },
         
         /**
-         * Handle keyboard navigation for accessibility
+         * Handle scroll behavior (optional)
          */
-        handleKeyboardNavigation: function() {
-            // Add tab index to navigation items
-            $('.wpbnp-nav-item').attr('tabindex', '0');
+        handleScrollBehavior: function() {
+            if (!this.settings.advanced || !this.settings.advanced.hide_on_scroll) {
+                return;
+            }
             
-            // Handle focus management
-            $('.wpbnp-nav-item').on('focus', function() {
-                $(this).addClass('wpbnp-focused');
-            }).on('blur', function() {
-                $(this).removeClass('wpbnp-focused');
-            });
-        },
-        
-        /**
-         * Handle device orientation change
-         */
-        handleOrientationChange: function() {
-            // Recalculate positioning if needed
-            setTimeout(function() {
-                $(window).trigger('resize');
-            }, 100);
-        },
-        
-        /**
-         * Initialize smooth scrolling for anchor links
-         */
-        initSmoothScrolling: function() {
-            $('.wpbnp-nav-item[href^="#"]').on('click', function(e) {
-                var target = $(this.getAttribute('href'));
+            let lastScrollTop = 0;
+            let scrollTimeout;
+            
+            $(window).on('scroll', function() {
+                const scrollTop = $(this).scrollTop();
+                const $nav = $('.wpbnp-bottom-nav');
                 
-                if (target.length) {
-                    e.preventDefault();
-                    $('html, body').animate({
-                        scrollTop: target.offset().top - 100
-                    }, 500);
+                clearTimeout(scrollTimeout);
+                
+                if (scrollTop > lastScrollTop && scrollTop > 100) {
+                    // Scrolling down
+                    $nav.addClass('wpbnp-hidden');
+                } else {
+                    // Scrolling up
+                    $nav.removeClass('wpbnp-hidden');
                 }
-            });
-        },
-        
-        /**
-         * Add support for swipe gestures on mobile
-         */
-        addSwipeSupport: function() {
-            var startX, startY, endX, endY;
-            var $nav = $('.wpbnp-bottom-nav');
-            
-            $nav.on('touchstart', function(e) {
-                startX = e.originalEvent.touches[0].clientX;
-                startY = e.originalEvent.touches[0].clientY;
-            });
-            
-            $nav.on('touchend', function(e) {
-                endX = e.originalEvent.changedTouches[0].clientX;
-                endY = e.originalEvent.changedTouches[0].clientY;
                 
-                var deltaX = Math.abs(endX - startX);
-                var deltaY = Math.abs(endY - startY);
+                // Show navigation after scroll stops
+                scrollTimeout = setTimeout(() => {
+                    $nav.removeClass('wpbnp-hidden');
+                }, 1000);
                 
-                // Horizontal swipe
-                if (deltaX > 50 && deltaY < 30) {
-                    var direction = endX > startX ? 'right' : 'left';
-                    $(document).trigger('wpbnp_swipe', [direction]);
-                }
+                lastScrollTop = scrollTop;
             });
         }
     };
     
-    // Initialize when document is ready
+    // Initialize when DOM is ready
     $(document).ready(function() {
         WPBNP_Frontend.init();
     });
     
-    // Handle orientation change
-    $(window).on('orientationchange', function() {
-        WPBNP_Frontend.handleOrientationChange();
+    // Also initialize on window load for better compatibility
+    $(window).on('load', function() {
+        WPBNP_Frontend.updateBadges();
     });
     
-    // Expose to global scope for developers
+    // Make it globally available
     window.WPBNP_Frontend = WPBNP_Frontend;
     
 })(jQuery);
