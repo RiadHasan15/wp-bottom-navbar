@@ -1,0 +1,491 @@
+/* WP Bottom Navigation Pro - Frontend Styles */
+
+/* Base Navigation Styles */
+.wpbnp-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    height: 60px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+/* Navigation Items */
+.wpbnp-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #333333;
+    font-size: 12px;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    position: relative;
+    flex: 1;
+    max-width: 80px;
+    min-height: 40px;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.wpbnp-nav-item:hover,
+.wpbnp-nav-item:focus {
+    color: #0073aa;
+    text-decoration: none;
+    outline: none;
+}
+
+.wpbnp-nav-item.active {
+    color: #0073aa;
+}
+
+.wpbnp-nav-item:focus {
+    box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.5);
+}
+
+/* Icon Styles */
+.wpbnp-nav-icon {
+    font-size: 20px;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    position: relative;
+}
+
+.wpbnp-nav-icon .dashicons {
+    font-size: inherit;
+    width: auto;
+    height: auto;
+}
+
+.wpbnp-custom-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.wpbnp-custom-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+/* Label Styles */
+.wpbnp-nav-label {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-top: 2px;
+}
+
+/* Badge Styles */
+.wpbnp-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ff4444;
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    z-index: 1;
+}
+
+/* Animation Classes */
+.wpbnp-nav-item {
+    transition: all 0.3s ease;
+}
+
+/* Bounce Animation */
+@keyframes wpbnp-bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.wpbnp-animation-bounce .wpbnp-nav-item:hover .wpbnp-nav-icon {
+    animation: wpbnp-bounce 0.6s ease;
+}
+
+/* Zoom Animation */
+.wpbnp-animation-zoom .wpbnp-nav-item:hover .wpbnp-nav-icon {
+    transform: scale(1.2);
+}
+
+/* Pulse Animation */
+@keyframes wpbnp-pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.wpbnp-animation-pulse .wpbnp-nav-item:hover .wpbnp-nav-icon {
+    animation: wpbnp-pulse 1s infinite;
+}
+
+/* Ripple Effect */
+.wpbnp-nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.wpbnp-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0, 115, 170, 0.3);
+    transform: scale(0);
+    animation: wpbnp-ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes wpbnp-ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Preset Styles */
+
+/* Minimal Preset */
+.wpbnp-preset-minimal {
+    background-color: #ffffff;
+    border-top-color: #e0e0e0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wpbnp-preset-minimal .wpbnp-nav-item {
+    color: #333333;
+}
+
+.wpbnp-preset-minimal .wpbnp-nav-item:hover,
+.wpbnp-preset-minimal .wpbnp-nav-item.active {
+    color: #0073aa;
+}
+
+/* Dark Mode Preset */
+.wpbnp-preset-dark {
+    background-color: #1a1a1a;
+    border-top-color: #333333;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.wpbnp-preset-dark .wpbnp-nav-item {
+    color: #ffffff;
+}
+
+.wpbnp-preset-dark .wpbnp-nav-item:hover,
+.wpbnp-preset-dark .wpbnp-nav-item.active {
+    color: #4a9eff;
+}
+
+/* Material Design Preset */
+.wpbnp-preset-material {
+    background-color: #f5f5f5;
+    border-top-color: #e0e0e0;
+    height: 56px;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.wpbnp-preset-material .wpbnp-nav-item {
+    color: #424242;
+}
+
+.wpbnp-preset-material .wpbnp-nav-item:hover,
+.wpbnp-preset-material .wpbnp-nav-item.active {
+    color: #2196f3;
+}
+
+/* iOS Style Preset */
+.wpbnp-preset-ios {
+    background-color: #f8f8f8;
+    border-top-color: #c6c6c8;
+    height: 83px;
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
+    padding-bottom: 20px; /* Safe area for iPhone X+ */
+}
+
+.wpbnp-preset-ios .wpbnp-nav-item {
+    color: #8e8e93;
+}
+
+.wpbnp-preset-ios .wpbnp-nav-item:hover,
+.wpbnp-preset-ios .wpbnp-nav-item.active {
+    color: #007aff;
+}
+
+/* Glassmorphism Preset */
+.wpbnp-preset-glassmorphism {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.wpbnp-preset-glassmorphism .wpbnp-nav-item {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.wpbnp-preset-glassmorphism .wpbnp-nav-item:hover,
+.wpbnp-preset-glassmorphism .wpbnp-nav-item.active {
+    color: #0073aa;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+}
+
+/* Neumorphism Preset */
+.wpbnp-preset-neumorphism {
+    background: #e0e5ec;
+    border-top: none;
+    box-shadow: inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff;
+}
+
+.wpbnp-preset-neumorphism .wpbnp-nav-item {
+    color: #4a5568;
+    border-radius: 12px;
+    margin: 0 4px;
+}
+
+.wpbnp-preset-neumorphism .wpbnp-nav-item:hover,
+.wpbnp-preset-neumorphism .wpbnp-nav-item.active {
+    color: #0073aa;
+    box-shadow: 3px 3px 6px #a3b1c6, -3px -3px 6px #ffffff;
+}
+
+/* Flat Design Preset */
+.wpbnp-preset-flat {
+    background-color: #3498db;
+    border-top: none;
+    box-shadow: none;
+}
+
+.wpbnp-preset-flat .wpbnp-nav-item {
+    color: #ffffff;
+}
+
+.wpbnp-preset-flat .wpbnp-nav-item:hover,
+.wpbnp-preset-flat .wpbnp-nav-item.active {
+    color: #ecf0f1;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Floating Pills Preset */
+.wpbnp-preset-floating-pills {
+    background: transparent;
+    border-top: none;
+    box-shadow: none;
+    padding: 10px 20px;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+}
+
+.wpbnp-preset-floating-pills .wpbnp-nav-item {
+    color: #333333;
+    background: transparent;
+    border-radius: 20px;
+    padding: 8px 12px;
+    margin: 0 2px;
+}
+
+.wpbnp-preset-floating-pills .wpbnp-nav-item:hover,
+.wpbnp-preset-floating-pills .wpbnp-nav-item.active {
+    color: #ffffff;
+    background: #0073aa;
+}
+
+/* Gradient Flow Preset */
+.wpbnp-preset-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-top: none;
+    box-shadow: 0 -4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.wpbnp-preset-gradient .wpbnp-nav-item {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.wpbnp-preset-gradient .wpbnp-nav-item:hover,
+.wpbnp-preset-gradient .wpbnp-nav-item.active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+/* Frosted Blur Preset */
+.wpbnp-preset-frosted {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.wpbnp-preset-frosted .wpbnp-nav-item {
+    color: #333333;
+}
+
+.wpbnp-preset-frosted .wpbnp-nav-item:hover,
+.wpbnp-preset-frosted .wpbnp-nav-item.active {
+    color: #0073aa;
+    background: rgba(0, 115, 170, 0.1);
+    border-radius: 8px;
+}
+
+/* Device Specific Styles */
+@media (max-width: 768px) {
+    .wpbnp-bottom-nav {
+        height: 60px;
+        padding: 8px;
+    }
+    
+    .wpbnp-nav-item {
+        max-width: none;
+        flex: 1;
+    }
+    
+    .wpbnp-nav-label {
+        font-size: 11px;
+    }
+    
+    .wpbnp-nav-icon {
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .wpbnp-bottom-nav {
+        height: 65px;
+        padding: 12px;
+    }
+    
+    .wpbnp-nav-item {
+        max-width: 100px;
+    }
+}
+
+@media (min-width: 1025px) {
+    .wpbnp-bottom-nav {
+        height: 70px;
+        padding: 15px;
+    }
+    
+    .wpbnp-nav-item {
+        max-width: 120px;
+    }
+    
+    .wpbnp-nav-label {
+        font-size: 13px;
+    }
+    
+    .wpbnp-nav-icon {
+        font-size: 22px;
+    }
+}
+
+/* Accessibility */
+.wpbnp-nav-item:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wpbnp-nav-item,
+    .wpbnp-nav-icon {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .wpbnp-bottom-nav {
+        border-top: 2px solid #000;
+    }
+    
+    .wpbnp-nav-item {
+        border: 1px solid transparent;
+    }
+    
+    .wpbnp-nav-item:hover,
+    .wpbnp-nav-item:focus,
+    .wpbnp-nav-item.active {
+        border-color: #000;
+        background: #fff;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .wpbnp-bottom-nav {
+        display: none !important;
+    }
+}
+
+/* RTL Support */
+.rtl .wpbnp-badge {
+    right: auto;
+    left: -5px;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .wpbnp-bottom-nav:not([class*="wpbnp-preset-"]) {
+        background-color: #1a1a1a;
+        border-top-color: #333333;
+        color: #ffffff;
+    }
+    
+    .wpbnp-bottom-nav:not([class*="wpbnp-preset-"]) .wpbnp-nav-item {
+        color: #ffffff;
+    }
+    
+    .wpbnp-bottom-nav:not([class*="wpbnp-preset-"]) .wpbnp-nav-item:hover,
+    .wpbnp-bottom-nav:not([class*="wpbnp-preset-"]) .wpbnp-nav-item.active {
+        color: #4a9eff;
+    }
+}

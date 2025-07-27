@@ -1,0 +1,245 @@
+✅ WordPress Plugin – WP Bottom Navigation Pro
+
+
+---
+
+📝 Objective:
+
+Build a WordPress plugin named "WP Bottom Navigation Pro" that provides a fully customizable, mobile-first bottom navigation bar, with visual design presets, notification badges, animations, role/device-based display rules, and a full-featured admin panel.
+
+
+---
+
+📁 Project Requirements:
+
+1. Plugin Setup
+
+Create a folder named: wp-bottom-navigation-pro
+
+Main plugin file: wp-bottom-navigation-pro.php
+
+Add plugin headers and required WordPress hooks (init, admin_menu, enqueue_scripts, etc.)
+
+Follow WordPress coding standards throughout.
+
+
+
+---
+
+🎨 2. Design Presets (10 Total)
+
+Include these built-in visual style presets (with preview thumbnails):
+
+1. Glassmorphism
+
+
+2. Neumorphism (Soft UI)
+
+
+3. Minimal
+
+
+4. Material Design
+
+
+5. Flat Design
+
+
+6. Dark Mode
+
+
+7. Frosted Blur
+
+
+8. Gradient Flow
+
+
+9. Floating Pills
+
+
+10. iOS Style
+
+
+
+➡️ Allow users to choose a preset or save their own custom presets.
+
+
+---
+
+⚙️ 3. Core Features
+
+✅ Navigation Builder
+
+Drag-and-drop interface to manage up to 7 navigation items
+
+Each item should support:
+
+Icon (Dashicons, FontAwesome, or custom SVG/PNG upload)
+
+Optional label
+
+Custom link or predefined action (e.g., Home, Cart, Account)
+
+Role-based visibility (e.g., show only to admins or guests)
+
+
+
+
+---
+
+✅ Per-Device Navigation
+
+Allow separate nav bar configurations for:
+
+Mobile
+
+Tablet
+
+Desktop
+
+
+
+Each device can have its own style and items.
+
+
+---
+
+✅ Notification Badges
+
+Show live badge counts for:
+
+WooCommerce cart
+
+BuddyPress notifications/messages
+
+Custom logic via apply_filters or add_filter hooks
+
+
+
+
+---
+
+✅ Shortcode Support
+
+Create [wp_bottom_nav] shortcode
+
+Enables manual insertion in pages, templates, or builders
+
+
+
+---
+
+🖥️ 4. Admin Panel
+
+Create a full-featured admin panel under Appearance > Bottom Navigation:
+
+Tabs:
+
+Items
+
+Devices
+
+Styles
+
+Animations
+
+Badges
+
+Display Rules
+
+Presets
+
+Advanced
+
+
+Features:
+
+Live preview panel with device toggle (Mobile/Tablet/Desktop)
+
+Visual Preset Manager (select/browse templates)
+
+Icon Picker (search + upload custom icons)
+
+Google Fonts integration for labels
+
+Customize:
+
+Font size, weight, spacing
+
+Padding/margin between elements
+
+Icon/label spacing
+
+
+Animation options:
+
+Bounce, Zoom, Ripple, Pulse, None
+
+
+Toggle label visibility (icon-only mode)
+
+Export/Import settings (JSON)
+
+Quick Reset button to restore defaults
+
+
+
+---
+
+🎨 5. Theme Compatibility
+
+Works out of the box with popular themes:
+
+Astra, OceanWP, Hello Elementor, etc.
+
+
+Compatible with page builders:
+
+Elementor, Divi, Bricks
+
+
+Add fallback logic for themes that don’t include wp_footer()
+
+
+
+---
+
+✅ 6. Technical Standards
+
+Fully responsive & mobile-first
+
+Clean code with sanitization and escaping
+
+Use wp_enqueue_script, wp_enqueue_style properly
+
+Add do_action() and apply_filters() for developer extensibility
+
+Accessible: support ARIA roles, tab navigation
+
+
+
+---
+
+📦 Final Output
+
+A fully working, installable WordPress plugin:
+wp-bottom-navigation-pro.zip
+
+
+Organized structure:
+
+wp-bottom-navigation-pro/
+├── wp-bottom-navigation-pro.php
+├── assets/
+│   ├── css/
+│   └── js/
+├── admin/
+│   └── settings-ui.php
+├── includes/
+│   └── functions.php
+├── presets/
+│   └── default-presets.json
+└── languages/
+
+
+---

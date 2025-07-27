@@ -1,0 +1,187 @@
+{
+    "minimal": {
+        "name": "Minimal",
+        "description": "Clean and simple design",
+        "style": {
+            "background_color": "#ffffff",
+            "text_color": "#333333",
+            "active_color": "#0073aa",
+            "border_color": "#e0e0e0",
+            "height": 60,
+            "border_radius": 0,
+            "box_shadow": "0 -2px 8px rgba(0,0,0,0.1)"
+        },
+        "animations": {
+            "enabled": false,
+            "type": "none",
+            "duration": 300
+        }
+    },
+    "dark": {
+        "name": "Dark Mode",
+        "description": "Dark theme for better night viewing",
+        "style": {
+            "background_color": "#1a1a1a",
+            "text_color": "#ffffff",
+            "active_color": "#4a9eff",
+            "border_color": "#333333",
+            "height": 60,
+            "border_radius": 0,
+            "box_shadow": "0 -2px 8px rgba(0,0,0,0.3)"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "pulse",
+            "duration": 400
+        }
+    },
+    "material": {
+        "name": "Material Design",
+        "description": "Google Material Design inspired",
+        "style": {
+            "background_color": "#f5f5f5",
+            "text_color": "#424242",
+            "active_color": "#2196f3",
+            "border_color": "#e0e0e0",
+            "height": 56,
+            "border_radius": 0,
+            "box_shadow": "0 -4px 8px rgba(0,0,0,0.12)"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "ripple",
+            "duration": 300
+        }
+    },
+    "ios": {
+        "name": "iOS Style",
+        "description": "Apple iOS inspired design",
+        "style": {
+            "background_color": "#f8f8f8",
+            "text_color": "#8e8e93",
+            "active_color": "#007aff",
+            "border_color": "#c6c6c8",
+            "height": 83,
+            "border_radius": 0,
+            "box_shadow": "0 -1px 0 rgba(0,0,0,0.1)"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "bounce",
+            "duration": 500
+        }
+    },
+    "glassmorphism": {
+        "name": "Glassmorphism",
+        "description": "Modern glass effect with blur and transparency",
+        "style": {
+            "background_color": "rgba(255,255,255,0.25)",
+            "text_color": "#2c3e50",
+            "active_color": "#3498db",
+            "border_color": "rgba(255,255,255,0.18)",
+            "height": 70,
+            "border_radius": 20,
+            "box_shadow": "0 -8px 32px rgba(31,38,135,0.37)"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "fade",
+            "duration": 400
+        },
+        "backdrop_filter": "blur(8px)",
+        "border": "1px solid rgba(255,255,255,0.18)"
+    },
+    "neumorphism": {
+        "name": "Neumorphism",
+        "description": "Soft UI with subtle shadows and highlights",
+        "style": {
+            "background_color": "#e0e5ec",
+            "text_color": "#9baacf",
+            "active_color": "#5a67d8",
+            "border_color": "transparent",
+            "height": 75,
+            "border_radius": 25,
+            "box_shadow": "9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "slide",
+            "duration": 350
+        }
+    },
+    "cyberpunk": {
+        "name": "Cyberpunk",
+        "description": "Futuristic neon-styled interface",
+        "style": {
+            "background_color": "#0d1421",
+            "text_color": "#00ff41",
+            "active_color": "#ff0080",
+            "border_color": "#00ff41",
+            "height": 65,
+            "border_radius": 5,
+            "box_shadow": "0 -4px 20px rgba(0,255,65,0.3), inset 0 1px 0 rgba(0,255,65,0.5)"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "heartbeat",
+            "duration": 600
+        },
+        "text_shadow": "0 0 10px #00ff41"
+    },
+    "vintage": {
+        "name": "Vintage",
+        "description": "Retro design with warm earth tones",
+        "style": {
+            "background_color": "#d4a574",
+            "text_color": "#8b4513",
+            "active_color": "#cd853f",
+            "border_color": "#deb887",
+            "height": 68,
+            "border_radius": 15,
+            "box_shadow": "0 -3px 10px rgba(139,69,19,0.3)"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "swing",
+            "duration": 450
+        }
+    },
+    "gradient": {
+        "name": "Gradient",
+        "description": "Vibrant gradient backgrounds with smooth transitions",
+        "style": {
+            "background_color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            "text_color": "#ffffff",
+            "active_color": "#ffd700",
+            "border_color": "transparent",
+            "height": 72,
+            "border_radius": 20,
+            "box_shadow": "0 -5px 25px rgba(102,126,234,0.4)"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "rotate",
+            "duration": 400
+        }
+    },
+    "floating": {
+        "name": "Floating",
+        "description": "Elevated floating bar with rounded corners",
+        "style": {
+            "background_color": "#ffffff",
+            "text_color": "#666666",
+            "active_color": "#ff6b6b",
+            "border_color": "transparent",
+            "height": 55,
+            "border_radius": 30,
+            "box_shadow": "0 -10px 30px rgba(0,0,0,0.15)",
+            "margin": "0 20px 20px 20px"
+        },
+        "animations": {
+            "enabled": true,
+            "type": "shake",
+            "duration": 250
+        },
+        "position": "floating"
+    }
+}
