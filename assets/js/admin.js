@@ -13,12 +13,124 @@ jQuery(document).ready(function($) {
         presets: wpbnp_admin.presets || {},
         dashicons: wpbnp_admin.dashicons || {},
         nonce: wpbnp_admin.nonce || '',
+        currentTab: 'items',
         
         init: function() {
+            this.currentTab = this.getCurrentTab();
             this.initializeItems();
             this.bindEvents();
             this.initializeColorPickers();
             this.setupSortable();
+            this.loadFormData();
+        },
+        
+        // Get current tab from URL or default
+        getCurrentTab: function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('tab') || 'items';
+        },
+        
+        // Load form data from settings
+        loadFormData: function() {
+            this.populateFormFields();
+        },
+        
+        // Populate form fields with current settings
+        populateFormFields: function() {
+            const settings = this.settings;
+            
+            // Populate enabled checkbox
+            $('input[name="settings[enabled]"]').prop('checked', settings.enabled);
+            
+            // Populate style fields
+            if (settings.style) {
+                Object.keys(settings.style).forEach(key => {
+                    const input = $(`input[name="settings[style][${key}]"], select[name="settings[style][${key}]"], textarea[name="settings[style][${key}]"]`);
+                    if (input.length) {
+                        input.val(settings.style[key]);
+                        if (input.hasClass('wpbnp-color-picker')) {
+                            input.wpColorPicker('color', settings.style[key]);
+                        }
+                    }
+                });
+            }
+            
+            // Populate animation fields
+            if (settings.animations) {
+                Object.keys(settings.animations).forEach(key => {
+                    const input = $(`input[name="settings[animations][${key}]"], select[name="settings[animations][${key}]"]`);
+                    if (input.length) {
+                        if (input.attr('type') === 'checkbox') {
+                            input.prop('checked', settings.animations[key]);
+                        } else {
+                            input.val(settings.animations[key]);
+                        }
+                    }
+                });
+            }
+            
+            // Populate device fields
+            if (settings.devices) {
+                Object.keys(settings.devices).forEach(device => {
+                    Object.keys(settings.devices[device]).forEach(key => {
+                        const input = $(`input[name="settings[devices][${device}][${key}]"]`);
+                        if (input.length) {
+                            if (input.attr('type') === 'checkbox') {
+                                input.prop('checked', settings.devices[device][key]);
+                            } else {
+                                input.val(settings.devices[device][key]);
+                            }
+                        }
+                    });
+                });
+            }
+            
+            // Populate display rules
+            if (settings.display_rules) {
+                Object.keys(settings.display_rules).forEach(key => {
+                    if (key === 'user_roles' && Array.isArray(settings.display_rules[key])) {
+                        settings.display_rules[key].forEach(role => {
+                            $(`input[name="settings[display_rules][user_roles][]"][value="${role}"]`).prop('checked', true);
+                        });
+                    } else {
+                        const input = $(`input[name="settings[display_rules][${key}]"]`);
+                        if (input.length) {
+                            if (input.attr('type') === 'checkbox') {
+                                input.prop('checked', settings.display_rules[key]);
+                            } else {
+                                input.val(settings.display_rules[key]);
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Populate badge fields
+            if (settings.badges) {
+                Object.keys(settings.badges).forEach(key => {
+                    const input = $(`input[name="settings[badges][${key}]"], select[name="settings[badges][${key}]"]`);
+                    if (input.length) {
+                        if (input.attr('type') === 'checkbox') {
+                            input.prop('checked', settings.badges[key]);
+                        } else {
+                            input.val(settings.badges[key]);
+                            if (input.hasClass('wpbnp-color-picker')) {
+                                input.wpColorPicker('color', settings.badges[key]);
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Populate advanced fields
+            if (settings.advanced) {
+                Object.keys(settings.advanced).forEach(key => {
+                    const input = $(`input[name="settings[advanced][${key}]"], select[name="settings[advanced][${key}]"], textarea[name="settings[advanced][${key}]"]`);
+                    if (input.length) {
+                        input.val(settings.advanced[key]);
+                    }
+                });
+            }
         },
         
         // Initialize navigation items
@@ -114,9 +226,75 @@ jQuery(document).ready(function($) {
             // Update items data when inputs change
             $(document).on('input change', '.wpbnp-nav-item-row input', this.updateItemsData.bind(this));
             
-            // Export/Import settings
-            $(document).on('click', '#wpbnp-export-settings', this.exportSettings.bind(this));
-            $(document).on('click', '#wpbnp-import-settings', this.importSettings.bind(this));
+            // Export/Import/Reset settings
+            $(document).on('click', '.wpbnp-export-settings', this.exportSettings.bind(this));
+            $(document).on('click', '.wpbnp-import-settings', this.importSettings.bind(this));
+            $(document).on('click', '.wpbnp-reset-settings', this.resetSettings.bind(this));
+            
+            // Handle tab switching with state preservation
+            $(document).on('click', '.wpbnp-tab', this.handleTabSwitch.bind(this));
+        },
+        
+        // Handle tab switching while preserving form state
+        handleTabSwitch: function(e) {
+            // Let the default navigation happen, but preserve current form state
+            this.saveFormState();
+        },
+        
+        // Save current form state to localStorage
+        saveFormState: function() {
+            const formData = this.getFormData();
+            localStorage.setItem('wpbnp_form_state', JSON.stringify(formData));
+        },
+        
+        // Get form data
+        getFormData: function() {
+            const formData = {};
+            const form = $('#wpbnp-settings-form');
+            
+            // Get all form inputs
+            form.find('input, select, textarea').each(function() {
+                const $input = $(this);
+                const name = $input.attr('name');
+                if (name) {
+                    if ($input.attr('type') === 'checkbox') {
+                        formData[name] = $input.is(':checked');
+                    } else if ($input.attr('type') === 'radio') {
+                        if ($input.is(':checked')) {
+                            formData[name] = $input.val();
+                        }
+                    } else {
+                        formData[name] = $input.val();
+                    }
+                }
+            });
+            
+            return formData;
+        },
+        
+        // Restore form state from localStorage
+        restoreFormState: function() {
+            const savedState = localStorage.getItem('wpbnp_form_state');
+            if (savedState) {
+                try {
+                    const formData = JSON.parse(savedState);
+                    Object.keys(formData).forEach(name => {
+                        const $input = $(`[name="${name}"]`);
+                        if ($input.length) {
+                            if ($input.attr('type') === 'checkbox') {
+                                $input.prop('checked', formData[name]);
+                            } else {
+                                $input.val(formData[name]);
+                                if ($input.hasClass('wpbnp-color-picker')) {
+                                    $input.wpColorPicker('color', formData[name]);
+                                }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error restoring form state:', e);
+                }
+            }
         },
         
         // Handle form submission
@@ -129,27 +307,77 @@ jQuery(document).ready(function($) {
             
             // Disable submit button
             const submitBtn = $('.wpbnp-save-settings');
-            submitBtn.prop('disabled', true).text('Saving...');
+            const originalText = submitBtn.text();
+            submitBtn.prop('disabled', true).text(wpbnp_admin.strings.saving || 'Saving...');
             
             $.ajax({
-                url: ajaxurl,
+                url: wpbnp_admin.ajax_url,
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: (response) => {
                     if (response.success) {
-                        this.showNotification('Settings saved successfully!', 'success');
-                        this.settings = response.data.settings;
+                        this.showNotification(wpbnp_admin.strings.saved || 'Settings saved successfully!', 'success');
+                        // Update local settings
+                        if (response.data && response.data.settings) {
+                            this.settings = response.data.settings;
+                        }
+                        // Clear saved form state
+                        localStorage.removeItem('wpbnp_form_state');
                     } else {
-                        this.showNotification(response.data || 'Error saving settings', 'error');
+                        this.showNotification(response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings', 'error');
                     }
                 },
                 error: () => {
                     this.showNotification('Ajax error occurred', 'error');
                 },
                 complete: () => {
-                    submitBtn.prop('disabled', false).text('Save Settings');
+                    submitBtn.prop('disabled', false).text(originalText);
+                }
+            });
+        },
+        
+        // Reset settings
+        resetSettings: function(e) {
+            e.preventDefault();
+            
+            if (!confirm(wpbnp_admin.strings.confirm_reset || 'Are you sure you want to reset all settings to defaults?')) {
+                return;
+            }
+            
+            const button = $(e.target);
+            const originalText = button.text();
+            button.prop('disabled', true).text('Resetting...');
+            
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_reset_settings',
+                    nonce: this.nonce
+                },
+                success: (response) => {
+                    if (response.success) {
+                        this.showNotification('Settings reset to defaults!', 'success');
+                        // Update settings and reload page to reflect changes
+                        if (response.data && response.data.settings) {
+                            this.settings = response.data.settings;
+                        }
+                        // Clear saved form state and reload page
+                        localStorage.removeItem('wpbnp_form_state');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        this.showNotification(response.data ? response.data.message : 'Error resetting settings', 'error');
+                    }
+                },
+                error: () => {
+                    this.showNotification('Ajax error occurred', 'error');
+                },
+                complete: () => {
+                    button.prop('disabled', false).text(originalText);
                 }
             });
         },
@@ -210,6 +438,7 @@ jQuery(document).ready(function($) {
                 iconsHtml += `
                     <div class="wpbnp-icon-option" data-icon="${icon}">
                         <span class="dashicons ${icon}"></span>
+                        <span class="icon-name">${this.dashicons[icon]}</span>
                     </div>
                 `;
             });
@@ -222,6 +451,9 @@ jQuery(document).ready(function($) {
                             <span class="wpbnp-modal-close">&times;</span>
                         </div>
                         <div class="wpbnp-modal-body">
+                            <div class="wpbnp-icon-search">
+                                <input type="text" placeholder="Search icons..." id="wpbnp-icon-search">
+                            </div>
                             <div class="wpbnp-icon-grid">
                                 ${iconsHtml}
                             </div>
@@ -244,6 +476,20 @@ jQuery(document).ready(function($) {
                 const targetInput = $('#wpbnp-icon-modal').data('target-input');
                 targetInput.val(icon);
                 $('#wpbnp-icon-modal').hide();
+            });
+            
+            // Icon search functionality
+            $(document).on('input', '#wpbnp-icon-search', function() {
+                const searchTerm = $(this).val().toLowerCase();
+                $('.wpbnp-icon-option').each(function() {
+                    const iconName = $(this).find('.icon-name').text().toLowerCase();
+                    const iconClass = $(this).data('icon').toLowerCase();
+                    if (iconName.includes(searchTerm) || iconClass.includes(searchTerm)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
             });
         },
         
@@ -281,6 +527,11 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
+            
+            // Update preset selector
+            $('input[name="settings[preset]"]').val(presetKey);
+            $('.wpbnp-preset-card').removeClass('active');
+            $(`.wpbnp-preset-card[data-preset="${presetKey}"]`).addClass('active');
             
             this.showNotification(`${preset.name} preset applied!`, 'success');
         },
@@ -339,91 +590,130 @@ jQuery(document).ready(function($) {
         // Export settings
         exportSettings: function(e) {
             e.preventDefault();
-            const dataStr = JSON.stringify(this.settings, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
-            const exportFileDefaultName = 'wpbnp-settings.json';
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
+            const button = $(e.target);
+            const originalText = button.text();
+            button.prop('disabled', true).text('Exporting...');
+            
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_export_settings',
+                    nonce: this.nonce
+                },
+                success: (response) => {
+                    if (response.success) {
+                        // Create and trigger download
+                        const dataStr = response.data.data;
+                        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                        const linkElement = document.createElement('a');
+                        linkElement.setAttribute('href', dataUri);
+                        linkElement.setAttribute('download', response.data.filename);
+                        linkElement.click();
+                        
+                        this.showNotification('Settings exported successfully!', 'success');
+                    } else {
+                        this.showNotification(response.data ? response.data.message : 'Error exporting settings', 'error');
+                    }
+                },
+                error: () => {
+                    this.showNotification('Ajax error occurred', 'error');
+                },
+                complete: () => {
+                    button.prop('disabled', false).text(originalText);
+                }
+            });
         },
         
         // Import settings
         importSettings: function(e) {
             e.preventDefault();
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            
-            input.onchange = (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const settings = JSON.parse(e.target.result);
-                            this.applyImportedSettings(settings);
-                            this.showNotification('Settings imported successfully!', 'success');
-                        } catch (error) {
-                            this.showNotification('Error parsing JSON file', 'error');
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            };
-            
-            input.click();
-        },
-        
-        // Apply imported settings
-        applyImportedSettings: function(settings) {
-            // Update form fields
-            Object.keys(settings).forEach(section => {
-                if (typeof settings[section] === 'object') {
-                    Object.keys(settings[section]).forEach(key => {
-                        const input = $(`input[name="settings[${section}][${key}]"], select[name="settings[${section}][${key}]"]`);
-                        if (input.length) {
-                            if (input.attr('type') === 'checkbox') {
-                                input.prop('checked', settings[section][key]);
-                            } else {
-                                input.val(settings[section][key]);
-                                if (input.hasClass('wpbnp-color-picker')) {
-                                    input.wpColorPicker('color', settings[section][key]);
-                                }
-                            }
-                        }
-                    });
-                }
-            });
-            
-            // Update items
-            if (settings.items) {
-                this.settings.items = settings.items;
-                this.initializeItems();
-            }
+            $('#wpbnp-import-file').click();
         },
         
         // Show notification
         showNotification: function(message, type = 'success') {
             const notification = $(`
                 <div class="wpbnp-notification ${type}">
-                    ${message}
+                    <span class="wpbnp-notification-message">${message}</span>
+                    <button type="button" class="wpbnp-notification-close">&times;</button>
                 </div>
             `);
             
             $('#wpbnp-notifications').append(notification);
             
+            // Auto-remove after 5 seconds
             setTimeout(() => {
                 notification.fadeOut(() => {
                     notification.remove();
                 });
-            }, 4000);
+            }, 5000);
+            
+            // Manual close
+            notification.find('.wpbnp-notification-close').on('click', function() {
+                notification.fadeOut(() => {
+                    notification.remove();
+                });
+            });
         }
     };
     
     // Initialize admin
     WPBottomNavAdmin.init();
+    
+    // Handle file import when file is selected
+    $('#wpbnp-import-file').on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importData = e.target.result;
+                    
+                    // Send import data via AJAX
+                    $.ajax({
+                        url: wpbnp_admin.ajax_url,
+                        type: 'POST',
+                        data: {
+                            action: 'wpbnp_import_settings',
+                            nonce: WPBottomNavAdmin.nonce,
+                            import_data: importData
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                WPBottomNavAdmin.showNotification('Settings imported successfully!', 'success');
+                                // Update settings and reload page
+                                if (response.data && response.data.settings) {
+                                    WPBottomNavAdmin.settings = response.data.settings;
+                                }
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000);
+                            } else {
+                                WPBottomNavAdmin.showNotification(response.data ? response.data.message : 'Error importing settings', 'error');
+                            }
+                        },
+                        error: function() {
+                            WPBottomNavAdmin.showNotification('Ajax error occurred', 'error');
+                        }
+                    });
+                } catch (error) {
+                    WPBottomNavAdmin.showNotification('Error reading file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        // Reset file input
+        $(this).val('');
+    });
+    
+    // Restore form state on page load if switching tabs
+    if (localStorage.getItem('wpbnp_form_state')) {
+        setTimeout(() => {
+            WPBottomNavAdmin.restoreFormState();
+        }, 500); // Delay to ensure color pickers are initialized
+    }
     
     // Make it globally available
     window.WPBottomNavAdmin = WPBottomNavAdmin;
