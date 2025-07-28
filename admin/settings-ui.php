@@ -142,6 +142,16 @@ class WPBNP_Admin_UI {
                 </div>
             </div>
             
+            <!-- Developer Credit -->
+            <div class="wpbnp-developer-credit">
+                <p>
+                    <?php esc_html_e('Made with', 'wp-bottom-navigation-pro'); ?> ❤️ <?php esc_html_e('by', 'wp-bottom-navigation-pro'); ?> 
+                    <a href="https://riadhasan.info/" target="_blank" rel="noopener noreferrer">
+                        <strong>Riad Hasan</strong>
+                    </a>
+                </p>
+            </div>
+            
             <div id="wpbnp-notifications"></div>
         </div>
         <?php

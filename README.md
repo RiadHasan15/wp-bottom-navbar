@@ -200,4 +200,4 @@ For support and questions:
 
 ---
 
-**Made with ❤️ for the WordPress community**
+**Made with ❤️ by [Riad Hasan](https://riadhasan.info/) for the WordPress community**
