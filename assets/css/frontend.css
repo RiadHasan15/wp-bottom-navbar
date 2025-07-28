@@ -39,9 +39,11 @@
     flex: 1;
     max-width: 80px;
     min-height: 40px;
-    border-radius: 4px;
-    padding: 4px;
+    border-radius: 8px;
+    padding: 6px;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 .wpbnp-nav-item:hover,
@@ -49,14 +51,49 @@
     color: #0073aa;
     text-decoration: none;
     outline: none;
+    transform: translateY(-2px);
+    background-color: rgba(0, 115, 170, 0.08);
 }
 
 .wpbnp-nav-item.active {
     color: #0073aa;
+    background-color: rgba(0, 115, 170, 0.12);
+    transform: translateY(-1px);
 }
 
+/* Remove blue border and add modern app-like feedback */
 .wpbnp-nav-item:focus {
-    box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.5);
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: rgba(0, 115, 170, 0.15);
+    transform: scale(0.98);
+}
+
+.wpbnp-nav-item:active {
+    transform: scale(0.95);
+    background-color: rgba(0, 115, 170, 0.2);
+    transition: all 0.1s ease;
+}
+
+/* Modern ripple effect on tap */
+.wpbnp-nav-item::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.wpbnp-nav-item:active::before {
+    width: 40px;
+    height: 40px;
 }
 
 /* Loading state */

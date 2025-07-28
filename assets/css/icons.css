@@ -1,0 +1,182 @@
+/* WP Bottom Navigation Pro - Icon Libraries */
+
+/* Apple SF Symbols Style Icons (using Unicode symbols and CSS) */
+[class*="apple-"]:before {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Icons", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1;
+    display: inline-block;
+    text-decoration: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Apple Navigation & Home Icons */
+.apple-house:before { content: "🏠"; }
+.apple-house-fill:before { content: "🏠"; filter: brightness(1.2); }
+.apple-square-grid-2x2:before { content: "⊞"; }
+.apple-list-bullet:before { content: "☰"; }
+.apple-ellipsis:before { content: "⋯"; }
+
+/* Apple E-commerce Icons */
+.apple-cart:before { content: "🛒"; }
+.apple-cart-fill:before { content: "🛒"; filter: brightness(1.2); }
+.apple-bag:before { content: "🛍"; }
+.apple-bag-fill:before { content: "🛍"; filter: brightness(1.2); }
+.apple-creditcard:before { content: "💳"; }
+
+/* Apple Social & Communication Icons */
+.apple-person:before { content: "👤"; }
+.apple-person-fill:before { content: "👤"; filter: brightness(1.2); }
+.apple-person-2:before { content: "👥"; }
+.apple-person-2-fill:before { content: "👥"; filter: brightness(1.2); }
+.apple-heart:before { content: "♡"; }
+.apple-heart-fill:before { content: "❤"; }
+.apple-message:before { content: "💬"; }
+.apple-message-fill:before { content: "💬"; filter: brightness(1.2); }
+.apple-phone:before { content: "📞"; }
+.apple-phone-fill:before { content: "📞"; filter: brightness(1.2); }
+.apple-envelope:before { content: "✉"; }
+.apple-envelope-fill:before { content: "✉"; filter: brightness(1.2); }
+
+/* Apple Content & Media Icons */
+.apple-magnifyingglass:before { content: "🔍"; }
+.apple-camera:before { content: "📷"; }
+.apple-camera-fill:before { content: "📷"; filter: brightness(1.2); }
+.apple-photo:before { content: "🖼"; }
+.apple-photo-fill:before { content: "🖼"; filter: brightness(1.2); }
+.apple-play:before { content: "▷"; }
+.apple-play-fill:before { content: "▶"; }
+.apple-music-note:before { content: "♪"; }
+
+/* Apple Information & Status Icons */
+.apple-info-circle:before { content: "ⓘ"; }
+.apple-info-circle-fill:before { content: "ⓘ"; filter: brightness(1.2); }
+.apple-star:before { content: "☆"; }
+.apple-star-fill:before { content: "★"; }
+.apple-bookmark:before { content: "🔖"; }
+.apple-bookmark-fill:before { content: "🔖"; filter: brightness(1.2); }
+
+/* Apple Time & Location Icons */
+.apple-calendar:before { content: "📅"; }
+.apple-clock:before { content: "🕐"; }
+.apple-clock-fill:before { content: "🕐"; filter: brightness(1.2); }
+.apple-location:before { content: "📍"; }
+.apple-location-fill:before { content: "📍"; filter: brightness(1.2); }
+.apple-map:before { content: "🗺"; }
+.apple-map-fill:before { content: "🗺"; filter: brightness(1.2); }
+
+/* Apple Settings & Tools Icons */
+.apple-gearshape:before { content: "⚙"; }
+.apple-gearshape-fill:before { content: "⚙"; filter: brightness(1.2); }
+.apple-wrench:before { content: "🔧"; }
+.apple-wrench-fill:before { content: "🔧"; filter: brightness(1.2); }
+.apple-slider-horizontal-3:before { content: "🎛"; }
+
+/* Material Design Icons (using Unicode and CSS) */
+[class*="material-"]:before {
+    font-family: "Material Icons", "Material Icons Outlined", "Material Symbols Outlined", sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    display: inline-block;
+    text-decoration: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    font-feature-settings: 'liga';
+}
+
+/* Material Navigation & Home Icons */
+.material-home:before { content: "🏠"; }
+.material-dashboard:before { content: "⊞"; }
+.material-menu:before { content: "☰"; }
+.material-more-vert:before { content: "⋮"; }
+.material-more-horiz:before { content: "⋯"; }
+
+/* Material E-commerce Icons */
+.material-shopping-cart:before { content: "🛒"; }
+.material-shopping-bag:before { content: "🛍"; }
+.material-store:before { content: "🏪"; }
+.material-payment:before { content: "💳"; }
+.material-local-offer:before { content: "🏷"; }
+
+/* Material Social & Communication Icons */
+.material-person:before { content: "👤"; }
+.material-people:before { content: "👥"; }
+.material-favorite:before { content: "❤"; }
+.material-favorite-border:before { content: "♡"; }
+.material-message:before { content: "💬"; }
+.material-phone:before { content: "📞"; }
+.material-email:before { content: "✉"; }
+.material-share:before { content: "📤"; }
+
+/* Material Content & Media Icons */
+.material-search:before { content: "🔍"; }
+.material-camera-alt:before { content: "📷"; }
+.material-photo-library:before { content: "🖼"; }
+.material-videocam:before { content: "📹"; }
+.material-music-note:before { content: "♪"; }
+.material-play-arrow:before { content: "▶"; }
+
+/* Material Information & Status Icons */
+.material-info:before { content: "ⓘ"; }
+.material-star:before { content: "★"; }
+.material-star-border:before { content: "☆"; }
+.material-bookmark:before { content: "🔖"; }
+.material-bookmark-border:before { content: "🔖"; opacity: 0.5; }
+
+/* Material Time & Location Icons */
+.material-event:before { content: "📅"; }
+.material-schedule:before { content: "🕐"; }
+.material-location-on:before { content: "📍"; }
+.material-map:before { content: "🗺"; }
+
+/* Material Settings & Tools Icons */
+.material-settings:before { content: "⚙"; }
+.material-build:before { content: "🔧"; }
+.material-tune:before { content: "🎛"; }
+.material-filter-list:before { content: "⚙"; transform: rotate(90deg); }
+
+/* Enhanced styling for all icon libraries */
+.wpbnp-nav-icon [class*="apple-"],
+.wpbnp-nav-icon [class*="material-"] {
+    font-size: inherit;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+/* Premium styling for iOS preset with Apple icons */
+.wpbnp-preset-ios .wpbnp-nav-icon [class*="apple-"] {
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+/* Material Design styling for Material preset */
+.wpbnp-preset-material .wpbnp-nav-icon [class*="material-"] {
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+}
+
+/* Cyberpunk glow effect for Material icons */
+.wpbnp-preset-cyberpunk .wpbnp-nav-icon [class*="material-"] {
+    text-shadow: 0 0 8px currentColor;
+}
+
+/* Glassmorphism subtle transparency */
+.wpbnp-preset-glassmorphism .wpbnp-nav-icon [class*="apple-"] {
+    opacity: 0.9;
+    filter: blur(0.5px);
+}
+
+/* Floating preset icon enhancement */
+.wpbnp-preset-floating .wpbnp-nav-icon [class*="apple-"] {
+    transform: translateY(-1px);
+}

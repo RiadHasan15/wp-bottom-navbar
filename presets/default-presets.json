@@ -1,187 +1,232 @@
 {
     "minimal": {
         "name": "Minimal",
-        "description": "Clean and simple design",
+        "description": "Clean and simple design with subtle interactions",
+        "icon_library": "dashicons",
         "style": {
             "background_color": "#ffffff",
-            "text_color": "#333333",
-            "active_color": "#0073aa",
-            "border_color": "#e0e0e0",
-            "height": 60,
+            "text_color": "#6b7280",
+            "active_color": "#3b82f6",
+            "border_color": "#e5e7eb",
+            "height": 64,
             "border_radius": 0,
-            "box_shadow": "0 -2px 8px rgba(0,0,0,0.1)"
+            "box_shadow": "0 -1px 3px rgba(0,0,0,0.1)",
+            "font_size": 11,
+            "font_weight": "400",
+            "icon_size": 22,
+            "padding": 8
         },
         "animations": {
-            "enabled": false,
-            "type": "none",
-            "duration": 300
+            "enabled": true,
+            "type": "fade",
+            "duration": 200
         }
     },
     "dark": {
         "name": "Dark Mode",
-        "description": "Dark theme for better night viewing",
+        "description": "Elegant dark theme perfect for night usage",
+        "icon_library": "dashicons",
         "style": {
-            "background_color": "#1a1a1a",
-            "text_color": "#ffffff",
-            "active_color": "#4a9eff",
-            "border_color": "#333333",
-            "height": 60,
+            "background_color": "#1f2937",
+            "text_color": "#9ca3af",
+            "active_color": "#60a5fa",
+            "border_color": "#374151",
+            "height": 64,
             "border_radius": 0,
-            "box_shadow": "0 -2px 8px rgba(0,0,0,0.3)"
+            "box_shadow": "0 -2px 8px rgba(0,0,0,0.25)",
+            "font_size": 11,
+            "font_weight": "400",
+            "icon_size": 22,
+            "padding": 8
         },
         "animations": {
             "enabled": true,
             "type": "pulse",
-            "duration": 400
+            "duration": 300
         }
     },
     "material": {
         "name": "Material Design",
-        "description": "Google Material Design inspired",
+        "description": "Google Material Design with elevation and bold colors",
+        "icon_library": "material",
         "style": {
-            "background_color": "#f5f5f5",
-            "text_color": "#424242",
+            "background_color": "#fafafa",
+            "text_color": "#616161",
             "active_color": "#2196f3",
             "border_color": "#e0e0e0",
             "height": 56,
             "border_radius": 0,
-            "box_shadow": "0 -4px 8px rgba(0,0,0,0.12)"
+            "box_shadow": "0 -4px 8px rgba(0,0,0,0.12)",
+            "font_size": 12,
+            "font_weight": "500",
+            "icon_size": 24,
+            "padding": 8
         },
         "animations": {
             "enabled": true,
             "type": "ripple",
-            "duration": 300
+            "duration": 400
         }
     },
     "ios": {
-        "name": "iOS Style",
-        "description": "Apple iOS inspired design",
+        "name": "iOS Native",
+        "description": "Apple iOS style with SF Symbols and precise spacing",
+        "icon_library": "apple",
         "style": {
-            "background_color": "#f8f8f8",
+            "background_color": "#f2f2f7",
             "text_color": "#8e8e93",
             "active_color": "#007aff",
             "border_color": "#c6c6c8",
             "height": 83,
             "border_radius": 0,
-            "box_shadow": "0 -1px 0 rgba(0,0,0,0.1)"
+            "box_shadow": "0 -0.5px 0 rgba(0,0,0,0.1)",
+            "font_size": 10,
+            "font_weight": "400",
+            "icon_size": 25,
+            "padding": 4
         },
         "animations": {
             "enabled": true,
             "type": "bounce",
-            "duration": 500
+            "duration": 250
         }
     },
     "glassmorphism": {
         "name": "Glassmorphism",
-        "description": "Modern glass effect with blur and transparency",
+        "description": "Modern glass effect with backdrop blur and transparency",
+        "icon_library": "apple",
         "style": {
             "background_color": "rgba(255,255,255,0.25)",
-            "text_color": "#2c3e50",
-            "active_color": "#3498db",
+            "text_color": "#4b5563",
+            "active_color": "#8b5cf6",
             "border_color": "rgba(255,255,255,0.18)",
-            "height": 70,
-            "border_radius": 20,
-            "box_shadow": "0 -8px 32px rgba(31,38,135,0.37)"
-        },
-        "animations": {
-            "enabled": true,
-            "type": "fade",
-            "duration": 400
-        },
-        "backdrop_filter": "blur(8px)",
-        "border": "1px solid rgba(255,255,255,0.18)"
-    },
-    "neumorphism": {
-        "name": "Neumorphism",
-        "description": "Soft UI with subtle shadows and highlights",
-        "style": {
-            "background_color": "#e0e5ec",
-            "text_color": "#9baacf",
-            "active_color": "#5a67d8",
-            "border_color": "transparent",
-            "height": 75,
-            "border_radius": 25,
-            "box_shadow": "9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff"
+            "height": 68,
+            "border_radius": 16,
+            "box_shadow": "0 -8px 32px rgba(0,0,0,0.1)",
+            "font_size": 11,
+            "font_weight": "500",
+            "icon_size": 22,
+            "padding": 12
         },
         "animations": {
             "enabled": true,
             "type": "slide",
-            "duration": 350
+            "duration": 300
         }
     },
-    "cyberpunk": {
-        "name": "Cyberpunk",
-        "description": "Futuristic neon-styled interface",
+    "neumorphism": {
+        "name": "Neumorphism",
+        "description": "Soft UI with subtle shadows and modern depth",
+        "icon_library": "apple",
         "style": {
-            "background_color": "#0d1421",
-            "text_color": "#00ff41",
-            "active_color": "#ff0080",
-            "border_color": "#00ff41",
-            "height": 65,
-            "border_radius": 5,
-            "box_shadow": "0 -4px 20px rgba(0,255,65,0.3), inset 0 1px 0 rgba(0,255,65,0.5)"
+            "background_color": "#e0e5ec",
+            "text_color": "#4b5563",
+            "active_color": "#6366f1",
+            "border_color": "#e0e5ec",
+            "height": 70,
+            "border_radius": 35,
+            "box_shadow": "9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff",
+            "font_size": 11,
+            "font_weight": "500",
+            "icon_size": 20,
+            "padding": 16
         },
         "animations": {
             "enabled": true,
             "type": "heartbeat",
-            "duration": 600
-        },
-        "text_shadow": "0 0 10px #00ff41"
-    },
-    "vintage": {
-        "name": "Vintage",
-        "description": "Retro design with warm earth tones",
-        "style": {
-            "background_color": "#d4a574",
-            "text_color": "#8b4513",
-            "active_color": "#cd853f",
-            "border_color": "#deb887",
-            "height": 68,
-            "border_radius": 15,
-            "box_shadow": "0 -3px 10px rgba(139,69,19,0.3)"
-        },
-        "animations": {
-            "enabled": true,
-            "type": "swing",
-            "duration": 450
-        }
-    },
-    "gradient": {
-        "name": "Gradient",
-        "description": "Vibrant gradient backgrounds with smooth transitions",
-        "style": {
-            "background_color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            "text_color": "#ffffff",
-            "active_color": "#ffd700",
-            "border_color": "transparent",
-            "height": 72,
-            "border_radius": 20,
-            "box_shadow": "0 -5px 25px rgba(102,126,234,0.4)"
-        },
-        "animations": {
-            "enabled": true,
-            "type": "rotate",
             "duration": 400
         }
     },
-    "floating": {
-        "name": "Floating",
-        "description": "Elevated floating bar with rounded corners",
+    "cyberpunk": {
+        "name": "Cyberpunk",
+        "description": "Futuristic neon design with glowing effects",
+        "icon_library": "material",
         "style": {
-            "background_color": "#ffffff",
-            "text_color": "#666666",
-            "active_color": "#ff6b6b",
-            "border_color": "transparent",
-            "height": 55,
-            "border_radius": 30,
-            "box_shadow": "0 -10px 30px rgba(0,0,0,0.15)",
-            "margin": "0 20px 20px 20px"
+            "background_color": "#0d1421",
+            "text_color": "#00ff88",
+            "active_color": "#ff0080",
+            "border_color": "#00ff88",
+            "height": 60,
+            "border_radius": 0,
+            "box_shadow": "0 -4px 20px rgba(0,255,136,0.3), inset 0 1px 0 rgba(0,255,136,0.5)",
+            "font_size": 10,
+            "font_weight": "600",
+            "icon_size": 20,
+            "padding": 8
         },
         "animations": {
             "enabled": true,
             "type": "shake",
-            "duration": 250
+            "duration": 500
+        }
+    },
+    "vintage": {
+        "name": "Vintage Classic",
+        "description": "Retro design with warm colors and classic typography",
+        "icon_library": "dashicons",
+        "style": {
+            "background_color": "#f5f1eb",
+            "text_color": "#8b7355",
+            "active_color": "#d2691e",
+            "border_color": "#d4c4a8",
+            "height": 65,
+            "border_radius": 8,
+            "box_shadow": "0 -3px 12px rgba(139,115,85,0.2)",
+            "font_size": 12,
+            "font_weight": "400",
+            "icon_size": 20,
+            "padding": 10
         },
-        "position": "floating"
+        "animations": {
+            "enabled": true,
+            "type": "swing",
+            "duration": 600
+        }
+    },
+    "gradient": {
+        "name": "Gradient Flow",
+        "description": "Dynamic gradient backgrounds with smooth transitions",
+        "icon_library": "apple",
+        "style": {
+            "background_color": "#667eea",
+            "text_color": "#ffffff",
+            "active_color": "#ffd700",
+            "border_color": "transparent",
+            "height": 62,
+            "border_radius": 0,
+            "box_shadow": "0 -4px 20px rgba(102,126,234,0.4)",
+            "font_size": 11,
+            "font_weight": "500",
+            "icon_size": 22,
+            "padding": 10
+        },
+        "animations": {
+            "enabled": true,
+            "type": "zoom",
+            "duration": 350
+        }
+    },
+    "floating": {
+        "name": "Floating Pill",
+        "description": "Floating design with rounded corners and elegant spacing",
+        "icon_library": "apple",
+        "style": {
+            "background_color": "#ffffff",
+            "text_color": "#6b7280",
+            "active_color": "#10b981",
+            "border_color": "#e5e7eb",
+            "height": 56,
+            "border_radius": 28,
+            "box_shadow": "0 -10px 30px rgba(0,0,0,0.15)",
+            "font_size": 10,
+            "font_weight": "500",
+            "icon_size": 20,
+            "padding": 8
+        },
+        "animations": {
+            "enabled": true,
+            "type": "rotate",
+            "duration": 300
+        }
     }
 }
