@@ -1,36 +1,214 @@
 /* WP Bottom Navigation Pro - Icon Libraries */
 
-/* Apple SF Symbols Style Icons (using Unicode characters) */
-.apple-house:before,
-.apple-house-fill:before { content: "🏠"; }
+/* Apple SF Symbols Style Icons (using SF Symbols Unicode) */
 
-.apple-cart:before,
-.apple-cart-fill:before { content: "🛒"; }
+/* Navigation & Home */
+.house:before, .house-fill:before { content: "􀎞"; }
+.house-circle:before, .house-circle-fill:before { content: "􀎟"; }
+.building:before, .building-fill:before { content: "􀤈"; }
+.building-2:before, .building-2-fill:before { content: "􀤉"; }
+.map:before, .map-fill:before { content: "􀙬"; }
+.mappin:before { content: "􀋑"; }
+.mappin-circle:before, .mappin-circle-fill:before { content: "􀋒"; }
+.location:before, .location-fill:before { content: "􀋑"; }
+.airplane:before { content: "✈️"; }
+.car:before, .car-fill:before { content: "􀙘"; }
+.bicycle:before { content: "􀷹"; }
 
-.apple-person:before,
-.apple-person-fill:before { content: "👤"; }
+/* Users & People */
+.person:before, .person-fill:before { content: "􀉩"; }
+.person-circle:before, .person-circle-fill:before { content: "􀉪"; }
+.person-crop-circle:before, .person-crop-circle-fill:before { content: "􀉫"; }
+.person-2:before, .person-2-fill:before { content: "􀉬"; }
+.person-3:before, .person-3-fill:before { content: "􀉭"; }
+.facetime:before { content: "􀟈"; }
+.faceid:before { content: "􀎫"; }
+.touchid:before { content: "􀎬"; }
 
-.apple-heart:before { content: "🤍"; }
-.apple-heart-fill:before { content: "❤️"; }
+/* Shopping & Commerce */
+.cart:before, .cart-fill:before { content: "􀍩"; }
+.cart-circle:before, .cart-circle-fill:before { content: "􀍪"; }
+.bag:before, .bag-fill:before { content: "􀍫"; }
+.handbag:before, .handbag-fill:before { content: "􀍬"; }
+.briefcase:before, .briefcase-fill:before { content: "􀍭"; }
+.creditcard:before, .creditcard-fill:before { content: "􀍮"; }
+.banknote:before, .banknote-fill:before { content: "􀍯"; }
+.dollarsign:before { content: "􀇀"; }
+.dollarsign-circle:before, .dollarsign-circle-fill:before { content: "􀇁"; }
+.tag:before, .tag-fill:before { content: "􀍰"; }
+.gift:before, .gift-fill:before { content: "􀍱"; }
 
-.apple-message:before { content: "💬"; }
+/* Communication & Social */
+.message:before, .message-fill:before { content: "􀌤"; }
+.message-circle:before, .message-circle-fill:before { content: "􀌥"; }
+.envelope:before, .envelope-fill:before { content: "􀍕"; }
+.envelope-open:before, .envelope-open-fill:before { content: "􀍖"; }
+.paperplane:before, .paperplane-fill:before { content: "􀈟"; }
+.phone:before, .phone-fill:before { content: "􀌾"; }
+.phone-circle:before, .phone-circle-fill:before { content: "􀌿"; }
+.text-bubble:before, .text-bubble-fill:before { content: "􀌮"; }
+.megaphone:before, .megaphone-fill:before { content: "􀝎"; }
+.speaker:before, .speaker-fill:before { content: "􀫸"; }
+.wifi:before { content: "􀙇"; }
+.airpods:before { content: "􀪷"; }
+.homepod:before, .homepod-fill:before { content: "􀪹"; }
 
-.apple-phone:before { content: "📱"; }
+/* Content & Media */
+.camera:before, .camera-fill:before { content: "􀌟"; }
+.camera-circle:before, .camera-circle-fill:before { content: "􀌠"; }
+.video:before, .video-fill:before { content: "􀍈"; }
+.photo:before, .photo-fill:before { content: "􀌃"; }
+.music-note:before { content: "􀑪"; }
+.headphones:before { content: "􀑱"; }
+.play:before, .play-fill:before { content: "􀊄"; }
+.play-circle:before, .play-circle-fill:before { content: "􀊅"; }
+.pause:before, .pause-fill:before { content: "􀊆"; }
+.pause-circle:before, .pause-circle-fill:before { content: "􀊇"; }
+.stop:before, .stop-fill:before { content: "􀛷"; }
+.backward:before, .backward-fill:before { content: "􀊊"; }
+.forward:before, .forward-fill:before { content: "􀊌"; }
+.shuffle:before { content: "􀊝"; }
+.repeat:before { content: "􀊞"; }
+.tv:before, .tv-fill:before { content: "􀡴"; }
+.appletv:before, .appletv-fill:before { content: "􀡵"; }
 
-.apple-envelope:before { content: "✉️"; }
+/* Navigation & Controls */
+.list-bullet:before { content: "􀋲"; }
+.list-bullet-circle:before, .list-bullet-circle-fill:before { content: "􀋳"; }
+.square-grid-2x2:before, .square-grid-2x2-fill:before { content: "􀇍"; }
+.square-grid-3x2:before, .square-grid-3x2-fill:before { content: "􀇎"; }
+.square-grid-3x3:before, .square-grid-3x3-fill:before { content: "􀇏"; }
+.rectangle:before, .rectangle-fill:before { content: "􀏃"; }
+.arrow-up:before { content: "􀄩"; }
+.arrow-up-circle:before, .arrow-up-circle-fill:before { content: "􀄪"; }
+.arrow-down:before { content: "􀄫"; }
+.arrow-down-circle:before, .arrow-down-circle-fill:before { content: "􀄬"; }
+.arrow-left:before { content: "􀄭"; }
+.arrow-left-circle:before, .arrow-left-circle-fill:before { content: "􀄮"; }
+.arrow-right:before { content: "􀄯"; }
+.arrow-right-circle:before, .arrow-right-circle-fill:before { content: "􀄰"; }
+.chevron-up:before { content: "􀆃"; }
+.chevron-down:before { content: "􀆈"; }
+.chevron-left:before { content: "􀆉"; }
+.chevron-right:before { content: "􀆊"; }
 
-.apple-magnifyingglass:before { content: "🔍"; }
+/* Actions & Controls */
+.plus:before { content: "􀅼"; }
+.plus-circle:before, .plus-circle-fill:before { content: "􀅽"; }
+.minus:before { content: "􀅾"; }
+.minus-circle:before, .minus-circle-fill:before { content: "􀅿"; }
+.multiply:before { content: "􀆀"; }
+.xmark:before { content: "􀆄"; }
+.xmark-circle:before, .xmark-circle-fill:before { content: "􀆅"; }
+.checkmark:before { content: "􀆅"; }
+.checkmark-circle:before, .checkmark-circle-fill:before { content: "􀆆"; }
+.trash:before, .trash-fill:before { content: "􀈑"; }
+.archivebox:before, .archivebox-fill:before { content: "􀈖"; }
 
-.apple-camera:before { content: "📷"; }
+/* Social & Favorites */
+.heart:before { content: "􀊴"; }
+.heart-fill:before { content: "􀊵"; }
+.heart-circle:before, .heart-circle-fill:before { content: "􀊶"; }
+.star:before { content: "􀋃"; }
+.star-fill:before { content: "􀋄"; }
+.star-circle:before, .star-circle-fill:before { content: "􀋅"; }
+.bookmark:before, .bookmark-fill:before { content: "􀉂"; }
+.bookmark-circle:before, .bookmark-circle-fill:before { content: "􀉃"; }
+.trophy:before, .trophy-fill:before { content: "􀋞"; }
+.flag:before, .flag-fill:before { content: "􀃂"; }
+.bell:before, .bell-fill:before { content: "􀋚"; }
+.bell-circle:before, .bell-circle-fill:before { content: "􀋛"; }
 
-.apple-gearshape:before { content: "⚙️"; }
+/* Search & Discovery */
+.magnifyingglass:before { content: "􀊫"; }
+.magnifyingglass-circle:before, .magnifyingglass-circle-fill:before { content: "􀊬"; }
+.binoculars:before, .binoculars-fill:before { content: "􀙳"; }
+.eye:before, .eye-fill:before { content: "􀋭"; }
+.eye-slash:before, .eye-slash-fill:before { content: "􀋮"; }
+.questionmark:before { content: "􀥲"; }
+.questionmark-circle:before, .questionmark-circle-fill:before { content: "􀥳"; }
 
-.apple-star:before { content: "⭐"; }
-.apple-star-fill:before { content: "⭐"; }
+/* Files & Documents */
+.doc:before, .doc-fill:before { content: "􀈗"; }
+.doc-text:before, .doc-text-fill:before { content: "􀈘"; }
+.folder:before, .folder-fill:before { content: "􀈞"; }
+.folder-circle:before, .folder-circle-fill:before { content: "􀈟"; }
+.icloud:before, .icloud-fill:before { content: "􀌋"; }
+.book:before, .book-fill:before { content: "􀉕"; }
+.newspaper:before, .newspaper-fill:before { content: "􀣰"; }
 
-.apple-list-bullet:before { content: "☰"; }
+/* Settings & Tools */
+.gearshape:before, .gearshape-fill:before { content: "􀍟"; }
+.gearshape-2:before, .gearshape-2-fill:before { content: "􀍠"; }
+.wrench:before, .wrench-fill:before { content: "􀎕"; }
+.hammer:before, .hammer-fill:before { content: "􀎖"; }
+.scissors:before { content: "􀎗"; }
+.app:before, .app-fill:before { content: "􀣺"; }
+.bolt:before, .bolt-fill:before { content: "􀋦"; }
+.power:before { content: "􀥰"; }
+.moon:before, .moon-fill:before { content: "􀆹"; }
+.sun-max:before, .sun-max-fill:before { content: "􀆫"; }
+.lightbulb:before, .lightbulb-fill:before { content: "􀛭"; }
 
-.apple-square-grid-2x2:before { content: "⊞"; }
+/* Security & Privacy */
+.lock:before, .lock-fill:before { content: "􀎡"; }
+.lock-circle:before, .lock-circle-fill:before { content: "􀎢"; }
+.key:before, .key-fill:before { content: "􀎣"; }
+.shield:before, .shield-fill:before { content: "􀎤"; }
+.exclamationmark:before { content: "􀇿"; }
+.exclamationmark-circle:before, .exclamationmark-circle-fill:before { content: "􀈀"; }
+.info:before { content: "􀅴"; }
+.info-circle:before, .info-circle-fill:before { content: "􀅵"; }
+
+/* Time & Calendar */
+.clock:before, .clock-fill:before { content: "􀐫"; }
+.clock-circle:before, .clock-circle-fill:before { content: "􀐬"; }
+.alarm:before, .alarm-fill:before { content: "􀐮"; }
+.stopwatch:before, .stopwatch-fill:before { content: "􀐯"; }
+.timer:before { content: "􀐰"; }
+.calendar:before { content: "􀉉"; }
+.hourglass:before { content: "􀖇"; }
+
+/* Base styling for Apple SF Symbols */
+[class*="house"]:before,
+[class*="building"]:before,
+[class*="map"]:before,
+[class*="person"]:before,
+[class*="cart"]:before,
+[class*="bag"]:before,
+[class*="message"]:before,
+[class*="phone"]:before,
+[class*="camera"]:before,
+[class*="video"]:before,
+[class*="photo"]:before,
+[class*="music"]:before,
+[class*="play"]:before,
+[class*="pause"]:before,
+[class*="list"]:before,
+[class*="grid"]:before,
+[class*="arrow"]:before,
+[class*="chevron"]:before,
+[class*="plus"]:before,
+[class*="minus"]:before,
+[class*="heart"]:before,
+[class*="star"]:before,
+[class*="bookmark"]:before,
+[class*="magnifying"]:before,
+[class*="eye"]:before,
+[class*="doc"]:before,
+[class*="folder"]:before,
+[class*="gear"]:before,
+[class*="lock"]:before,
+[class*="clock"]:before {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
 
 /* Material Icons need to be styled properly for text content */
 .material-icons {
@@ -50,6 +228,69 @@
 }
 
 /* FontAwesome and Bootstrap Icons are handled by their respective CDNs */
+
+/* Icon preview fixes for admin panel */
+.wpbnp-icon-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.wpbnp-icon-preview .material-icons {
+    font-size: 18px;
+}
+
+.wpbnp-icon-preview [class*="house"],
+.wpbnp-icon-preview [class*="person"],
+.wpbnp-icon-preview [class*="cart"],
+.wpbnp-icon-preview [class*="heart"],
+.wpbnp-icon-preview [class*="star"],
+.wpbnp-icon-preview [class*="gear"] {
+    font-size: 18px;
+}
+
+/* Ensure SF Symbols display properly */
+.wpbnp-icon-preview [class*="apple-"]:before,
+.wpbnp-icon-preview [class*="house"]:before,
+.wpbnp-icon-preview [class*="building"]:before,
+.wpbnp-icon-preview [class*="person"]:before {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+}
+
+/* Fallback for icons that might not have specific styles */
+.wpbnp-icon-preview span:not(.dashicons):not(.material-icons):not([class*="feather-"]):before {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Fix for Bootstrap and FontAwesome in admin */
+.wpbnp-icon-preview i {
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+}
+
+/* Ensure Feather icons display properly */
+.wpbnp-icon-preview [class*="feather-"] {
+    width: 18px;
+    height: 18px;
+}
+
+/* General icon sizing for consistency */
+.wpbnp-nav-icon,
+.wpbnp-icon-preview {
+    font-size: inherit;
+}
+
+.wpbnp-nav-icon span,
+.wpbnp-nav-icon i {
+    font-size: inherit;
+    line-height: 1;
+}
 
 /* Base styling for all custom icon types */
 [class*="apple-"] {
