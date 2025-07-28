@@ -28,7 +28,7 @@ function wpbnp_get_default_settings() {
         'items' => array(
             array(
                 'id' => 'home',
-                'icon' => 'bi bi-house-door-fill',
+                'icon' => 'bi bi-house-door',
                 'label' => __('Home', 'wp-bottom-navigation-pro'),
                 'url' => home_url(),
                 'enabled' => true,
@@ -37,7 +37,7 @@ function wpbnp_get_default_settings() {
             ),
             array(
                 'id' => 'shop',
-                'icon' => 'bi bi-cart-fill',
+                'icon' => 'bi bi-cart',
                 'label' => __('Shop', 'wp-bottom-navigation-pro'),
                 'url' => '#',
                 'enabled' => true,
@@ -46,7 +46,7 @@ function wpbnp_get_default_settings() {
             ),
             array(
                 'id' => 'account',
-                'icon' => 'bi bi-person-fill',
+                'icon' => 'bi bi-person',
                 'label' => __('Account', 'wp-bottom-navigation-pro'),
                 'url' => '#',
                 'enabled' => true,
