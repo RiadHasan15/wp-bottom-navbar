@@ -837,14 +837,37 @@ jQuery(document).ready(function($) {
             this.bindIconModalEvents();
         },
         
-        // Apply preset
+        // Apply preset with debouncing and performance optimization
         applyPreset: function(e) {
             e.preventDefault();
-            const presetKey = $(e.currentTarget).data('preset');
+            const $target = $(e.currentTarget);
+            
+            // Prevent double-clicks and rapid clicking
+            if ($target.hasClass('wpbnp-applying')) {
+                return;
+            }
+            
+            $target.addClass('wpbnp-applying');
+            
+            const presetKey = $target.data('preset');
             const preset = this.presets[presetKey];
             
-            if (!preset) return;
+            if (!preset) {
+                $target.removeClass('wpbnp-applying');
+                return;
+            }
             
+            // Show immediate feedback
+            $target.find('.wpbnp-preset-name').text('Applying...');
+            
+            // Use setTimeout to allow UI to update and prevent blocking
+            setTimeout(() => {
+                this.doApplyPreset(preset, presetKey, $target);
+            }, 50);
+        },
+        
+        // Actual preset application logic (separated for performance)
+        doApplyPreset: function(preset, presetKey, $target) {
             // Define icon library mapping for each preset
             const presetIconMapping = {
                 'minimal': 'dashicons',
@@ -1150,6 +1173,10 @@ jQuery(document).ready(function($) {
             
             // Auto-save the form after preset application
             this.saveFormState();
+            
+            // Reset button state and restore text
+            $target.removeClass('wpbnp-applying');
+            $target.find('.wpbnp-preset-name').text(preset.name);
         },
         
         // Generate HTML for icon preview

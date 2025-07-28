@@ -350,6 +350,18 @@
     background: #f0f8ff;
 }
 
+.wpbnp-preset-card.wpbnp-applying {
+    opacity: 0.7;
+    pointer-events: none;
+    transform: scale(0.98);
+    transition: all 0.2s ease;
+}
+
+.wpbnp-preset-card.wpbnp-applying .wpbnp-preset-name {
+    color: #666;
+    font-style: italic;
+}
+
 .wpbnp-preset-preview {
     margin-bottom: 15px;
 }

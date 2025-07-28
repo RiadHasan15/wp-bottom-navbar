@@ -169,6 +169,111 @@
 .calendar:before { content: "📅"; }
 .hourglass:before { content: "⏳"; }
 
+/* Extended Apple Icons Coverage */
+
+/* Additional Navigation & Transportation */
+.location-north:before, .location-north-fill:before { content: "🧭"; }
+.location-slash:before, .location-slash-fill:before { content: "🚫"; }
+.scope:before { content: "🔭"; }
+.airplane-circle:before, .airplane-circle-fill:before { content: "✈️"; }
+.car-circle:before, .car-circle-fill:before { content: "🚗"; }
+.tram:before, .tram-fill:before { content: "🚊"; }
+.train-side-front-car:before { content: "🚆"; }
+.bicycle-circle:before, .bicycle-circle-fill:before { content: "🚲"; }
+.figure-walk:before, .figure-walk-circle:before, .figure-walk-circle-fill:before { content: "🚶"; }
+
+/* Extended People & Social */
+.person-crop-square:before, .person-crop-square-fill:before { content: "👤"; }
+.person-crop-artframe:before { content: "🖼️"; }
+.person-badge-plus:before, .person-badge-plus-fill:before { content: "👤"; }
+.person-badge-minus:before, .person-badge-minus-fill:before { content: "👤"; }
+.person-and-background-dotted:before { content: "👤"; }
+.person-2-circle:before, .person-2-circle-fill:before { content: "👥"; }
+.person-2-square-stack:before, .person-2-square-stack-fill:before { content: "👥"; }
+.person-crop-circle-badge-plus:before { content: "👤"; }
+.person-crop-circle-badge-minus:before { content: "👤"; }
+.person-crop-circle-badge-checkmark:before { content: "✅"; }
+.person-crop-circle-badge-xmark:before { content: "❌"; }
+.person-crop-circle-badge-exclamationmark:before { content: "❗"; }
+.person-crop-rectangle-stack:before, .person-crop-rectangle-stack-fill:before { content: "👥"; }
+.person-line-dotted-person:before, .person-line-dotted-person-fill:before { content: "👥"; }
+.person-wave-2:before, .person-wave-2-fill:before { content: "👋"; }
+.person-text-rectangle:before, .person-text-rectangle-fill:before { content: "👤"; }
+.personalhotspot:before { content: "📶"; }
+.shareplay:before { content: "📺"; }
+
+/* Extended Shopping & Commerce */
+.cart-badge-plus:before, .cart-badge-minus:before { content: "🛒"; }
+.bag-badge-plus:before, .bag-badge-minus:before { content: "🛍️"; }
+.briefcase-circle:before, .briefcase-circle-fill:before { content: "💼"; }
+.case:before, .case-fill:before { content: "💼"; }
+.suitcase:before, .suitcase-fill:before { content: "🧳"; }
+.suitcase-cart:before, .suitcase-cart-fill:before { content: "🧳"; }
+.creditcard-circle:before, .creditcard-circle-fill:before { content: "💳"; }
+.dollarsign-square:before, .dollarsign-square-fill:before { content: "💲"; }
+.eurosign:before, .eurosign-circle:before, .eurosign-circle-fill:before { content: "💶"; }
+.sterlingsign:before, .sterlingsign-circle:before, .sterlingsign-circle-fill:before { content: "💷"; }
+.yensign:before, .yensign-circle:before, .yensign-circle-fill:before { content: "💴"; }
+.bitcoinsign:before, .bitcoinsign-circle:before, .bitcoinsign-circle-fill:before { content: "₿"; }
+.tag-circle:before, .tag-circle-fill:before { content: "🏷️"; }
+.tags:before, .tags-fill:before { content: "🏷️"; }
+.percent:before { content: "%"; }
+.gift-circle:before, .gift-circle-fill:before { content: "🎁"; }
+.giftcard:before, .giftcard-fill:before { content: "🎁"; }
+.purchased:before, .purchased-circle:before, .purchased-circle-fill:before { content: "✅"; }
+
+/* Extended Communication */
+.message-badge:before, .message-badge-filled-fill:before { content: "💬"; }
+.envelope-badge:before, .envelope-badge-fill:before { content: "✉️"; }
+.mail-stack:before, .mail-stack-fill:before { content: "📧"; }
+.mail-and-text-magnifyingglass:before { content: "🔍"; }
+.paperplane-circle:before, .paperplane-circle-fill:before { content: "🛫"; }
+.phone-badge-plus:before { content: "📱"; }
+.phone-connection:before { content: "📞"; }
+.phone-arrow-up-right:before { content: "📞"; }
+.phone-arrow-down-left:before { content: "📞"; }
+.phone-down:before, .phone-down-fill:before, .phone-down-circle:before { content: "📵"; }
+
+/* Universal Fallback for Apple-style Icons */
+/* This catches any Apple icon that doesn't have a specific definition above */
+
+/* Generic fallback that applies to common Apple icon patterns */
+span[class*="-fill"]:before,
+span[class*="-circle"]:before,
+span[class*="badge-"]:before,
+span[class*="crop-"]:before,
+span[class*="text-"]:before,
+span[class*="wave-"]:before,
+span[class*="line-"]:before,
+span[class*="arrow-"]:before,
+span[class*="square-"]:before,
+span[class*="side-"]:before {
+    content: "📱"; /* Default iOS-style emoji for undefined Apple icons */
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Symbol", sans-serif !important;
+    font-weight: normal;
+    font-style: normal;
+    font-size: inherit;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Catch-all for any unrecognized Apple-style class that might be used as an icon */
+.wpbnp-icon-preview span:not(.dashicons):not(.material-icons):not([class*="feather-"]):not([class*="fa-"]):not([class*="bi-"]):before {
+    content: "📱";
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Symbol", sans-serif !important;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
 /* Base styling for Apple-style icons (now using emoji) */
 [class*="house"]:before,
 [class*="building"]:before,
