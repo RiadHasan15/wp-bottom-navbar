@@ -862,12 +862,12 @@ jQuery(document).ready(function($) {
             
             // Use setTimeout to allow UI to update and prevent blocking
             setTimeout(() => {
-                this.doApplyPreset(preset, presetKey, $target);
+                this.doApplyPreset(preset, presetKey, $target, e);
             }, 50);
         },
         
         // Actual preset application logic (separated for performance)
-        doApplyPreset: function(preset, presetKey, $target) {
+        doApplyPreset: function(preset, presetKey, $target, originalEvent) {
             // Define icon library mapping for each preset
             const presetIconMapping = {
                 'minimal': 'dashicons',
@@ -1013,70 +1013,27 @@ jQuery(document).ready(function($) {
                 });
             }
             
-            // CRITICAL: Auto-convert existing item icons to match preset's icon library
+            // OPTIONAL: Auto-convert existing item icons to match preset's icon library (simplified)
             if (this.settings.items && this.settings.items.length > 0) {
-                let iconsChanged = 0;
+                // Only convert icons if explicitly requested (to avoid performance issues)
+                // Users can enable this by holding Shift while clicking preset
+                const shouldConvertIcons = originalEvent && originalEvent.shiftKey; // Enable with Shift+Click
                 
-                this.settings.items.forEach((item, index) => {
-                    if (item.icon) {
-                        // Detect current icon type more accurately
-                        let currentIconType = 'dashicons';
-                        if (item.icon.startsWith('fas fa-') || item.icon.startsWith('far fa-') || item.icon.startsWith('fab fa-')) {
-                            currentIconType = 'fontawesome';
-                        } else if (item.icon.startsWith('bi bi-')) {
-                            currentIconType = 'bootstrap';
-                        } else if (item.icon.startsWith('feather-')) {
-                            currentIconType = 'feather';
-                        } else if (item.icon.startsWith('dashicons-')) {
-                            currentIconType = 'dashicons';
-                        } else if (this.isAppleIcon(item.icon)) {
-                            // Apple SF Symbols like 'house-fill', 'person-circle'
-                            currentIconType = 'apple';
-                        } else if (!item.icon.includes('dashicons-') && !item.icon.includes('fa-') && !item.icon.includes('bi ') && !item.icon.includes('-') && !item.icon.includes('<')) {
-                            // Material icons (single words like 'home', 'person')
-                            currentIconType = 'material';
-                        }
-                        
-                        // Always convert icons to match the preset's recommended library
-                        if (currentIconType !== recommendedIconLibrary) {
-                            // Try to find a matching icon in the conversion table
-                            let convertedIcon = null;
-                            
-                            // Search through conversion mappings
-                            Object.keys(iconConversion).forEach(iconType => {
-                                const mapping = iconConversion[iconType];
-                                if (mapping[currentIconType] === item.icon) {
-                                    convertedIcon = mapping[recommendedIconLibrary];
-                                }
-                            });
-                            
-                            // If no direct conversion found, use default preset-appropriate icons
-                            if (!convertedIcon) {
-                                const defaultIcons = {
-                                    'dashicons': ['dashicons-admin-home', 'dashicons-cart', 'dashicons-admin-users', 'dashicons-heart', 'dashicons-search'],
-                                    'material': ['home', 'shopping_cart', 'person', 'favorite', 'search'],
-                                    'apple': ['house-fill', 'cart-fill', 'person-fill', 'heart-fill', 'magnifyingglass'],
-                                    'fontawesome': ['fas fa-home', 'fas fa-shopping-cart', 'fas fa-user', 'fas fa-heart', 'fas fa-search'],
-                                    'bootstrap': ['bi bi-house-door-fill', 'bi bi-cart-fill', 'bi bi-person-fill', 'bi bi-heart-fill', 'bi bi-search'],
-                                    'feather': ['feather-home', 'feather-shopping-cart', 'feather-user', 'feather-heart', 'feather-search']
-                                };
-                                
-                                // Use appropriate default icon based on item index
-                                const defaultIconsForLibrary = defaultIcons[recommendedIconLibrary] || defaultIcons['dashicons'];
-                                convertedIcon = defaultIconsForLibrary[index % defaultIconsForLibrary.length] || defaultIconsForLibrary[0];
-                            }
-                            
-                            // Apply the conversion
-                            if (convertedIcon) {
+                if (shouldConvertIcons) {
+                    let iconsChanged = 0;
+                    
+                    // Simplified conversion - only convert obvious mismatches
+                    this.settings.items.forEach((item, index) => {
+                        if (item.icon && this.needsIconConversion(item.icon, recommendedIconLibrary)) {
+                            const convertedIcon = this.getSimpleIconConversion(item.icon, recommendedIconLibrary, index);
+                            if (convertedIcon && convertedIcon !== item.icon) {
                                 item.icon = convertedIcon;
                                 iconsChanged++;
                                 
-                                // Update the UI immediately
+                                // Update the UI in batch (more efficient)
                                 const iconInput = $(`.wpbnp-nav-item-row:eq(${index}) .wpbnp-icon-input`);
                                 if (iconInput.length) {
                                     iconInput.val(convertedIcon);
-                                    
-                                    // Update the icon preview
                                     const iconPreview = iconInput.siblings('.wpbnp-icon-preview');
                                     if (iconPreview.length) {
                                         iconPreview.html(this.generateIconHTML(convertedIcon));
@@ -1084,15 +1041,12 @@ jQuery(document).ready(function($) {
                                 }
                             }
                         }
-                    }
-                });
-                
-                // Show notification about icon conversions
-                if (iconsChanged > 0) {
-                    this.showNotification(`🎨 Updated ${iconsChanged} icon(s) to ${recommendedIconLibrary.toUpperCase()} library for the ${preset.name} preset!`, 'success');
+                    });
                     
-                    // Update the items data
-                    this.updateItemsData();
+                                                              // Show notification about icon conversions
+                     if (iconsChanged > 0) {
+                         this.showNotification(`🎨 Updated ${iconsChanged} icon(s) to ${recommendedIconLibrary.toUpperCase()} library!`, 'success');
+                     }
                 }
             }
             
@@ -1158,8 +1112,10 @@ jQuery(document).ready(function($) {
                 const defaultItems = defaultPresetItems[presetKey] || defaultPresetItems['minimal'];
                 this.settings.items = [...defaultItems];
                 
-                // Re-render items list
-                this.renderItemsList();
+                // Re-render items list (batched)
+                setTimeout(() => {
+                    this.renderItemsList();
+                }, 10);
                 this.showNotification(`✨ Added ${defaultItems.length} default items for the ${preset.name} preset!`, 'info');
             }
 
@@ -1168,15 +1124,76 @@ jQuery(document).ready(function($) {
             $('.wpbnp-preset-card').removeClass('active');
             $(`.wpbnp-preset-card[data-preset="${presetKey}"]`).addClass('active');
             
-            // Show success notification with icon library info
-            this.showNotification(`🎨 ${preset.name} preset applied! Using ${recommendedIconLibrary.toUpperCase()} icons for optimal design.`, 'success');
+            // Show success notification
+            this.showNotification(`✨ ${preset.name} preset applied successfully!`, 'success');
             
-            // Auto-save the form after preset application
-            this.saveFormState();
+            // Auto-save the form after preset application (debounced)
+            setTimeout(() => {
+                this.saveFormState();
+            }, 100);
             
             // Reset button state and restore text
             $target.removeClass('wpbnp-applying');
             $target.find('.wpbnp-preset-name').text(preset.name);
+        },
+        
+        // Check if icon needs conversion (simplified)
+        needsIconConversion: function(iconClass, targetLibrary) {
+            if (!iconClass || !targetLibrary) return false;
+            
+            const iconType = this.getIconType(iconClass);
+            return iconType !== targetLibrary;
+        },
+        
+        // Get icon type (simplified detection)
+        getIconType: function(iconClass) {
+            if (iconClass.startsWith('dashicons-')) return 'dashicons';
+            if (iconClass.startsWith('fas fa-') || iconClass.startsWith('far fa-') || iconClass.startsWith('fab fa-')) return 'fontawesome';
+            if (iconClass.startsWith('bi bi-')) return 'bootstrap';
+            if (iconClass.startsWith('feather-')) return 'feather';
+            if (this.isAppleIcon(iconClass)) return 'apple';
+            if (!iconClass.includes('-') && !iconClass.includes(' ') && !iconClass.includes('<')) return 'material';
+            return 'dashicons'; // default
+        },
+        
+        // Simple icon conversion (basic mapping only)
+        getSimpleIconConversion: function(iconClass, targetLibrary, index) {
+            // Basic conversion map for common icons only
+            const basicConversions = {
+                'home': {
+                    'dashicons': 'dashicons-admin-home',
+                    'fontawesome': 'fas fa-home',
+                    'bootstrap': 'bi bi-house-door-fill',
+                    'material': 'home',
+                    'apple': 'house-fill',
+                    'feather': 'feather-home'
+                },
+                'user': {
+                    'dashicons': 'dashicons-admin-users',
+                    'fontawesome': 'fas fa-user',
+                    'bootstrap': 'bi bi-person-fill',
+                    'material': 'person',
+                    'apple': 'person-fill',
+                    'feather': 'feather-user'
+                },
+                'search': {
+                    'dashicons': 'dashicons-search',
+                    'fontawesome': 'fas fa-search',
+                    'bootstrap': 'bi bi-search',
+                    'material': 'search',
+                    'apple': 'magnifyingglass',
+                    'feather': 'feather-search'
+                }
+            };
+            
+            // Try to find conversion, otherwise return original
+            for (const [key, mapping] of Object.entries(basicConversions)) {
+                if (Object.values(mapping).includes(iconClass)) {
+                    return mapping[targetLibrary] || iconClass;
+                }
+            }
+            
+            return iconClass; // Return original if no conversion found
         },
         
         // Generate HTML for icon preview
