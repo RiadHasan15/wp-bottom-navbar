@@ -37,8 +37,11 @@ class WPBNP_Frontend {
             return;
         }
         
+        $preset = $settings['preset'] ?? 'minimal';
+        $preset_class = 'wpbnp-preset-' . esc_attr($preset);
+        
         ?>
-        <nav class="wpbnp-bottom-nav" id="wpbnp-bottom-nav" role="navigation" aria-label="<?php esc_attr_e('Bottom Navigation', 'wp-bottom-navigation-pro'); ?>">
+        <nav class="wpbnp-bottom-nav <?php echo esc_attr($preset_class); ?>" id="wpbnp-bottom-nav" role="navigation" aria-label="<?php esc_attr_e('Bottom Navigation', 'wp-bottom-navigation-pro'); ?>">
             <?php
             foreach ($items as $item) {
                 if (!wpbnp_can_user_see_item($item)) {

@@ -696,3 +696,269 @@ input:checked + .wpbnp-toggle-slider:before {
         border: 2px solid #000;
     }
 }
+
+/* Enhanced Icon Picker Modal */
+.wpbnp-icon-modal-content {
+    max-width: 700px;
+    max-height: 80vh;
+}
+
+.wpbnp-icon-search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+
+#wpbnp-icon-search {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+}
+
+#wpbnp-icon-search:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
+}
+
+.wpbnp-icon-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 12px;
+    color: #666;
+    min-width: 100px;
+}
+
+#wpbnp-icon-count {
+    font-weight: 600;
+    color: #0073aa;
+}
+
+#wpbnp-current-library {
+    color: #999;
+    margin-top: 2px;
+}
+
+/* Icon Library Tabs */
+.wpbnp-icon-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 0;
+}
+
+.wpbnp-icon-tab {
+    padding: 12px 24px;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: -2px;
+}
+
+.wpbnp-icon-tab:hover {
+    background: #f8f9fa;
+    color: #0073aa;
+}
+
+.wpbnp-icon-tab.active {
+    background: #0073aa;
+    color: #ffffff;
+    border-bottom: 2px solid #0073aa;
+}
+
+/* Icon Content */
+.wpbnp-icon-content {
+    min-height: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.wpbnp-icon-library-content {
+    display: none;
+}
+
+.wpbnp-icon-library-content.active {
+    display: block;
+}
+
+.wpbnp-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.wpbnp-icon-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    min-height: 80px;
+    justify-content: center;
+}
+
+.wpbnp-icon-option:hover {
+    border-color: #0073aa;
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 115, 170, 0.15);
+}
+
+.wpbnp-icon-option.selected {
+    border-color: #0073aa;
+    background: #e7f3ff;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
+}
+
+.wpbnp-icon-option span.dashicons,
+.wpbnp-icon-option span[class*="apple-"],
+.wpbnp-icon-option span[class*="material-"] {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #666;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.wpbnp-icon-option:hover span.dashicons,
+.wpbnp-icon-option:hover span[class*="apple-"],
+.wpbnp-icon-option:hover span[class*="material-"] {
+    color: #0073aa;
+}
+
+.wpbnp-icon-option.selected span.dashicons,
+.wpbnp-icon-option.selected span[class*="apple-"],
+.wpbnp-icon-option.selected span[class*="material-"] {
+    color: #0073aa;
+}
+
+.wpbnp-icon-option .icon-name {
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wpbnp-icon-option:hover .icon-name {
+    color: #0073aa;
+}
+
+.wpbnp-icon-option.selected .icon-name {
+    color: #0073aa;
+    font-weight: 600;
+}
+
+/* Apple and Material icons specific styling */
+.wpbnp-icon-option span[class*="apple-"] {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Icons", sans-serif;
+    font-weight: 300;
+}
+
+.wpbnp-icon-option span[class*="material-"] {
+    font-family: "Material Icons", "Material Icons Outlined", sans-serif;
+    font-weight: normal;
+}
+
+/* Responsive adjustments for icon picker */
+@media (max-width: 768px) {
+    .wpbnp-icon-modal-content {
+        max-width: 95vw;
+        margin: 20px;
+    }
+    
+    .wpbnp-icon-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 6px;
+    }
+    
+    .wpbnp-icon-option {
+        padding: 12px 8px;
+        min-height: 70px;
+    }
+    
+    .wpbnp-icon-search-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .wpbnp-icon-stats {
+        align-items: flex-start;
+    }
+    
+    .wpbnp-icon-tabs {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .wpbnp-icon-tab {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Enhanced Modal Styling */
+.wpbnp-modal {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.wpbnp-modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e0e0e0;
+}
+
+.wpbnp-modal-header {
+    border-bottom: 2px solid #f0f0f0;
+    padding: 20px 24px;
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.wpbnp-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.wpbnp-modal-close {
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+.wpbnp-modal-close:hover {
+    color: #666;
+}
+
+.wpbnp-modal-body {
+    padding: 24px;
+}

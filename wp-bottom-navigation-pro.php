@@ -135,6 +135,14 @@ class WP_Bottom_Navigation_Pro {
             WPBNP_VERSION
         );
         
+        // Enqueue icon libraries CSS
+        wp_enqueue_style(
+            'wpbnp-icons',
+            WPBNP_PLUGIN_URL . 'assets/css/icons.css',
+            array('wpbnp-frontend'),
+            WPBNP_VERSION
+        );
+        
         // Enqueue JavaScript
         wp_enqueue_script(
             'wpbnp-frontend',
@@ -450,72 +458,269 @@ class WP_Bottom_Navigation_Pro {
      */
     private function generate_preset_css($preset, $settings) {
         $css = "\n/* Preset CSS: {$preset} */\n";
+        $css .= ".wpbnp-bottom-nav { /* Preset: {$preset} */ }\n";
+        
+        // Add preset class to navigation
+        $css .= ".wpbnp-bottom-nav.wpbnp-preset-{$preset} {\n";
         
         switch ($preset) {
+            case 'minimal':
+                $css .= "
+                    /* Minimal preset enhancements */
+                }
+                .wpbnp-preset-minimal .wpbnp-nav-item {
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                }
+                .wpbnp-preset-minimal .wpbnp-nav-item:hover {
+                    transform: translateY(-1px) !important;
+                }";
+                break;
+                
+            case 'dark':
+                $css .= "
+                    /* Dark mode enhancements */
+                    border-top: 1px solid rgba(55, 65, 81, 0.8) !important;
+                }
+                .wpbnp-preset-dark .wpbnp-nav-item:hover {
+                    background-color: rgba(75, 85, 99, 0.3) !important;
+                    border-radius: 8px !important;
+                }
+                .wpbnp-preset-dark .wpbnp-nav-item.active {
+                    background-color: rgba(96, 165, 250, 0.2) !important;
+                    border-radius: 8px !important;
+                }";
+                break;
+                
+            case 'material':
+                $css .= "
+                    /* Material Design enhancements */
+                    elevation: 8;
+                }
+                .wpbnp-preset-material .wpbnp-nav-item {
+                    border-radius: 12px !important;
+                    margin: 4px !important;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                }
+                .wpbnp-preset-material .wpbnp-nav-item:hover {
+                    background-color: rgba(33, 150, 243, 0.08) !important;
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3) !important;
+                }
+                .wpbnp-preset-material .wpbnp-nav-item.active {
+                    background-color: rgba(33, 150, 243, 0.12) !important;
+                    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.4) !important;
+                }";
+                break;
+                
+            case 'ios':
+                $css .= "
+                    /* iOS native enhancements */
+                    backdrop-filter: blur(20px) !important;
+                    -webkit-backdrop-filter: blur(20px) !important;
+                    background-color: rgba(242, 242, 247, 0.8) !important;
+                }
+                .wpbnp-preset-ios .wpbnp-nav-item {
+                    transition: all 0.25s ease-out !important;
+                    border-radius: 10px !important;
+                    margin: 0 2px !important;
+                }
+                .wpbnp-preset-ios .wpbnp-nav-item:hover {
+                    background-color: rgba(0, 122, 255, 0.1) !important;
+                    transform: scale(1.05) !important;
+                }
+                .wpbnp-preset-ios .wpbnp-nav-item.active {
+                    background-color: rgba(0, 122, 255, 0.15) !important;
+                    transform: scale(1.02) !important;
+                }";
+                break;
+                
             case 'glassmorphism':
                 $css .= "
-                .wpbnp-bottom-nav {
+                    backdrop-filter: blur(16px) !important;
+                    -webkit-backdrop-filter: blur(16px) !important;
+                    border: 1px solid rgba(255,255,255,0.2) !important;
+                    background-color: rgba(255,255,255,0.1) !important;
+                    box-shadow: 0 -8px 32px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.05) !important;
+                }
+                .wpbnp-preset-glassmorphism .wpbnp-nav-item {
                     backdrop-filter: blur(8px) !important;
-                    -webkit-backdrop-filter: blur(8px) !important;
-                    border: 1px solid rgba(255,255,255,0.18) !important;
-                    background-color: rgba(255,255,255,0.25) !important;
+                    border-radius: 12px !important;
+                    border: 1px solid rgba(255,255,255,0.1) !important;
+                    transition: all 0.3s ease !important;
+                }
+                .wpbnp-preset-glassmorphism .wpbnp-nav-item:hover {
+                    background-color: rgba(139, 92, 246, 0.1) !important;
+                    border-color: rgba(139, 92, 246, 0.2) !important;
+                    transform: translateY(-3px) !important;
+                    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15) !important;
                 }";
                 break;
                 
             case 'neumorphism':
                 $css .= "
-                .wpbnp-bottom-nav {
                     background-color: #e0e5ec !important;
-                    box-shadow: 9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff !important;
+                    box-shadow: 
+                        9px 9px 16px #a3b1c6, 
+                        -9px -9px 16px #ffffff,
+                        inset 0 0 0 1px rgba(255,255,255,0.8) !important;
+                    border: none !important;
                 }
-                .wpbnp-nav-item:hover {
-                    box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff !important;
-                    border-radius: 12px !important;
+                .wpbnp-preset-neumorphism .wpbnp-nav-item {
+                    background: #e0e5ec !important;
+                    border-radius: 14px !important;
+                    box-shadow: 
+                        5px 5px 10px #a3b1c6, 
+                        -5px -5px 10px #ffffff !important;
+                    border: none !important;
+                    transition: all 0.3s ease !important;
+                }
+                .wpbnp-preset-neumorphism .wpbnp-nav-item:hover {
+                    box-shadow: 
+                        inset 3px 3px 6px #a3b1c6, 
+                        inset -3px -3px 6px #ffffff !important;
+                    transform: translateY(1px) !important;
+                }
+                .wpbnp-preset-neumorphism .wpbnp-nav-item.active {
+                    box-shadow: 
+                        inset 5px 5px 10px #a3b1c6, 
+                        inset -5px -5px 10px #ffffff !important;
                 }";
                 break;
                 
             case 'cyberpunk':
                 $css .= "
-                .wpbnp-bottom-nav {
-                    background-color: #0d1421 !important;
-                    border-top-color: #00ff41 !important;
-                    box-shadow: 0 -4px 20px rgba(0,255,65,0.3), inset 0 1px 0 rgba(0,255,65,0.5) !important;
+                    background: linear-gradient(135deg, #0d1421 0%, #1a1f3a 100%) !important;
+                    border-top: 2px solid #00ff88 !important;
+                    box-shadow: 
+                        0 -4px 20px rgba(0,255,136,0.4), 
+                        inset 0 1px 0 rgba(0,255,136,0.3) !important;
+                    position: relative !important;
                 }
-                .wpbnp-nav-item {
-                    color: #00ff41 !important;
-                    text-shadow: 0 0 10px currentColor !important;
+                .wpbnp-preset-cyberpunk:before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 1px;
+                    background: linear-gradient(90deg, transparent, #00ff88, transparent);
+                    animation: cyberpunk-scan 3s ease-in-out infinite;
                 }
-                .wpbnp-nav-item:hover,
-                .wpbnp-nav-item.active {
-                    color: #ff0080 !important;
-                    text-shadow: 0 0 15px currentColor !important;
+                @keyframes cyberpunk-scan {
+                    0%, 100% { opacity: 0; }
+                    50% { opacity: 1; }
+                }
+                .wpbnp-preset-cyberpunk .wpbnp-nav-item {
+                    border: 1px solid rgba(0,255,136,0.3) !important;
+                    border-radius: 4px !important;
+                    transition: all 0.3s ease !important;
+                    position: relative !important;
+                    overflow: hidden !important;
+                }
+                .wpbnp-preset-cyberpunk .wpbnp-nav-item:hover {
+                    border-color: #ff0080 !important;
+                    box-shadow: 
+                        0 0 15px rgba(255,0,128,0.5),
+                        inset 0 0 15px rgba(255,0,128,0.1) !important;
+                    transform: translateY(-2px) !important;
+                }
+                .wpbnp-preset-cyberpunk .wpbnp-nav-item:active {
+                    animation: cyberpunk-glitch 0.3s ease !important;
+                }
+                @keyframes cyberpunk-glitch {
+                    0%, 100% { transform: translateY(0); }
+                    20% { transform: translateY(-2px) translateX(2px); }
+                    40% { transform: translateY(2px) translateX(-2px); }
+                    60% { transform: translateY(-1px) translateX(1px); }
+                    80% { transform: translateY(1px) translateX(-1px); }
+                }";
+                break;
+                
+            case 'vintage':
+                $css .= "
+                    background: linear-gradient(135deg, #f5f1eb 0%, #e8dcc0 100%) !important;
+                    border-top: 2px solid #d4c4a8 !important;
+                    box-shadow: 
+                        0 -3px 12px rgba(139,115,85,0.2),
+                        inset 0 1px 0 rgba(255,255,255,0.8) !important;
+                }
+                .wpbnp-preset-vintage .wpbnp-nav-item {
+                    border-radius: 6px !important;
+                    transition: all 0.4s ease !important;
+                    border: 1px solid rgba(139,115,85,0.2) !important;
+                }
+                .wpbnp-preset-vintage .wpbnp-nav-item:hover {
+                    background: linear-gradient(135deg, rgba(210,105,30,0.1), rgba(139,115,85,0.1)) !important;
+                    border-color: rgba(210,105,30,0.3) !important;
+                    box-shadow: 0 2px 8px rgba(210,105,30,0.2) !important;
+                    transform: translateY(-1px) !important;
                 }";
                 break;
                 
             case 'gradient':
                 $css .= "
-                .wpbnp-bottom-nav {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
                     border: none !important;
+                    box-shadow: 
+                        0 -4px 20px rgba(102,126,234,0.4),
+                        0 0 0 1px rgba(255,255,255,0.1) !important;
+                    position: relative !important;
+                    overflow: hidden !important;
                 }
-                .wpbnp-nav-item {
-                    color: #ffffff !important;
+                .wpbnp-preset-gradient:before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                    animation: gradient-shine 3s ease-in-out infinite;
                 }
-                .wpbnp-nav-item:hover,
-                .wpbnp-nav-item.active {
-                    color: #ffd700 !important;
+                @keyframes gradient-shine {
+                    0% { left: -100%; }
+                    50% { left: 100%; }
+                    100% { left: 100%; }
+                }
+                .wpbnp-preset-gradient .wpbnp-nav-item {
+                    border-radius: 8px !important;
+                    border: 1px solid rgba(255,255,255,0.1) !important;
+                    transition: all 0.3s ease !important;
+                }
+                .wpbnp-preset-gradient .wpbnp-nav-item:hover {
+                    background-color: rgba(255,215,0,0.2) !important;
+                    border-color: rgba(255,215,0,0.3) !important;
+                    transform: translateY(-2px) scale(1.05) !important;
+                    box-shadow: 0 8px 20px rgba(255,215,0,0.3) !important;
                 }";
                 break;
                 
             case 'floating':
                 $css .= "
-                .wpbnp-bottom-nav {
                     margin: 0 20px 20px 20px !important;
-                    border-radius: 30px !important;
+                    border-radius: 28px !important;
                     left: 20px !important;
                     right: 20px !important;
                     bottom: 20px !important;
-                    box-shadow: 0 -10px 30px rgba(0,0,0,0.15) !important;
+                    box-shadow: 
+                        0 -10px 30px rgba(0,0,0,0.15),
+                        0 0 0 1px rgba(0,0,0,0.05),
+                        inset 0 1px 0 rgba(255,255,255,0.8) !important;
+                    border: none !important;
+                }
+                .wpbnp-preset-floating .wpbnp-nav-item {
+                    border-radius: 20px !important;
+                    margin: 4px !important;
+                    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+                }
+                .wpbnp-preset-floating .wpbnp-nav-item:hover {
+                    background-color: rgba(16, 185, 129, 0.1) !important;
+                    transform: translateY(-3px) scale(1.05) !important;
+                    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3) !important;
+                }
+                .wpbnp-preset-floating .wpbnp-nav-item.active {
+                    background-color: rgba(16, 185, 129, 0.15) !important;
+                    transform: translateY(-1px) !important;
                 }";
                 break;
         }
