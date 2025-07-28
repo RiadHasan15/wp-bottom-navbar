@@ -1,6 +1,45 @@
 jQuery(document).ready(function($) {
     'use strict';
     
+    // CRITICAL: Immediate checkbox state preservation - runs before everything else
+    (function() {
+        const savedState = localStorage.getItem('wpbnp_form_state');
+        if (savedState) {
+            try {
+                const formData = JSON.parse(savedState);
+                if (formData['settings[enabled]'] !== undefined) {
+                    // Use MutationObserver to watch for the checkbox and restore it immediately
+                    const observer = new MutationObserver(function(mutations) {
+                        const checkbox = document.querySelector('input[name="settings[enabled]"]');
+                        if (checkbox) {
+                            checkbox.checked = Boolean(formData['settings[enabled]']);
+                            console.log('MutationObserver: Restored enabled checkbox to:', checkbox.checked);
+                            observer.disconnect(); // Stop observing once we've found and set the checkbox
+                        }
+                    });
+                    
+                    // Start observing
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                    
+                    // Fallback: try to set it immediately if it already exists
+                    setTimeout(() => {
+                        const checkbox = document.querySelector('input[name="settings[enabled]"]');
+                        if (checkbox) {
+                            checkbox.checked = Boolean(formData['settings[enabled]']);
+                            console.log('Immediate fallback: Restored enabled checkbox to:', checkbox.checked);
+                        }
+                        observer.disconnect(); // Clean up observer
+                    }, 50);
+                }
+            } catch (e) {
+                console.warn('Error in immediate checkbox restoration:', e);
+            }
+        }
+    })();
+    
     // Check if we have admin data available
     if (typeof wpbnp_admin === 'undefined') {
         console.warn('WP Bottom Navigation Pro: Admin data not available');
@@ -17,6 +56,13 @@ jQuery(document).ready(function($) {
         
         init: function() {
             this.currentTab = this.getCurrentTab();
+            
+            // CRITICAL: Immediately save current form state on load to capture any existing values
+            setTimeout(() => {
+                this.saveFormState();
+                console.log('Initial form state saved on page load');
+            }, 100);
+            
             this.bindEvents();
             this.initializeColorPickers();
             this.setupSortable();
@@ -32,7 +78,7 @@ jQuery(document).ready(function($) {
                         this.restoreFormState();
                     }, 100);
                 }
-            }, 100);
+            }, 200);
         },
         
         // Get current tab from URL or default
@@ -261,9 +307,17 @@ jQuery(document).ready(function($) {
             }, 500));
             
             // Specific handler for the Enable Bottom Navigation checkbox
-            $(document).on('change', 'input[name="settings[enabled]"]', () => {
+            $(document).on('change', 'input[name="settings[enabled]"]', (e) => {
+                const isChecked = $(e.target).is(':checked');
+                
+                // Update local settings immediately
+                this.settings.enabled = isChecked;
+                
+                // Save form state immediately
                 this.saveFormState();
-                console.log('Saved state due to Enable Bottom Navigation change');
+                
+                console.log('Enable Bottom Navigation changed to:', isChecked);
+                console.log('Saved state immediately');
             });
         },
         
@@ -298,7 +352,16 @@ jQuery(document).ready(function($) {
         // Save current form state to localStorage
         saveFormState: function() {
             const formData = this.getFormData();
+            
+            // CRITICAL: Always ensure the enabled checkbox state is captured
+            const enabledCheckbox = $('input[name="settings[enabled]"]');
+            if (enabledCheckbox.length) {
+                formData['settings[enabled]'] = enabledCheckbox.is(':checked');
+                console.log('Saved enabled checkbox state:', formData['settings[enabled]']);
+            }
+            
             localStorage.setItem('wpbnp_form_state', JSON.stringify(formData));
+            console.log('Form state saved to localStorage:', formData);
         },
         
         // Get form data
@@ -337,6 +400,19 @@ jQuery(document).ready(function($) {
                 try {
                     const formData = JSON.parse(savedState);
                     
+                    // CRITICAL: Handle the enabled checkbox FIRST and more aggressively
+                    if (formData['settings[enabled]'] !== undefined) {
+                        const enabledCheckbox = $('input[name="settings[enabled]"]');
+                        if (enabledCheckbox.length) {
+                            const shouldBeChecked = Boolean(formData['settings[enabled]']);
+                            enabledCheckbox.prop('checked', shouldBeChecked);
+                            console.log('Restored enabled checkbox to:', shouldBeChecked);
+                            
+                            // Also update the local settings object
+                            this.settings.enabled = shouldBeChecked;
+                        }
+                    }
+                    
                     // Restore regular form fields
                     Object.keys(formData).forEach(name => {
                         if (name === 'wpbnp_items_data') {
@@ -350,6 +426,11 @@ jQuery(document).ready(function($) {
                             } catch (e) {
                                 console.warn('Error parsing items data:', e);
                             }
+                            return;
+                        }
+                        
+                        // Skip enabled checkbox as we handled it above
+                        if (name === 'settings[enabled]') {
                             return;
                         }
                         
