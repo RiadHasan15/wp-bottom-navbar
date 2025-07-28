@@ -1013,11 +1013,11 @@ jQuery(document).ready(function($) {
                 });
             }
             
-            // OPTIONAL: Auto-convert existing item icons to match preset's icon library (simplified)
+            // AUTO-CONVERT: Existing item icons to match preset's icon library
             if (this.settings.items && this.settings.items.length > 0) {
-                // Only convert icons if explicitly requested (to avoid performance issues)
-                // Users can enable this by holding Shift while clicking preset
-                const shouldConvertIcons = originalEvent && originalEvent.shiftKey; // Enable with Shift+Click
+                // Always convert icons to match the preset's recommended library
+                // This gives users the expected theme-appropriate experience
+                const shouldConvertIcons = true; // Always convert for better UX
                 
                 if (shouldConvertIcons) {
                     let iconsChanged = 0;
@@ -1045,7 +1045,16 @@ jQuery(document).ready(function($) {
                     
                                                               // Show notification about icon conversions
                      if (iconsChanged > 0) {
-                         this.showNotification(`🎨 Updated ${iconsChanged} icon(s) to ${recommendedIconLibrary.toUpperCase()} library!`, 'success');
+                         const libraryNames = {
+                             'bootstrap': 'Bootstrap Icons',
+                             'apple': 'Apple SF Symbols (iOS)',
+                             'material': 'Material Design',
+                             'fontawesome': 'FontAwesome',
+                             'dashicons': 'Dashicons',
+                             'feather': 'Feather Icons'
+                         };
+                         const libraryName = libraryNames[recommendedIconLibrary] || recommendedIconLibrary.toUpperCase();
+                         this.showNotification(`🎨 Converted ${iconsChanged} icon(s) to ${libraryName} for better theme consistency!`, 'success');
                      }
                 }
             }
@@ -1178,6 +1187,14 @@ jQuery(document).ready(function($) {
                     'apple': 'person-fill',
                     'feather': 'feather-user'
                 },
+                'account': {  // Added account mapping
+                    'bootstrap': 'bi bi-person-fill',
+                    'dashicons': 'dashicons-admin-users',
+                    'fontawesome': 'fas fa-user',
+                    'material': 'person',
+                    'apple': 'person-fill',
+                    'feather': 'feather-user'
+                },
                 'search': {
                     'bootstrap': 'bi bi-search',
                     'dashicons': 'dashicons-search',
@@ -1187,6 +1204,14 @@ jQuery(document).ready(function($) {
                     'feather': 'feather-search'
                 },
                 'cart': {
+                    'bootstrap': 'bi bi-cart-fill',
+                    'dashicons': 'dashicons-cart',
+                    'fontawesome': 'fas fa-shopping-cart',
+                    'material': 'shopping_cart',
+                    'apple': 'cart-fill',
+                    'feather': 'feather-shopping-cart'
+                },
+                'shop': {  // Added shop mapping
                     'bootstrap': 'bi bi-cart-fill',
                     'dashicons': 'dashicons-cart',
                     'fontawesome': 'fas fa-shopping-cart',
@@ -1212,10 +1237,69 @@ jQuery(document).ready(function($) {
                 }
             };
             
-            // Try to find conversion, otherwise return original
+            // Try to find conversion by checking if current icon exists in any mapping
             for (const [key, mapping] of Object.entries(basicConversions)) {
                 if (Object.values(mapping).includes(iconClass)) {
                     return mapping[targetLibrary] || iconClass;
+                }
+            }
+            
+            // Special handling for common Bootstrap to Apple conversions
+            const bootstrapToAppleMap = {
+                'bi bi-house-door-fill': 'house-fill',
+                'bi bi-cart-fill': 'cart-fill', 
+                'bi bi-person-fill': 'person-fill',
+                'bi bi-search': 'magnifyingglass',
+                'bi bi-heart-fill': 'heart-fill',
+                'bi bi-gear-fill': 'gearshape-fill'
+            };
+            
+            // Special handling for common Dashicons to Apple conversions  
+            const dashiconsToAppleMap = {
+                'dashicons-admin-home': 'house-fill',
+                'dashicons-cart': 'cart-fill',
+                'dashicons-admin-users': 'person-fill',
+                'dashicons-search': 'magnifyingglass',
+                'dashicons-heart': 'heart-fill',
+                'dashicons-admin-settings': 'gearshape-fill'
+            };
+            
+            // Apply direct mappings based on target library
+            if (targetLibrary === 'apple') {
+                if (bootstrapToAppleMap[iconClass]) {
+                    return bootstrapToAppleMap[iconClass];
+                }
+                if (dashiconsToAppleMap[iconClass]) {
+                    return dashiconsToAppleMap[iconClass];
+                }
+            } else if (targetLibrary === 'bootstrap') {
+                // Reverse mappings for converting TO Bootstrap
+                const appleToBootstrapMap = {
+                    'house-fill': 'bi bi-house-door-fill',
+                    'cart-fill': 'bi bi-cart-fill',
+                    'person-fill': 'bi bi-person-fill',
+                    'magnifyingglass': 'bi bi-search',
+                    'heart-fill': 'bi bi-heart-fill',
+                    'gearshape-fill': 'bi bi-gear-fill'
+                };
+                if (appleToBootstrapMap[iconClass]) {
+                    return appleToBootstrapMap[iconClass];
+                }
+            } else if (targetLibrary === 'material') {
+                // Common conversions to Material
+                const toMaterialMap = {
+                    'bi bi-house-door-fill': 'home',
+                    'bi bi-cart-fill': 'shopping_cart',
+                    'bi bi-person-fill': 'person',
+                    'house-fill': 'home',
+                    'cart-fill': 'shopping_cart',
+                    'person-fill': 'person',
+                    'dashicons-admin-home': 'home',
+                    'dashicons-cart': 'shopping_cart',
+                    'dashicons-admin-users': 'person'
+                };
+                if (toMaterialMap[iconClass]) {
+                    return toMaterialMap[iconClass];
                 }
             }
             
