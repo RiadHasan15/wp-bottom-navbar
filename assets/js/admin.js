@@ -868,18 +868,18 @@ jQuery(document).ready(function($) {
         
         // Actual preset application logic (separated for performance)
         doApplyPreset: function(preset, presetKey, $target, originalEvent) {
-            // Define icon library mapping for each preset (theme-appropriate)
+            // Define icon library mapping for each preset (Bootstrap Icons for all)
             const presetIconMapping = {
-                'minimal': 'bootstrap',      // Modern, clean Bootstrap icons
-                'dark': 'bootstrap',         // Modern, clean Bootstrap icons
-                'material': 'material',      // Google Material Design icons
-                'ios': 'apple',              // Apple SF Symbols for iOS feel
-                'glassmorphism': 'bootstrap', // Modern Bootstrap for glass effect
-                'neumorphism': 'apple',      // Soft Apple icons for neumorphic design
-                'cyberpunk': 'fontawesome',  // Tech-focused FontAwesome icons
-                'vintage': 'dashicons',      // Classic WordPress Dashicons
-                'gradient': 'bootstrap',     // Modern Bootstrap icons
-                'floating': 'apple'          // Soft Apple icons for floating design
+                'minimal': 'bootstrap',      // Bootstrap Icons
+                'dark': 'bootstrap',         // Bootstrap Icons
+                'material': 'bootstrap',     // Bootstrap Icons (simplified)
+                'ios': 'bootstrap',          // Bootstrap Icons (simplified)
+                'glassmorphism': 'bootstrap', // Bootstrap Icons
+                'neumorphism': 'bootstrap',  // Bootstrap Icons (simplified)
+                'cyberpunk': 'bootstrap',    // Bootstrap Icons (simplified)
+                'vintage': 'bootstrap',      // Bootstrap Icons (simplified)
+                'gradient': 'bootstrap',     // Bootstrap Icons
+                'floating': 'bootstrap'      // Bootstrap Icons (simplified)
             };
             
             // Get recommended icon library for this preset
@@ -1013,11 +1013,10 @@ jQuery(document).ready(function($) {
                 });
             }
             
-            // AUTO-CONVERT: Existing item icons to match preset's icon library
-            if (this.settings.items && this.settings.items.length > 0) {
-                // Always convert icons to match the preset's recommended library
-                // This gives users the expected theme-appropriate experience
-                const shouldConvertIcons = true; // Always convert for better UX
+            // DISABLED: Auto-conversion (keeping Bootstrap Icons for all presets for simplicity)
+            if (false && this.settings.items && this.settings.items.length > 0) {
+                // Conversion disabled - using Bootstrap Icons universally
+                const shouldConvertIcons = false; // Disabled
                 
                 if (shouldConvertIcons) {
                     let iconsChanged = 0;
@@ -1027,7 +1026,6 @@ jQuery(document).ready(function($) {
                         if (item.icon && this.needsIconConversion(item.icon, recommendedIconLibrary)) {
                             const convertedIcon = this.getSimpleIconConversion(item.icon, recommendedIconLibrary, index);
                             if (convertedIcon && convertedIcon !== item.icon) {
-                                console.log(`Converting icon: ${item.icon} → ${convertedIcon} (${recommendedIconLibrary})`);
                                 item.icon = convertedIcon;
                                 iconsChanged++;
                                 
@@ -1036,55 +1034,13 @@ jQuery(document).ready(function($) {
                         }
                     });
                     
-                                                              // Show notification about icon conversions
-                     if (iconsChanged > 0) {
-                         const libraryNames = {
-                             'bootstrap': 'Bootstrap Icons',
-                             'apple': 'Apple SF Symbols (iOS)',
-                             'material': 'Material Design',
-                             'fontawesome': 'FontAwesome',
-                             'dashicons': 'Dashicons',
-                             'feather': 'Feather Icons'
-                         };
-                         const libraryName = libraryNames[recommendedIconLibrary] || recommendedIconLibrary.toUpperCase();
-                         this.showNotification(`🎨 Converted ${iconsChanged} icon(s) to ${libraryName} for better theme consistency!`, 'success');
-                         
-                         // Refresh the items list to show the new icons
-                         this.refreshItemsList();
-                         
-                         // Also manually update form inputs to ensure they have the correct values
-                         this.settings.items.forEach((item, index) => {
-                             const iconInput = $(`.wpbnp-nav-item-row:eq(${index}) .wpbnp-icon-input`);
-                             if (iconInput.length && iconInput.val() !== item.icon) {
-                                 console.log(`Manually updating input ${index}: ${iconInput.val()} → ${item.icon}`);
-                                 iconInput.val(item.icon);
-                             }
-                         });
-                         
-                         // Auto-save the converted icons to database (increased timeout to ensure DOM is updated)
-                         setTimeout(() => {
-                             this.showNotification('💾 Saving converted icons...', 'info');
-                             
-                             // Debug: Check what's actually in the form before saving
-                             console.log('Current settings before save:', this.settings);
-                             const formData = new FormData(document.getElementById('wpbnp-settings-form'));
-                             console.log('Form data items before save:');
-                             for (let i = 0; i < 10; i++) {
-                                 const iconValue = formData.get(`settings[items][${i}][icon]`);
-                                 if (iconValue) {
-                                     console.log(`Item ${i} icon in form:`, iconValue);
-                                 }
-                             }
-                             
-                             this.saveSettings();
-                         }, 300);
-                     }
+                                                              // Icon conversion disabled - using Bootstrap Icons for all presets
                 }
             }
             
             // If no items exist, create default preset-appropriate items
             if (!this.settings.items || this.settings.items.length === 0) {
-                // Same 3 default items (Home, Shop, Account) but with theme-appropriate icons
+                // Same 3 default items (Home, Shop, Account) with Bootstrap Icons for all presets
                 const defaultPresetItems = {
                     'minimal': [
                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
@@ -1097,14 +1053,14 @@ jQuery(document).ready(function($) {
                         {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'material': [
-                        {id: 'home', label: 'Home', icon: 'home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'shopping_cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'person', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'ios': [
-                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'glassmorphism': [
                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
@@ -1112,19 +1068,19 @@ jQuery(document).ready(function($) {
                         {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'neumorphism': [
-                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'cyberpunk': [
-                        {id: 'home', label: 'Home', icon: 'fas fa-home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'fas fa-shopping-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'fas fa-user', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'vintage': [
-                        {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'dashicons-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'dashicons-admin-users', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'gradient': [
                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
@@ -1132,9 +1088,9 @@ jQuery(document).ready(function($) {
                         {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'floating': [
-                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ]
                 };
                 
@@ -1484,29 +1440,18 @@ jQuery(document).ready(function($) {
         
         // Refresh the items list display
         refreshItemsList: function() {
-            console.log('Refreshing items list with:', this.settings.items);
-            
             // Clear existing items
             $('#wpbnp-items-list').empty();
             
             // Re-render all items from current settings
             if (this.settings.items && this.settings.items.length > 0) {
                 this.settings.items.forEach((item, index) => {
-                    console.log(`Adding item ${index}:`, item);
                     this.addItemRow(item, index);
                 });
             }
             
             // Re-setup sortable after refresh
             this.setupSortable();
-            
-            // Debug: Verify form inputs after refresh
-            setTimeout(() => {
-                console.log('Form inputs after refresh:');
-                $('.wpbnp-icon-input').each(function(i) {
-                    console.log(`Input ${i}:`, $(this).attr('name'), '=', $(this).val());
-                });
-            }, 50);
         },
         
         // Save settings programmatically (for auto-save after conversions)
@@ -1540,25 +1485,10 @@ jQuery(document).ready(function($) {
                 contentType: false,
                 success: (response) => {
                     if (response.success) {
-                        console.log('Settings auto-saved successfully after icon conversion');
-                        console.log('Server response:', response);
-                        
-                        // Check what icons were actually saved
-                        if (response.data && response.data.settings && response.data.settings.items) {
-                            console.log('Saved items with icons:');
-                            response.data.settings.items.forEach((item, i) => {
-                                console.log(`Saved item ${i}: ${item.id} = ${item.icon}`);
-                            });
-                        }
-                        
-                        this.showNotification('✅ Icons saved! Changes will appear on frontend.', 'success');
                         // Update local settings from response
                         if (response.data && response.data.settings) {
                             this.settings = response.data.settings;
                         }
-                    } else {
-                        console.error('Failed to auto-save settings:', response.data);
-                        this.showNotification('❌ Failed to save icon changes', 'error');
                     }
                 },
                 error: (xhr, status, error) => {
