@@ -62,10 +62,23 @@ class WPBNP_Frontend {
                    <?php endif; ?>>
                    
                     <span class="wpbnp-nav-icon">
-                        <?php if (strpos($item['icon'], 'dashicons-') === 0): ?>
-                            <span class="dashicons <?php echo esc_attr($item['icon']); ?>" aria-hidden="true"></span>
+                        <?php 
+                        $icon = $item['icon'];
+                        if (strpos($icon, 'dashicons-') === 0): ?>
+                            <span class="dashicons <?php echo esc_attr($icon); ?>" aria-hidden="true"></span>
+                        <?php elseif (strpos($icon, 'fas fa-') === 0): ?>
+                            <i class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></i>
+                        <?php elseif (strpos($icon, 'bi bi-') === 0): ?>
+                            <i class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></i>
+                        <?php elseif (strpos($icon, 'feather-') === 0): ?>
+                            <i class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></i>
+                        <?php elseif (strpos($icon, 'apple-') === 0): ?>
+                            <span class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></span>
+                        <?php elseif (!empty($icon) && !strpos($icon, '<') && !strpos($icon, 'fa-') && !strpos($icon, 'bi-')): ?>
+                            <!-- Material Icons (text content) -->
+                            <span class="material-icons" aria-hidden="true"><?php echo esc_attr($icon); ?></span>
                         <?php else: ?>
-                            <span class="wpbnp-custom-icon" aria-hidden="true"><?php echo wp_kses_post($item['icon']); ?></span>
+                            <span class="wpbnp-custom-icon" aria-hidden="true"><?php echo wp_kses_post($icon); ?></span>
                         <?php endif; ?>
                         
                         <?php if ($settings['badges']['enabled'] && $badge_count > 0): ?>
