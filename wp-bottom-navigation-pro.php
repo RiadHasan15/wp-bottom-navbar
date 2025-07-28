@@ -127,15 +127,37 @@ class WP_Bottom_Navigation_Pro {
             return;
         }
         
-        // Enqueue static CSS first (base styles)
+        // Enqueue FontAwesome
         wp_enqueue_style(
-            'wpbnp-frontend',
-            WPBNP_PLUGIN_URL . 'assets/css/frontend.css',
+            'fontawesome',
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+            array(),
+            '6.4.0'
+        );
+        
+        // Enqueue Material Icons
+        wp_enqueue_style(
+            'material-icons',
+            'https://fonts.googleapis.com/icon?family=Material+Icons',
             array(),
             WPBNP_VERSION
         );
         
-        // Enqueue icon libraries CSS
+        // Enqueue Bootstrap Icons
+        wp_enqueue_style(
+            'bootstrap-icons',
+            'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css',
+            array(),
+            '1.10.0'
+        );
+        
+        wp_enqueue_style(
+            'wpbnp-frontend',
+            WPBNP_PLUGIN_URL . 'assets/css/frontend.css',
+            array('fontawesome', 'material-icons', 'bootstrap-icons'),
+            WPBNP_VERSION
+        );
+        
         wp_enqueue_style(
             'wpbnp-icons',
             WPBNP_PLUGIN_URL . 'assets/css/icons.css',
@@ -143,7 +165,6 @@ class WP_Bottom_Navigation_Pro {
             WPBNP_VERSION
         );
         
-        // Enqueue JavaScript
         wp_enqueue_script(
             'wpbnp-frontend',
             WPBNP_PLUGIN_URL . 'assets/js/frontend.js',
@@ -152,14 +173,12 @@ class WP_Bottom_Navigation_Pro {
             true
         );
         
-        // Localize script with settings for JavaScript use
         wp_localize_script('wpbnp-frontend', 'wpbnp_frontend', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('wpbnp_nonce'),
             'settings' => wpbnp_get_settings()
         ));
         
-        // Add dynamic CSS inline (this will override static CSS)
         $this->add_dynamic_css();
     }
     
@@ -203,10 +222,13 @@ class WP_Bottom_Navigation_Pro {
             color: {$style['text_color']} !important;
             font-size: {$style['font_size']}px !important;
             font-weight: {$style['font_weight']} !important;
+            padding: {$style['padding']}px !important;
         }
         
-        .wpbnp-nav-item:hover,
-        .wpbnp-nav-item:focus,
+        .wpbnp-nav-item:hover {
+            color: {$style['hover_color']} !important;
+        }
+        
         .wpbnp-nav-item.active {
             color: {$style['active_color']} !important;
         }
@@ -816,16 +838,50 @@ class WP_Bottom_Navigation_Pro {
      * Enqueue admin assets
      */
     public function enqueue_admin_assets($hook) {
-        if ('appearance_page_wp-bottom-navigation-pro' !== $hook) {
+        if ($hook !== 'toplevel_page_wpbnp-settings') {
             return;
         }
         
+        // Enqueue FontAwesome for admin
+        wp_enqueue_style(
+            'fontawesome-admin',
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+            array(),
+            '6.4.0'
+        );
+        
+        // Enqueue Material Icons for admin
+        wp_enqueue_style(
+            'material-icons-admin',
+            'https://fonts.googleapis.com/icon?family=Material+Icons',
+            array(),
+            WPBNP_VERSION
+        );
+        
+        // Enqueue Bootstrap Icons for admin
+        wp_enqueue_style(
+            'bootstrap-icons-admin',
+            'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css',
+            array(),
+            '1.10.0'
+        );
+
         wp_enqueue_style(
             'wpbnp-admin',
             WPBNP_PLUGIN_URL . 'assets/css/admin.css',
-            array('wp-color-picker'),
+            array('wp-color-picker', 'fontawesome-admin', 'material-icons-admin', 'bootstrap-icons-admin'),
             WPBNP_VERSION
         );
+        
+        wp_enqueue_style(
+            'wpbnp-icons-admin',
+            WPBNP_PLUGIN_URL . 'assets/css/icons.css',
+            array('wpbnp-admin'),
+            WPBNP_VERSION
+        );
+        
+        wp_enqueue_script('wp-color-picker');
+        wp_enqueue_script('jquery-ui-sortable');
         
         wp_enqueue_script(
             'wpbnp-admin',
@@ -835,19 +891,30 @@ class WP_Bottom_Navigation_Pro {
             true
         );
         
-        // Localize admin script
+        // Get icon library data for JavaScript
+        $icon_libraries = array(
+            'dashicons' => wpbnp_get_dashicons(),
+            'fontawesome' => wpbnp_get_fontawesome_icons(),
+            'feather' => wpbnp_get_feather_icons(),
+            'material' => wpbnp_get_material_icons(),
+            'bootstrap' => wpbnp_get_bootstrap_icons(),
+            'apple' => wpbnp_get_apple_icons()
+        );
+        
         wp_localize_script('wpbnp-admin', 'wpbnp_admin', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('wpbnp_admin_nonce'),
-            'presets' => wpbnp_get_presets(),
-            'dashicons' => wpbnp_get_dashicons(),
             'strings' => array(
-                'saving' => __('Saving...', 'wp-bottom-navigation-pro'),
-                'saved' => __('Settings saved!', 'wp-bottom-navigation-pro'),
-                'error' => __('Error saving settings', 'wp-bottom-navigation-pro'),
-                'confirm_reset' => __('Are you sure you want to reset all settings?', 'wp-bottom-navigation-pro')
+                'confirm_reset' => __('Are you sure you want to reset all settings?', 'wp-bottom-navigation-pro'),
+                'confirm_delete_item' => __('Are you sure you want to delete this item?', 'wp-bottom-navigation-pro'),
+                'import_success' => __('Settings imported successfully!', 'wp-bottom-navigation-pro'),
+                'export_success' => __('Settings exported successfully!', 'wp-bottom-navigation-pro'),
+                'reset_success' => __('Settings reset successfully!', 'wp-bottom-navigation-pro'),
+                'save_success' => __('Settings saved successfully!', 'wp-bottom-navigation-pro'),
+                'error_occurred' => __('An error occurred. Please try again.', 'wp-bottom-navigation-pro')
             ),
-            'settings' => wpbnp_get_settings()
+            'icon_libraries' => $icon_libraries,
+            'presets' => $this->get_available_presets()
         ));
     }
     

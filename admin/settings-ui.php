@@ -92,6 +92,7 @@ class WPBNP_Admin_UI {
                         <input type="hidden" name="settings[style][background_color]" value="<?php echo esc_attr($settings['style']['background_color']); ?>">
                         <input type="hidden" name="settings[style][text_color]" value="<?php echo esc_attr($settings['style']['text_color']); ?>">
                         <input type="hidden" name="settings[style][active_color]" value="<?php echo esc_attr($settings['style']['active_color']); ?>">
+                        <input type="hidden" name="settings[style][hover_color]" value="<?php echo esc_attr($settings['style']['hover_color'] ?? '#0085ba'); ?>">
                         <input type="hidden" name="settings[style][border_color]" value="<?php echo esc_attr($settings['style']['border_color']); ?>">
                         <input type="hidden" name="settings[style][height]" value="<?php echo esc_attr($settings['style']['height']); ?>">
                         <input type="hidden" name="settings[style][border_radius]" value="<?php echo esc_attr($settings['style']['border_radius']); ?>">
@@ -286,37 +287,46 @@ class WPBNP_Admin_UI {
                 </div>
                 
                 <div class="wpbnp-field">
-                    <label><?php esc_html_e('Border Color', 'wp-bottom-navigation-pro'); ?></label>
-                    <input type="text" name="settings[style][border_color]" 
-                           value="<?php echo esc_attr($style['border_color']); ?>" 
+                    <label><?php esc_html_e('Hover Color', 'wp-bottom-navigation-pro'); ?></label>
+                    <input type="text" name="settings[style][hover_color]" 
+                           value="<?php echo esc_attr($style['hover_color'] ?? '#0085ba'); ?>" 
                            class="wpbnp-color-picker">
                 </div>
             </div>
             
             <div class="wpbnp-field-group">
                 <div class="wpbnp-field">
+                    <label><?php esc_html_e('Border Color', 'wp-bottom-navigation-pro'); ?></label>
+                    <input type="text" name="settings[style][border_color]" 
+                           value="<?php echo esc_attr($style['border_color']); ?>" 
+                           class="wpbnp-color-picker">
+                </div>
+                
+                <div class="wpbnp-field">
                     <label><?php esc_html_e('Height (px)', 'wp-bottom-navigation-pro'); ?></label>
                     <input type="number" name="settings[style][height]" 
                            value="<?php echo esc_attr($style['height']); ?>" 
                            min="40" max="120">
                 </div>
-                
+            </div>
+            
+            <div class="wpbnp-field-group">
                 <div class="wpbnp-field">
                     <label><?php esc_html_e('Border Radius (px)', 'wp-bottom-navigation-pro'); ?></label>
                     <input type="number" name="settings[style][border_radius]" 
                            value="<?php echo esc_attr($style['border_radius']); ?>" 
                            min="0" max="50">
                 </div>
-            </div>
-            
-            <div class="wpbnp-field-group">
+                
                 <div class="wpbnp-field">
                     <label><?php esc_html_e('Font Size (px)', 'wp-bottom-navigation-pro'); ?></label>
                     <input type="number" name="settings[style][font_size]" 
                            value="<?php echo esc_attr($style['font_size']); ?>" 
                            min="8" max="20">
                 </div>
-                
+            </div>
+            
+            <div class="wpbnp-field-group">
                 <div class="wpbnp-field">
                     <label><?php esc_html_e('Font Weight', 'wp-bottom-navigation-pro'); ?></label>
                     <select name="settings[style][font_weight]">
@@ -327,29 +337,29 @@ class WPBNP_Admin_UI {
                         <option value="700" <?php selected($style['font_weight'] ?? '400', '700'); ?>><?php esc_html_e('Bold (700)', 'wp-bottom-navigation-pro'); ?></option>
                     </select>
                 </div>
-            </div>
-            
-            <div class="wpbnp-field-group">
+                
                 <div class="wpbnp-field">
                     <label><?php esc_html_e('Icon Size (px)', 'wp-bottom-navigation-pro'); ?></label>
                     <input type="number" name="settings[style][icon_size]" 
                            value="<?php echo esc_attr($style['icon_size']); ?>" 
                            min="16" max="40">
                 </div>
-                
+            </div>
+            
+            <div class="wpbnp-field-group">
                 <div class="wpbnp-field">
                     <label><?php esc_html_e('Padding (px)', 'wp-bottom-navigation-pro'); ?></label>
                     <input type="number" name="settings[style][padding]" 
                            value="<?php echo esc_attr($style['padding'] ?? '10'); ?>" 
                            min="0" max="30">
                 </div>
-            </div>
-            
-            <div class="wpbnp-field">
-                <label><?php esc_html_e('Box Shadow', 'wp-bottom-navigation-pro'); ?></label>
-                <input type="text" name="settings[style][box_shadow]" 
-                       value="<?php echo esc_attr($style['box_shadow']); ?>" 
-                       placeholder="0 -2px 8px rgba(0,0,0,0.1)">
+                
+                <div class="wpbnp-field">
+                    <label><?php esc_html_e('Box Shadow', 'wp-bottom-navigation-pro'); ?></label>
+                    <input type="text" name="settings[style][box_shadow]" 
+                           value="<?php echo esc_attr($style['box_shadow']); ?>" 
+                           placeholder="0 -2px 8px rgba(0,0,0,0.1)">
+                </div>
             </div>
         </div>
         <?php

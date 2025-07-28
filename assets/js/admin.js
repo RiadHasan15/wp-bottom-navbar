@@ -645,15 +645,15 @@ jQuery(document).ready(function($) {
             const currentPreset = $('input[name="settings[preset]"]').val() || 'minimal';
             const presetIconMapping = {
                 'minimal': 'dashicons',
-                'dark': 'dashicons', 
+                'dark': 'fontawesome', 
                 'material': 'material',
                 'ios': 'apple',
-                'glassmorphism': 'apple',
+                'glassmorphism': 'bootstrap',
                 'neumorphism': 'apple',
-                'cyberpunk': 'material',
+                'cyberpunk': 'fontawesome',
                 'vintage': 'dashicons',
-                'gradient': 'apple',
-                'floating': 'apple'
+                'gradient': 'bootstrap',
+                'floating': 'fontawesome'
             };
             
             const recommendedLibrary = presetIconMapping[currentPreset] || 'dashicons';
@@ -690,162 +690,143 @@ jQuery(document).ready(function($) {
             const iconLibraries = {
                 'dashicons': {
                     name: 'Dashicons',
-                    icons: this.dashicons,
+                    icons: wpbnp_admin.icon_libraries.dashicons,
                     class: 'dashicons'
+                },
+                'fontawesome': {
+                    name: 'FontAwesome',
+                    icons: wpbnp_admin.icon_libraries.fontawesome,
+                    class: 'fas fa-'
+                },
+                'bootstrap': {
+                    name: 'Bootstrap Icons',
+                    icons: wpbnp_admin.icon_libraries.bootstrap,
+                    class: 'bi bi-'
+                },
+                'material': {
+                    name: 'Material Icons',
+                    icons: wpbnp_admin.icon_libraries.material,
+                    class: 'material-icons'
+                },
+                'feather': {
+                    name: 'Feather Icons',
+                    icons: wpbnp_admin.icon_libraries.feather,
+                    class: 'feather-'
                 },
                 'apple': {
                     name: 'Apple SF',
-                    icons: {
-                        'apple-house': 'House',
-                        'apple-house-fill': 'House Fill',
-                        'apple-cart': 'Cart',
-                        'apple-cart-fill': 'Cart Fill',
-                        'apple-bag': 'Bag',
-                        'apple-bag-fill': 'Bag Fill',
-                        'apple-person': 'Person',
-                        'apple-person-fill': 'Person Fill',
-                        'apple-heart': 'Heart',
-                        'apple-heart-fill': 'Heart Fill',
-                        'apple-message': 'Message',
-                        'apple-phone': 'Phone',
-                        'apple-envelope': 'Mail',
-                        'apple-magnifyingglass': 'Search',
-                        'apple-camera': 'Camera',
-                        'apple-gearshape': 'Settings',
-                        'apple-star': 'Star',
-                        'apple-star-fill': 'Star Fill',
-                        'apple-square-grid-2x2': 'Grid',
-                        'apple-list-bullet': 'Menu',
-                        'apple-ellipsis': 'More'
-                    },
-                    class: ''
-                },
-                'material': {
-                    name: 'Material',
-                    icons: {
-                        'material-home': 'Home',
-                        'material-dashboard': 'Dashboard',
-                        'material-menu': 'Menu',
-                        'material-shopping-cart': 'Shopping Cart',
-                        'material-store': 'Store',
-                        'material-person': 'Person',
-                        'material-favorite': 'Favorite',
-                        'material-message': 'Message',
-                        'material-search': 'Search',
-                        'material-camera-alt': 'Camera',
-                        'material-settings': 'Settings',
-                        'material-star': 'Star'
-                    },
-                    class: ''
+                    icons: wpbnp_admin.icon_libraries.apple,
+                    class: 'apple-'
                 }
             };
             
-            // Generate tabs
-            let tabsHtml = '';
-            let contentHtml = '';
-            
-            Object.keys(iconLibraries).forEach((libKey, index) => {
+            // Generate tabs HTML
+            let tabsHtml = '<div class="wpbnp-icon-tabs">';
+            Object.keys(iconLibraries).forEach(libKey => {
                 const lib = iconLibraries[libKey];
-                const isActive = index === 0 ? 'active' : '';
+                const iconCount = Object.keys(lib.icons).length;
+                tabsHtml += `
+                    <button type="button" class="wpbnp-icon-tab" data-library="${libKey}">
+                        ${lib.name} (${iconCount})
+                    </button>
+                `;
+            });
+            tabsHtml += '</div>';
+            
+            // Generate content HTML for each library
+            let contentHtml = '<div class="wpbnp-icon-content">';
+            Object.keys(iconLibraries).forEach(libKey => {
+                const lib = iconLibraries[libKey];
+                contentHtml += `<div class="wpbnp-icon-library-content" data-library="${libKey}">`;
                 
-                tabsHtml += `<button class="wpbnp-icon-tab ${isActive}" data-library="${libKey}">${lib.name}</button>`;
-                
-                let iconsHtml = '';
-                Object.keys(lib.icons).forEach(icon => {
-                    iconsHtml += `
-                        <div class="wpbnp-icon-option" data-icon="${icon}" data-library="${libKey}">
-                            <span class="${lib.class} ${icon}"></span>
-                            <span class="icon-name">${lib.icons[icon]}</span>
+                Object.keys(lib.icons).forEach(iconKey => {
+                    const iconName = lib.icons[iconKey];
+                    let iconClass = '';
+                    let iconElement = '';
+                    
+                    // Generate proper icon markup based on library type
+                    if (libKey === 'dashicons') {
+                        iconClass = `dashicons ${iconKey}`;
+                        iconElement = `<span class="${iconClass}"></span>`;
+                    } else if (libKey === 'fontawesome') {
+                        iconClass = `fas fa-${iconKey}`;
+                        iconElement = `<i class="${iconClass}"></i>`;
+                    } else if (libKey === 'bootstrap') {
+                        iconClass = `bi bi-${iconKey}`;
+                        iconElement = `<i class="${iconClass}"></i>`;
+                    } else if (libKey === 'material') {
+                        iconClass = 'material-icons';
+                        iconElement = `<span class="${iconClass}">${iconKey}</span>`;
+                    } else if (libKey === 'feather') {
+                        iconClass = `feather-${iconKey}`;
+                        iconElement = `<i class="${iconClass}"></i>`;
+                    } else if (libKey === 'apple') {
+                        iconClass = `apple-${iconKey}`;
+                        iconElement = `<span class="${iconClass}"></span>`;
+                    }
+                    
+                    // Store the actual icon identifier for saving
+                    let saveValue = '';
+                    if (libKey === 'dashicons') {
+                        saveValue = iconKey;
+                    } else if (libKey === 'fontawesome') {
+                        saveValue = `fas fa-${iconKey}`;
+                    } else if (libKey === 'bootstrap') {
+                        saveValue = `bi bi-${iconKey}`;
+                    } else if (libKey === 'material') {
+                        saveValue = iconKey; // Material icons use the text content
+                    } else if (libKey === 'feather') {
+                        saveValue = `feather-${iconKey}`;
+                    } else if (libKey === 'apple') {
+                        saveValue = `apple-${iconKey}`;
+                    }
+                    
+                    contentHtml += `
+                        <div class="wpbnp-icon-option" data-icon="${saveValue}" data-library="${libKey}" title="${iconName}">
+                            ${iconElement}
+                            <span class="wpbnp-icon-name">${iconName}</span>
                         </div>
                     `;
                 });
                 
-                contentHtml += `
-                    <div class="wpbnp-icon-library-content ${isActive}" data-library="${libKey}">
-                        <div class="wpbnp-icon-grid">
-                            ${iconsHtml}
-                        </div>
-                    </div>
-                `;
+                contentHtml += '</div>';
             });
+            contentHtml += '</div>';
             
+            // Complete modal HTML
             const modalHtml = `
                 <div id="wpbnp-icon-modal" class="wpbnp-modal" style="display: none;">
-                    <div class="wpbnp-modal-content wpbnp-icon-modal-content">
+                    <div class="wpbnp-modal-content">
                         <div class="wpbnp-modal-header">
-                            <h3>🎨 Choose Icon</h3>
-                            <span class="wpbnp-modal-close">&times;</span>
+                            <h3>Choose Icon</h3>
+                            <button type="button" class="wpbnp-modal-close">&times;</button>
                         </div>
                         <div class="wpbnp-modal-body">
-                            <div class="wpbnp-icon-search-container">
-                                <input type="text" placeholder="🔍 Search icons..." id="wpbnp-icon-search">
+                            <div class="wpbnp-icon-search-wrapper">
+                                <input type="text" id="wpbnp-icon-search" placeholder="Search icons..." />
                                 <div class="wpbnp-icon-stats">
+                                    <span id="wpbnp-current-library">All Icons</span> | 
                                     <span id="wpbnp-icon-count">0 icons</span>
-                                    <span id="wpbnp-current-library">Dashicons</span>
                                 </div>
                             </div>
-                            <div class="wpbnp-icon-tabs">
-                                ${tabsHtml}
-                            </div>
-                            <div class="wpbnp-icon-content">
-                                ${contentHtml}
-                            </div>
+                            ${tabsHtml}
+                            ${contentHtml}
                         </div>
                     </div>
                 </div>
             `;
             
+            // Remove existing modal and add new one
+            $('#wpbnp-icon-modal').remove();
             $('body').append(modalHtml);
             
-            // Update icon count
+            // Initialize with first tab active
+            $('.wpbnp-icon-tab').first().addClass('active');
+            $('.wpbnp-icon-library-content').first().addClass('active');
             this.updateIconCount();
             
-            // Bind modal events
-            $(document).on('click', '.wpbnp-modal-close, .wpbnp-modal', function(e) {
-                if (e.target === this) {
-                    $('#wpbnp-icon-modal').hide();
-                }
-            });
-            
-            // Icon selection
-            $(document).on('click', '.wpbnp-icon-option', function() {
-                const icon = $(this).data('icon');
-                const targetInput = $('#wpbnp-icon-modal').data('target-input');
-                targetInput.val(icon);
-                targetInput.trigger('change'); // Trigger change event for auto-save
-                $('.wpbnp-icon-option').removeClass('selected');
-                $(this).addClass('selected');
-                $('#wpbnp-icon-modal').hide();
-                
-                // Show success feedback
-                WPBottomNavAdmin.showNotification(`Icon "${icon}" selected!`, 'success');
-            });
-            
-            // Tab switching
-            $(document).on('click', '.wpbnp-icon-tab', function() {
-                const library = $(this).data('library');
-                $('.wpbnp-icon-tab').removeClass('active');
-                $('.wpbnp-icon-library-content').removeClass('active');
-                $(this).addClass('active');
-                $(`.wpbnp-icon-library-content[data-library="${library}"]`).addClass('active');
-                $('#wpbnp-current-library').text($(this).text());
-                WPBottomNavAdmin.updateIconCount();
-                $('#wpbnp-icon-search').val('').trigger('input');
-            });
-            
-            // Enhanced icon search functionality
-            $(document).on('input', '#wpbnp-icon-search', function() {
-                const searchTerm = $(this).val().toLowerCase();
-                $('.wpbnp-icon-option').each(function() {
-                    const iconName = $(this).find('.icon-name').text().toLowerCase();
-                    const iconClass = $(this).data('icon').toLowerCase();
-                    if (iconName.includes(searchTerm) || iconClass.includes(searchTerm)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            });
+            // Bind events
+            this.bindIconModalEvents();
         },
         
         // Apply preset
@@ -859,15 +840,15 @@ jQuery(document).ready(function($) {
             // Define icon library mapping for each preset
             const presetIconMapping = {
                 'minimal': 'dashicons',
-                'dark': 'dashicons', 
+                'dark': 'fontawesome', 
                 'material': 'material',
                 'ios': 'apple',
-                'glassmorphism': 'apple',
+                'glassmorphism': 'bootstrap',
                 'neumorphism': 'apple',
-                'cyberpunk': 'material',
+                'cyberpunk': 'fontawesome',
                 'vintage': 'dashicons',
-                'gradient': 'apple',
-                'floating': 'apple'
+                'gradient': 'bootstrap',
+                'floating': 'fontawesome'
             };
             
             // Get recommended icon library for this preset
@@ -878,73 +859,73 @@ jQuery(document).ready(function($) {
                 // Common icon mappings
                 'home': {
                     'dashicons': 'dashicons-admin-home',
-                    'apple': 'apple-house-fill',
-                    'material': 'material-home'
+                    'fontawesome': 'fas fa-home',
+                    'bootstrap': 'bi bi-house',
+                    'material': 'home',
+                    'apple': 'apple-house-fill'
                 },
                 'cart': {
                     'dashicons': 'dashicons-cart',
-                    'apple': 'apple-cart-fill',
-                    'material': 'material-shopping-cart'
+                    'fontawesome': 'fas fa-shopping-cart',
+                    'bootstrap': 'bi bi-cart',
+                    'material': 'shopping_cart',
+                    'apple': 'apple-cart-fill'
                 },
                 'user': {
                     'dashicons': 'dashicons-admin-users',
-                    'apple': 'apple-person-fill',
-                    'material': 'material-person'
+                    'fontawesome': 'fas fa-user',
+                    'bootstrap': 'bi bi-person',
+                    'material': 'person',
+                    'apple': 'apple-person-fill'
                 },
                 'heart': {
                     'dashicons': 'dashicons-heart',
-                    'apple': 'apple-heart-fill',
-                    'material': 'material-favorite'
+                    'fontawesome': 'fas fa-heart',
+                    'bootstrap': 'bi bi-heart-fill',
+                    'material': 'favorite',
+                    'apple': 'apple-heart-fill'
                 },
                 'search': {
                     'dashicons': 'dashicons-search',
-                    'apple': 'apple-magnifyingglass',
-                    'material': 'material-search'
+                    'fontawesome': 'fas fa-search',
+                    'bootstrap': 'bi bi-search',
+                    'material': 'search',
+                    'apple': 'apple-magnifyingglass'
                 },
                 'settings': {
                     'dashicons': 'dashicons-admin-settings',
-                    'apple': 'apple-gearshape',
-                    'material': 'material-settings'
-                },
-                'phone': {
-                    'dashicons': 'dashicons-phone',
-                    'apple': 'apple-phone',
-                    'material': 'material-phone'
-                },
-                'email': {
-                    'dashicons': 'dashicons-email',
-                    'apple': 'apple-envelope',
-                    'material': 'material-email'
-                },
-                'message': {
-                    'dashicons': 'dashicons-email',
-                    'apple': 'apple-message',
-                    'material': 'material-message'
+                    'fontawesome': 'fas fa-cog',
+                    'bootstrap': 'bi bi-gear',
+                    'material': 'settings',
+                    'apple': 'apple-gearshape'
                 },
                 'star': {
                     'dashicons': 'dashicons-star-filled',
-                    'apple': 'apple-star-fill',
-                    'material': 'material-star'
+                    'fontawesome': 'fas fa-star',
+                    'bootstrap': 'bi bi-star-fill',
+                    'material': 'star',
+                    'apple': 'apple-star-fill'
+                },
+                'message': {
+                    'dashicons': 'dashicons-email',
+                    'fontawesome': 'fas fa-message',
+                    'bootstrap': 'bi bi-chat',
+                    'material': 'message',
+                    'apple': 'apple-message'
                 },
                 'camera': {
                     'dashicons': 'dashicons-camera',
-                    'apple': 'apple-camera',
-                    'material': 'material-camera-alt'
+                    'fontawesome': 'fas fa-camera',
+                    'bootstrap': 'bi bi-camera',
+                    'material': 'camera_alt',
+                    'apple': 'apple-camera'
                 },
                 'menu': {
                     'dashicons': 'dashicons-menu',
-                    'apple': 'apple-list-bullet',
-                    'material': 'material-menu'
-                },
-                'dashboard': {
-                    'dashicons': 'dashicons-dashboard',
-                    'apple': 'apple-square-grid-2x2',
-                    'material': 'material-dashboard'
-                },
-                'store': {
-                    'dashicons': 'dashicons-store',
-                    'apple': 'apple-bag-fill',
-                    'material': 'material-store'
+                    'fontawesome': 'fas fa-bars',
+                    'bootstrap': 'bi bi-list',
+                    'material': 'menu',
+                    'apple': 'apple-list-bullet'
                 }
             };
             
@@ -1164,6 +1145,52 @@ jQuery(document).ready(function($) {
         updateIconCount: function() {
             const totalIcons = $('.wpbnp-icon-option').length;
             $('#wpbnp-icon-count').text(`${totalIcons} icons`);
+        },
+
+        // Bind events for the icon picker modal
+        bindIconModalEvents: function() {
+            $(document).on('click', '.wpbnp-modal-close, .wpbnp-modal', function(e) {
+                if (e.target === this) {
+                    $('#wpbnp-icon-modal').hide();
+                }
+            });
+
+            $(document).on('click', '.wpbnp-icon-option', function() {
+                const icon = $(this).data('icon');
+                const targetInput = $('#wpbnp-icon-modal').data('target-input');
+                targetInput.val(icon);
+                targetInput.trigger('change'); // Trigger change event for auto-save
+                $('.wpbnp-icon-option').removeClass('selected');
+                $(this).addClass('selected');
+                $('#wpbnp-icon-modal').hide();
+                
+                // Show success feedback
+                WPBottomNavAdmin.showNotification(`Icon "${icon}" selected!`, 'success');
+            });
+
+            $(document).on('click', '.wpbnp-icon-tab', function() {
+                const library = $(this).data('library');
+                $('.wpbnp-icon-tab').removeClass('active');
+                $('.wpbnp-icon-library-content').removeClass('active');
+                $(this).addClass('active');
+                $(`.wpbnp-icon-library-content[data-library="${library}"]`).addClass('active');
+                $('#wpbnp-current-library').text($(this).text());
+                WPBottomNavAdmin.updateIconCount();
+                $('#wpbnp-icon-search').val('').trigger('input');
+            });
+
+            $(document).on('input', '#wpbnp-icon-search', function() {
+                const searchTerm = $(this).val().toLowerCase();
+                $('.wpbnp-icon-option').each(function() {
+                    const iconName = $(this).find('.wpbnp-icon-name').text().toLowerCase();
+                    const iconClass = $(this).data('icon').toLowerCase();
+                    if (iconName.includes(searchTerm) || iconClass.includes(searchTerm)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
         }
     };
     
