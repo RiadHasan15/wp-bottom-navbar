@@ -226,7 +226,7 @@ class WP_Bottom_Navigation_Pro {
         }
         
         .wpbnp-nav-item:hover {
-            color: {$style['hover_color']} !important;
+            color: " . ($style['hover_color'] ?? $style['active_color']) . " !important;
         }
         
         .wpbnp-nav-item.active {
@@ -838,7 +838,7 @@ class WP_Bottom_Navigation_Pro {
      * Enqueue admin assets
      */
     public function enqueue_admin_assets($hook) {
-        if ($hook !== 'toplevel_page_wpbnp-settings') {
+        if ($hook !== 'appearance_page_wp-bottom-navigation-pro') {
             return;
         }
         
@@ -914,7 +914,7 @@ class WP_Bottom_Navigation_Pro {
                 'error_occurred' => __('An error occurred. Please try again.', 'wp-bottom-navigation-pro')
             ),
             'icon_libraries' => $icon_libraries,
-            'presets' => $this->get_available_presets()
+            'presets' => wpbnp_get_presets()
         ));
     }
     
