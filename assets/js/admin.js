@@ -870,116 +870,116 @@ jQuery(document).ready(function($) {
         doApplyPreset: function(preset, presetKey, $target, originalEvent) {
             // Define icon library mapping for each preset
             const presetIconMapping = {
-                'minimal': 'dashicons',
-                'dark': 'dashicons', 
+                'minimal': 'bootstrap',
+                'dark': 'bootstrap', 
                 'material': 'material',
                 'ios': 'apple',
                 'glassmorphism': 'bootstrap',
                 'neumorphism': 'apple',
                 'cyberpunk': 'bootstrap',
-                'vintage': 'dashicons',
+                'vintage': 'bootstrap',
                 'gradient': 'bootstrap',
                 'floating': 'apple'
             };
             
             // Get recommended icon library for this preset
-            const recommendedIconLibrary = presetIconMapping[presetKey] || 'dashicons';
+            const recommendedIconLibrary = presetIconMapping[presetKey] || 'bootstrap';
             
             // Icon conversion mapping between libraries
             const iconConversion = {
-                // Common icon mappings
+                // Common icon mappings (Bootstrap as preferred default)
                 'home': {
+                    'bootstrap': 'bi bi-house-door-fill',
                     'dashicons': 'dashicons-admin-home',
                     'fontawesome': 'fas fa-home',
-                    'bootstrap': 'bi bi-house-door-fill',
                     'material': 'home',
                     'apple': 'house-fill',
                     'feather': 'home'
                 },
                 'cart': {
+                    'bootstrap': 'bi bi-cart-fill',
                     'dashicons': 'dashicons-cart',
                     'fontawesome': 'fas fa-shopping-cart',
-                    'bootstrap': 'bi bi-cart-fill',
                     'material': 'shopping_cart',
                     'apple': 'cart-fill',
                     'feather': 'shopping-cart'
                 },
                 'user': {
+                    'bootstrap': 'bi bi-person-fill',
                     'dashicons': 'dashicons-admin-users',
                     'fontawesome': 'fas fa-user',
-                    'bootstrap': 'bi bi-person-fill',
                     'material': 'person',
                     'apple': 'person-fill',
                     'feather': 'user'
                 },
                 'heart': {
+                    'bootstrap': 'bi bi-heart-fill',
                     'dashicons': 'dashicons-heart',
                     'fontawesome': 'fas fa-heart',
-                    'bootstrap': 'bi bi-heart-fill',
                     'material': 'favorite',
                     'apple': 'heart-fill',
                     'feather': 'heart'
                 },
                 'search': {
+                    'bootstrap': 'bi bi-search',
                     'dashicons': 'dashicons-search',
                     'fontawesome': 'fas fa-search',
-                    'bootstrap': 'bi bi-search',
                     'material': 'search',
                     'apple': 'magnifyingglass',
                     'feather': 'search'
                 },
                 'settings': {
+                    'bootstrap': 'bi bi-gear-fill',
                     'dashicons': 'dashicons-admin-settings',
                     'fontawesome': 'fas fa-cog',
-                    'bootstrap': 'bi bi-gear-fill',
                     'material': 'settings',
                     'apple': 'gearshape-fill',
                     'feather': 'settings'
                 },
                 'star': {
+                    'bootstrap': 'bi bi-star-fill',
                     'dashicons': 'dashicons-star-filled',
                     'fontawesome': 'fas fa-star',
-                    'bootstrap': 'bi bi-star-fill',
                     'material': 'star',
                     'apple': 'star-fill',
                     'feather': 'star'
                 },
                 'message': {
+                    'bootstrap': 'bi bi-envelope-fill',
                     'dashicons': 'dashicons-email',
                     'fontawesome': 'fas fa-envelope',
-                    'bootstrap': 'bi bi-envelope-fill',
                     'material': 'mail',
                     'apple': 'envelope-fill',
                     'feather': 'mail'
                 },
                 'camera': {
+                    'bootstrap': 'bi bi-camera-fill',
                     'dashicons': 'dashicons-camera',
                     'fontawesome': 'fas fa-camera',
-                    'bootstrap': 'bi bi-camera-fill',
                     'material': 'camera_alt',
                     'apple': 'camera-fill',
                     'feather': 'camera'
                 },
                 'menu': {
+                    'bootstrap': 'bi bi-list',
                     'dashicons': 'dashicons-menu',
                     'fontawesome': 'fas fa-bars',
-                    'bootstrap': 'bi bi-list',
                     'material': 'menu',
                     'apple': 'list-bullet',
                     'feather': 'menu'
                 },
                 'phone': {
+                    'bootstrap': 'bi bi-telephone-fill',
                     'dashicons': 'dashicons-phone',
                     'fontawesome': 'fas fa-phone',
-                    'bootstrap': 'bi bi-telephone-fill',
                     'material': 'phone',
                     'apple': 'phone-fill',
                     'feather': 'phone'
                 },
                 'info': {
+                    'bootstrap': 'bi bi-info-circle-fill',
                     'dashicons': 'dashicons-info',
                     'fontawesome': 'fas fa-info-circle',
-                    'bootstrap': 'bi bi-info-circle-fill',
                     'material': 'info',
                     'apple': 'info-circle-fill',
                     'feather': 'info'
@@ -1054,14 +1054,14 @@ jQuery(document).ready(function($) {
             if (!this.settings.items || this.settings.items.length === 0) {
                 const defaultPresetItems = {
                     'minimal': [
-                        {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'dashicons-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'dashicons-admin-users', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'dark': [
-                        {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'search', label: 'Search', icon: 'dashicons-search', url: '#', enabled: true},
-                        {id: 'profile', label: 'Profile', icon: 'dashicons-admin-users', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'search', label: 'Search', icon: 'bi bi-search', url: '#', enabled: true},
+                        {id: 'profile', label: 'Profile', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'material': [
                         {id: 'home', label: 'Home', icon: 'home', url: wpbnp_admin.home_url, enabled: true},
@@ -1092,9 +1092,9 @@ jQuery(document).ready(function($) {
                          {id: 'account', label: 'Account', icon: 'bi bi-person-circle', url: '#', enabled: true}
                      ],
                     'vintage': [
-                        {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'gallery', label: 'Gallery', icon: 'dashicons-format-gallery', url: '#', enabled: true},
-                        {id: 'contact', label: 'Contact', icon: 'dashicons-email', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'gallery', label: 'Gallery', icon: 'bi bi-images', url: '#', enabled: true},
+                        {id: 'contact', label: 'Contact', icon: 'bi bi-envelope-fill', url: '#', enabled: true}
                     ],
                                          'gradient': [
                          {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
@@ -1109,7 +1109,11 @@ jQuery(document).ready(function($) {
                     ]
                 };
                 
-                const defaultItems = defaultPresetItems[presetKey] || defaultPresetItems['minimal'];
+                const defaultItems = defaultPresetItems[presetKey] || [
+                    {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                    {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                    {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                ];
                 this.settings.items = [...defaultItems];
                 
                 // Re-render items list (batched)
@@ -1147,42 +1151,66 @@ jQuery(document).ready(function($) {
         
         // Get icon type (simplified detection)
         getIconType: function(iconClass) {
+            if (iconClass.startsWith('bi bi-')) return 'bootstrap';
             if (iconClass.startsWith('dashicons-')) return 'dashicons';
             if (iconClass.startsWith('fas fa-') || iconClass.startsWith('far fa-') || iconClass.startsWith('fab fa-')) return 'fontawesome';
-            if (iconClass.startsWith('bi bi-')) return 'bootstrap';
             if (iconClass.startsWith('feather-')) return 'feather';
             if (this.isAppleIcon(iconClass)) return 'apple';
             if (!iconClass.includes('-') && !iconClass.includes(' ') && !iconClass.includes('<')) return 'material';
-            return 'dashicons'; // default
+            return 'bootstrap'; // default changed to bootstrap
         },
         
         // Simple icon conversion (basic mapping only)
         getSimpleIconConversion: function(iconClass, targetLibrary, index) {
-            // Basic conversion map for common icons only
+            // Basic conversion map for common icons only (Bootstrap as preferred default)
             const basicConversions = {
                 'home': {
+                    'bootstrap': 'bi bi-house-door-fill',
                     'dashicons': 'dashicons-admin-home',
                     'fontawesome': 'fas fa-home',
-                    'bootstrap': 'bi bi-house-door-fill',
                     'material': 'home',
                     'apple': 'house-fill',
                     'feather': 'feather-home'
                 },
                 'user': {
+                    'bootstrap': 'bi bi-person-fill',
                     'dashicons': 'dashicons-admin-users',
                     'fontawesome': 'fas fa-user',
-                    'bootstrap': 'bi bi-person-fill',
                     'material': 'person',
                     'apple': 'person-fill',
                     'feather': 'feather-user'
                 },
                 'search': {
+                    'bootstrap': 'bi bi-search',
                     'dashicons': 'dashicons-search',
                     'fontawesome': 'fas fa-search',
-                    'bootstrap': 'bi bi-search',
                     'material': 'search',
                     'apple': 'magnifyingglass',
                     'feather': 'feather-search'
+                },
+                'cart': {
+                    'bootstrap': 'bi bi-cart-fill',
+                    'dashicons': 'dashicons-cart',
+                    'fontawesome': 'fas fa-shopping-cart',
+                    'material': 'shopping_cart',
+                    'apple': 'cart-fill',
+                    'feather': 'feather-shopping-cart'
+                },
+                'heart': {
+                    'bootstrap': 'bi bi-heart-fill',
+                    'dashicons': 'dashicons-heart',
+                    'fontawesome': 'fas fa-heart',
+                    'material': 'favorite',
+                    'apple': 'heart-fill',
+                    'feather': 'feather-heart'
+                },
+                'settings': {
+                    'bootstrap': 'bi bi-gear-fill',
+                    'dashicons': 'dashicons-admin-settings',
+                    'fontawesome': 'fas fa-cog',
+                    'material': 'settings',
+                    'apple': 'gearshape-fill',
+                    'feather': 'feather-settings'
                 }
             };
             
@@ -1200,12 +1228,12 @@ jQuery(document).ready(function($) {
         generateIconHTML: function(iconClass) {
             if (!iconClass) return '';
             
-            // Handle different icon types
-            if (iconClass.startsWith('dashicons-')) {
+            // Handle different icon types (Bootstrap first as default)
+            if (iconClass.startsWith('bi bi-')) {
+                return `<i class="${iconClass}"></i>`;
+            } else if (iconClass.startsWith('dashicons-')) {
                 return `<span class="dashicons ${iconClass}"></span>`;
             } else if (iconClass.startsWith('fas fa-') || iconClass.startsWith('far fa-') || iconClass.startsWith('fab fa-')) {
-                return `<i class="${iconClass}"></i>`;
-            } else if (iconClass.startsWith('bi bi-')) {
                 return `<i class="${iconClass}"></i>`;
             } else if (iconClass.startsWith('feather-')) {
                 return `<i class="${iconClass}"></i>`;

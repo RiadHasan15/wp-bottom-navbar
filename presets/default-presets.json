@@ -2,7 +2,7 @@
     "minimal": {
         "name": "Minimal",
         "description": "Clean and simple design with subtle interactions",
-        "icon_library": "dashicons",
+        "icon_library": "bootstrap",
         "style": {
             "background_color": "#ffffff",
             "text_color": "#475569",
@@ -27,7 +27,7 @@
     "dark": {
         "name": "Dark Mode",
         "description": "Elegant dark theme perfect for night usage",
-        "icon_library": "dashicons",
+        "icon_library": "bootstrap",
         "style": {
             "background_color": "#111827",
             "text_color": "#d1d5db",
@@ -177,7 +177,7 @@
     "vintage": {
         "name": "Vintage Classic",
         "description": "Retro design with warm colors and classic typography",
-        "icon_library": "dashicons",
+        "icon_library": "bootstrap",
         "style": {
             "background_color": "#f5f1e8",
             "text_color": "#5d4e37",

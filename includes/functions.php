@@ -28,7 +28,7 @@ function wpbnp_get_default_settings() {
         'items' => array(
             array(
                 'id' => 'home',
-                'icon' => 'dashicons-admin-home',
+                'icon' => 'bi bi-house-door-fill',
                 'label' => __('Home', 'wp-bottom-navigation-pro'),
                 'url' => home_url(),
                 'enabled' => true,
@@ -37,7 +37,7 @@ function wpbnp_get_default_settings() {
             ),
             array(
                 'id' => 'shop',
-                'icon' => 'dashicons-cart',
+                'icon' => 'bi bi-cart-fill',
                 'label' => __('Shop', 'wp-bottom-navigation-pro'),
                 'url' => '#',
                 'enabled' => true,
@@ -46,7 +46,7 @@ function wpbnp_get_default_settings() {
             ),
             array(
                 'id' => 'account',
-                'icon' => 'dashicons-admin-users',
+                'icon' => 'bi bi-person-fill',
                 'label' => __('Account', 'wp-bottom-navigation-pro'),
                 'url' => '#',
                 'enabled' => true,
@@ -285,6 +285,13 @@ function wpbnp_get_presets() {
  */
 function wpbnp_get_icon_libraries() {
     return array(
+        'bootstrap' => array(
+            'name' => 'Bootstrap Icons',
+            'description' => 'Modern, comprehensive icon library (Default)',
+            'class_prefix' => 'bi bi-',
+            'type' => 'font',
+            'cdn' => 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css'
+        ),
         'dashicons' => array(
             'name' => 'Dashicons',
             'description' => 'WordPress native icons',
@@ -296,7 +303,7 @@ function wpbnp_get_icon_libraries() {
             'description' => 'Most popular icon library',
             'class_prefix' => 'fas fa-',
             'type' => 'font',
-            'cdn' => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+            'cdn' => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css'
         ),
         'feather' => array(
             'name' => 'Feather Icons',
@@ -310,13 +317,6 @@ function wpbnp_get_icon_libraries() {
             'class_prefix' => 'material-icons',
             'type' => 'font',
             'cdn' => 'https://fonts.googleapis.com/icon?family=Material+Icons'
-        ),
-        'bootstrap' => array(
-            'name' => 'Bootstrap Icons',
-            'description' => 'Bootstrap icon library',
-            'class_prefix' => 'bi bi-',
-            'type' => 'font',
-            'cdn' => 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css'
         ),
         'apple' => array(
             'name' => 'Apple SF Symbols',
