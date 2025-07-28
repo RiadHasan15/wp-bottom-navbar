@@ -435,3 +435,11 @@ msgstr ""
 #: wp-bottom-navigation-pro.php:95
 msgid "Bottom Navigation"
 msgstr ""
+
+#: admin/settings-ui.php:143
+msgid "Made with"
+msgstr ""
+
+#: admin/settings-ui.php:143
+msgid "by"
+msgstr ""
