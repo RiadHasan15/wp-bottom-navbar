@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Libraries Test</title>
+    <link rel="stylesheet" href="assets/css/icons.css">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .icon-test {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 100px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .icon-test [class*="apple-"],
+        .icon-test [class*="material-"] {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .icon-name {
+            font-size: 12px;
+            color: #666;
+        }
+        h2 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Icon Libraries Test</h1>
+    
+    <h2>Apple SF Symbols</h2>
+    <div class="apple-icons">
+        <div class="icon-test">
+            <span class="apple-house-fill"></span>
+            <div class="icon-name">House Fill</div>
+        </div>
+        <div class="icon-test">
+            <span class="apple-cart-fill"></span>
+            <div class="icon-name">Cart Fill</div>
+        </div>
+        <div class="icon-test">
+            <span class="apple-person-fill"></span>
+            <div class="icon-name">Person Fill</div>
+        </div>
+        <div class="icon-test">
+            <span class="apple-heart-fill"></span>
+            <div class="icon-name">Heart Fill</div>
+        </div>
+        <div class="icon-test">
+            <span class="apple-magnifyingglass"></span>
+            <div class="icon-name">Search</div>
+        </div>
+        <div class="icon-test">
+            <span class="apple-gearshape"></span>
+            <div class="icon-name">Settings</div>
+        </div>
+        <div class="icon-test">
+            <span class="apple-star-fill"></span>
+            <div class="icon-name">Star Fill</div>
+        </div>
+        <div class="icon-test">
+            <span class="apple-message"></span>
+            <div class="icon-name">Message</div>
+        </div>
+    </div>
+    
+    <h2>Material Design Icons</h2>
+    <div class="material-icons">
+        <div class="icon-test">
+            <span class="material-home"></span>
+            <div class="icon-name">Home</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-shopping-cart"></span>
+            <div class="icon-name">Shopping Cart</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-person"></span>
+            <div class="icon-name">Person</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-favorite"></span>
+            <div class="icon-name">Favorite</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-search"></span>
+            <div class="icon-name">Search</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-settings"></span>
+            <div class="icon-name">Settings</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-star"></span>
+            <div class="icon-name">Star</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-dashboard"></span>
+            <div class="icon-name">Dashboard</div>
+        </div>
+    </div>
+    
+    <h2>Different Colors Test</h2>
+    <div style="color: #0073aa;">
+        <div class="icon-test">
+            <span class="apple-heart-fill"></span>
+            <div class="icon-name">Blue Apple Heart</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-favorite"></span>
+            <div class="icon-name">Blue Material Heart</div>
+        </div>
+    </div>
+    
+    <div style="color: #e74c3c;">
+        <div class="icon-test">
+            <span class="apple-cart-fill"></span>
+            <div class="icon-name">Red Apple Cart</div>
+        </div>
+        <div class="icon-test">
+            <span class="material-shopping-cart"></span>
+            <div class="icon-name">Red Material Cart</div>
+        </div>
+    </div>
+    
+    <p><strong>Test Instructions:</strong></p>
+    <ol>
+        <li>All icons should be visible and render as proper SVG graphics</li>
+        <li>Icons should inherit color from their parent elements</li>
+        <li>No broken images or missing icons</li>
+        <li>Apple and Material icons should look distinct from each other</li>
+    </ol>
+    
+    <p><strong>If icons don't show:</strong> Check browser console for CSS loading errors</p>
+</body>
+</html>

@@ -700,22 +700,23 @@ jQuery(document).ready(function($) {
                         'apple-house-fill': 'House Fill',
                         'apple-cart': 'Cart',
                         'apple-cart-fill': 'Cart Fill',
+                        'apple-bag': 'Bag',
+                        'apple-bag-fill': 'Bag Fill',
                         'apple-person': 'Person',
                         'apple-person-fill': 'Person Fill',
                         'apple-heart': 'Heart',
                         'apple-heart-fill': 'Heart Fill',
-                        'apple-magnifyingglass': 'Search',
-                        'apple-gearshape': 'Settings',
-                        'apple-gearshape-fill': 'Settings Fill',
-                        'apple-envelope': 'Mail',
+                        'apple-message': 'Message',
                         'apple-phone': 'Phone',
-                        'apple-calendar': 'Calendar',
-                        'apple-location': 'Location',
+                        'apple-envelope': 'Mail',
+                        'apple-magnifyingglass': 'Search',
+                        'apple-camera': 'Camera',
+                        'apple-gearshape': 'Settings',
                         'apple-star': 'Star',
                         'apple-star-fill': 'Star Fill',
-                        'apple-camera': 'Camera',
-                        'apple-play': 'Play',
-                        'apple-message': 'Message'
+                        'apple-square-grid-2x2': 'Grid',
+                        'apple-list-bullet': 'Menu',
+                        'apple-ellipsis': 'More'
                     },
                     class: ''
                 },
@@ -723,22 +724,17 @@ jQuery(document).ready(function($) {
                     name: 'Material',
                     icons: {
                         'material-home': 'Home',
-                        'material-shopping-cart': 'Cart',
-                        'material-person': 'Person',
-                        'material-people': 'People',
-                        'material-favorite': 'Favorite',
-                        'material-search': 'Search',
-                        'material-settings': 'Settings',
-                        'material-email': 'Email',
-                        'material-phone': 'Phone',
-                        'material-event': 'Calendar',
-                        'material-location-on': 'Location',
-                        'material-star': 'Star',
-                        'material-camera-alt': 'Camera',
-                        'material-play-arrow': 'Play',
-                        'material-message': 'Message',
                         'material-dashboard': 'Dashboard',
-                        'material-menu': 'Menu'
+                        'material-menu': 'Menu',
+                        'material-shopping-cart': 'Shopping Cart',
+                        'material-store': 'Store',
+                        'material-person': 'Person',
+                        'material-favorite': 'Favorite',
+                        'material-message': 'Message',
+                        'material-search': 'Search',
+                        'material-camera-alt': 'Camera',
+                        'material-settings': 'Settings',
+                        'material-star': 'Star'
                     },
                     class: ''
                 }
@@ -907,28 +903,23 @@ jQuery(document).ready(function($) {
                 },
                 'settings': {
                     'dashicons': 'dashicons-admin-settings',
-                    'apple': 'apple-gearshape-fill',
+                    'apple': 'apple-gearshape',
                     'material': 'material-settings'
                 },
                 'phone': {
                     'dashicons': 'dashicons-phone',
-                    'apple': 'apple-phone-fill',
+                    'apple': 'apple-phone',
                     'material': 'material-phone'
                 },
                 'email': {
                     'dashicons': 'dashicons-email',
-                    'apple': 'apple-envelope-fill',
+                    'apple': 'apple-envelope',
                     'material': 'material-email'
                 },
-                'calendar': {
-                    'dashicons': 'dashicons-calendar',
-                    'apple': 'apple-calendar',
-                    'material': 'material-event'
-                },
-                'location': {
-                    'dashicons': 'dashicons-location',
-                    'apple': 'apple-location-fill',
-                    'material': 'material-location-on'
+                'message': {
+                    'dashicons': 'dashicons-email',
+                    'apple': 'apple-message',
+                    'material': 'material-message'
                 },
                 'star': {
                     'dashicons': 'dashicons-star-filled',
@@ -937,13 +928,23 @@ jQuery(document).ready(function($) {
                 },
                 'camera': {
                     'dashicons': 'dashicons-camera',
-                    'apple': 'apple-camera-fill',
+                    'apple': 'apple-camera',
                     'material': 'material-camera-alt'
                 },
                 'menu': {
                     'dashicons': 'dashicons-menu',
                     'apple': 'apple-list-bullet',
                     'material': 'material-menu'
+                },
+                'dashboard': {
+                    'dashicons': 'dashicons-dashboard',
+                    'apple': 'apple-square-grid-2x2',
+                    'material': 'material-dashboard'
+                },
+                'store': {
+                    'dashicons': 'dashicons-store',
+                    'apple': 'apple-bag-fill',
+                    'material': 'material-store'
                 }
             };
             
