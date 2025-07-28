@@ -1051,6 +1051,12 @@ jQuery(document).ready(function($) {
                          
                          // Refresh the items list to show the new icons
                          this.refreshItemsList();
+                         
+                         // Auto-save the converted icons to database
+                         setTimeout(() => {
+                             this.showNotification('💾 Saving converted icons...', 'info');
+                             this.saveSettings();
+                         }, 100);
                      }
                 }
             }
@@ -1469,6 +1475,54 @@ jQuery(document).ready(function($) {
             
             // Re-setup sortable after refresh
             this.setupSortable();
+        },
+        
+        // Save settings programmatically (for auto-save after conversions)
+        saveSettings: function() {
+            // Get current form data
+            const form = document.getElementById('wpbnp-settings-form');
+            if (!form) {
+                console.error('Settings form not found');
+                return;
+            }
+            
+            const formData = new FormData(form);
+            
+            // Handle unchecked checkboxes
+            $('#wpbnp-settings-form input[type="checkbox"]').each(function() {
+                const checkbox = $(this);
+                const name = checkbox.attr('name');
+                if (name && !formData.has(name)) {
+                    formData.append(name, '0');
+                }
+            });
+            
+            formData.append('action', 'wpbnp_save_settings');
+            formData.append('nonce', this.nonce);
+            
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: (response) => {
+                    if (response.success) {
+                        console.log('Settings auto-saved successfully after icon conversion');
+                        this.showNotification('✅ Icons saved! Changes will appear on frontend.', 'success');
+                        // Update local settings from response
+                        if (response.data && response.data.settings) {
+                            this.settings = response.data.settings;
+                        }
+                    } else {
+                        console.error('Failed to auto-save settings:', response.data);
+                        this.showNotification('❌ Failed to save icon changes', 'error');
+                    }
+                },
+                error: (xhr, status, error) => {
+                    console.error('AJAX error during auto-save:', error);
+                }
+            });
         },
         
         // Export settings
