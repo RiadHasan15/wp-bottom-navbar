@@ -229,7 +229,17 @@ class WP_Bottom_Navigation_Pro {
             color: " . ($style['hover_color'] ?? $style['active_color']) . " !important;
         }
         
+        .wpbnp-nav-item:hover .wpbnp-nav-icon,
+        .wpbnp-nav-item:hover .wpbnp-nav-icon * {
+            color: " . ($style['hover_color'] ?? $style['active_color']) . " !important;
+        }
+        
         .wpbnp-nav-item.active {
+            color: {$style['active_color']} !important;
+        }
+        
+        .wpbnp-nav-item.active .wpbnp-nav-icon,
+        .wpbnp-nav-item.active .wpbnp-nav-icon * {
             color: {$style['active_color']} !important;
         }
         
@@ -237,6 +247,11 @@ class WP_Bottom_Navigation_Pro {
             font-size: {$style['icon_size']}px !important;
             width: " . ($style['icon_size'] + 4) . "px !important;
             height: " . ($style['icon_size'] + 4) . "px !important;
+            color: " . ($style['icon_color'] ?? $style['text_color']) . " !important;
+        }
+        
+        .wpbnp-nav-icon * {
+            color: " . ($style['icon_color'] ?? $style['text_color']) . " !important;
         }
         
         .wpbnp-badge {

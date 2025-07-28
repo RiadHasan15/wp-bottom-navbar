@@ -88,12 +88,13 @@ class WPBNP_Admin_UI {
                         <?php endif; ?>
                         
                         <?php if ($this->current_tab !== 'styles' && $this->current_tab !== 'presets'): ?>
-                        <!-- Hidden fields to preserve style settings on non-style tabs -->
-                        <input type="hidden" name="settings[style][background_color]" value="<?php echo esc_attr($settings['style']['background_color']); ?>">
-                        <input type="hidden" name="settings[style][text_color]" value="<?php echo esc_attr($settings['style']['text_color']); ?>">
-                        <input type="hidden" name="settings[style][active_color]" value="<?php echo esc_attr($settings['style']['active_color']); ?>">
-                        <input type="hidden" name="settings[style][hover_color]" value="<?php echo esc_attr($settings['style']['hover_color'] ?? '#0085ba'); ?>">
-                        <input type="hidden" name="settings[style][border_color]" value="<?php echo esc_attr($settings['style']['border_color']); ?>">
+                                <!-- Hidden fields to preserve style settings on non-style tabs -->
+        <input type="hidden" name="settings[style][background_color]" value="<?php echo esc_attr($settings['style']['background_color']); ?>">
+        <input type="hidden" name="settings[style][text_color]" value="<?php echo esc_attr($settings['style']['text_color']); ?>">
+        <input type="hidden" name="settings[style][active_color]" value="<?php echo esc_attr($settings['style']['active_color']); ?>">
+        <input type="hidden" name="settings[style][hover_color]" value="<?php echo esc_attr($settings['style']['hover_color'] ?? '#0085ba'); ?>">
+        <input type="hidden" name="settings[style][icon_color]" value="<?php echo esc_attr($settings['style']['icon_color'] ?? '#666666'); ?>">
+        <input type="hidden" name="settings[style][border_color]" value="<?php echo esc_attr($settings['style']['border_color']); ?>">
                         <input type="hidden" name="settings[style][height]" value="<?php echo esc_attr($settings['style']['height']); ?>">
                         <input type="hidden" name="settings[style][border_radius]" value="<?php echo esc_attr($settings['style']['border_radius']); ?>">
                         <input type="hidden" name="settings[style][font_size]" value="<?php echo esc_attr($settings['style']['font_size']); ?>">
@@ -295,6 +296,13 @@ class WPBNP_Admin_UI {
             </div>
             
             <div class="wpbnp-field-group">
+                <div class="wpbnp-field">
+                    <label><?php esc_html_e('Icon Color', 'wp-bottom-navigation-pro'); ?></label>
+                    <input type="text" name="settings[style][icon_color]" 
+                           value="<?php echo esc_attr($style['icon_color'] ?? '#666666'); ?>" 
+                           class="wpbnp-color-picker">
+                </div>
+                
                 <div class="wpbnp-field">
                     <label><?php esc_html_e('Border Color', 'wp-bottom-navigation-pro'); ?></label>
                     <input type="text" name="settings[style][border_color]" 
