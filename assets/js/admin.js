@@ -10,11 +10,17 @@ jQuery(document).ready(function($) {
                 if (formData['settings[enabled]'] !== undefined) {
                     // Use MutationObserver to watch for the checkbox and restore it immediately
                     const observer = new MutationObserver(function(mutations) {
-                        const checkbox = document.querySelector('input[name="settings[enabled]"]');
+                        const checkbox = document.querySelector('input[name="settings[enabled]"][type="checkbox"]');
+                        const hiddenField = document.querySelector('input[name="settings[enabled]"][type="hidden"]');
+                        
                         if (checkbox) {
                             checkbox.checked = Boolean(formData['settings[enabled]']);
-                            console.log('MutationObserver: Restored enabled checkbox to:', checkbox.checked);
-                            observer.disconnect(); // Stop observing once we've found and set the checkbox
+                            console.log('MutationObserver: Restored enabled checkbox (visible) to:', checkbox.checked);
+                            observer.disconnect();
+                        } else if (hiddenField) {
+                            hiddenField.value = formData['settings[enabled]'] ? '1' : '0';
+                            console.log('MutationObserver: Restored enabled checkbox (hidden) to:', formData['settings[enabled]']);
+                            observer.disconnect();
                         }
                     });
                     
@@ -26,10 +32,15 @@ jQuery(document).ready(function($) {
                     
                     // Fallback: try to set it immediately if it already exists
                     setTimeout(() => {
-                        const checkbox = document.querySelector('input[name="settings[enabled]"]');
+                        const checkbox = document.querySelector('input[name="settings[enabled]"][type="checkbox"]');
+                        const hiddenField = document.querySelector('input[name="settings[enabled]"][type="hidden"]');
+                        
                         if (checkbox) {
                             checkbox.checked = Boolean(formData['settings[enabled]']);
-                            console.log('Immediate fallback: Restored enabled checkbox to:', checkbox.checked);
+                            console.log('Immediate fallback: Restored enabled checkbox (visible) to:', checkbox.checked);
+                        } else if (hiddenField) {
+                            hiddenField.value = formData['settings[enabled]'] ? '1' : '0';
+                            console.log('Immediate fallback: Restored enabled checkbox (hidden) to:', formData['settings[enabled]']);
                         }
                         observer.disconnect(); // Clean up observer
                     }, 50);
@@ -308,7 +319,7 @@ jQuery(document).ready(function($) {
             
             // Specific handler for the Enable Bottom Navigation checkbox
             $(document).on('change', 'input[name="settings[enabled]"]', (e) => {
-                const isChecked = $(e.target).is(':checked');
+                const isChecked = $(e.target).is(':checked') || $(e.target).val() === '1';
                 
                 // Update local settings immediately
                 this.settings.enabled = isChecked;
@@ -318,6 +329,15 @@ jQuery(document).ready(function($) {
                 
                 console.log('Enable Bottom Navigation changed to:', isChecked);
                 console.log('Saved state immediately');
+            });
+            
+            // Handle hidden field updates for non-Items tabs
+            $(document).on('wpbnp_update_enabled_state', (e, newState) => {
+                const hiddenField = $('#wpbnp-enabled-hidden');
+                if (hiddenField.length) {
+                    hiddenField.val(newState ? '1' : '0');
+                    console.log('Updated hidden enabled field to:', newState);
+                }
             });
         },
         
@@ -354,10 +374,18 @@ jQuery(document).ready(function($) {
             const formData = this.getFormData();
             
             // CRITICAL: Always ensure the enabled checkbox state is captured
-            const enabledCheckbox = $('input[name="settings[enabled]"]');
+            // Check for both visible checkbox and hidden field
+            const enabledCheckbox = $('input[name="settings[enabled]"][type="checkbox"]');
+            const enabledHidden = $('input[name="settings[enabled]"][type="hidden"]');
+            
             if (enabledCheckbox.length) {
+                // We're on Items tab with visible checkbox
                 formData['settings[enabled]'] = enabledCheckbox.is(':checked');
-                console.log('Saved enabled checkbox state:', formData['settings[enabled]']);
+                console.log('Saved enabled checkbox state (visible):', formData['settings[enabled]']);
+            } else if (enabledHidden.length) {
+                // We're on another tab with hidden field
+                formData['settings[enabled]'] = enabledHidden.val() === '1';
+                console.log('Saved enabled checkbox state (hidden):', formData['settings[enabled]']);
             }
             
             localStorage.setItem('wpbnp_form_state', JSON.stringify(formData));
@@ -402,15 +430,24 @@ jQuery(document).ready(function($) {
                     
                     // CRITICAL: Handle the enabled checkbox FIRST and more aggressively
                     if (formData['settings[enabled]'] !== undefined) {
-                        const enabledCheckbox = $('input[name="settings[enabled]"]');
+                        const shouldBeChecked = Boolean(formData['settings[enabled]']);
+                        
+                        // Handle visible checkbox (Items tab)
+                        const enabledCheckbox = $('input[name="settings[enabled]"][type="checkbox"]');
                         if (enabledCheckbox.length) {
-                            const shouldBeChecked = Boolean(formData['settings[enabled]']);
                             enabledCheckbox.prop('checked', shouldBeChecked);
-                            console.log('Restored enabled checkbox to:', shouldBeChecked);
-                            
-                            // Also update the local settings object
-                            this.settings.enabled = shouldBeChecked;
+                            console.log('Restored enabled checkbox (visible) to:', shouldBeChecked);
                         }
+                        
+                        // Handle hidden field (other tabs)
+                        const enabledHidden = $('input[name="settings[enabled]"][type="hidden"]');
+                        if (enabledHidden.length) {
+                            enabledHidden.val(shouldBeChecked ? '1' : '0');
+                            console.log('Restored enabled checkbox (hidden) to:', shouldBeChecked);
+                        }
+                        
+                        // Also update the local settings object
+                        this.settings.enabled = shouldBeChecked;
                     }
                     
                     // Restore regular form fields
