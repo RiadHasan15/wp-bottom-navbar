@@ -87,6 +87,33 @@ class WPBNP_Admin_UI {
                         </script>
                         <?php endif; ?>
                         
+                        <?php if ($this->current_tab !== 'styles' && $this->current_tab !== 'presets'): ?>
+                        <!-- Hidden fields to preserve style settings on non-style tabs -->
+                        <input type="hidden" name="settings[style][background_color]" value="<?php echo esc_attr($settings['style']['background_color']); ?>">
+                        <input type="hidden" name="settings[style][text_color]" value="<?php echo esc_attr($settings['style']['text_color']); ?>">
+                        <input type="hidden" name="settings[style][active_color]" value="<?php echo esc_attr($settings['style']['active_color']); ?>">
+                        <input type="hidden" name="settings[style][border_color]" value="<?php echo esc_attr($settings['style']['border_color']); ?>">
+                        <input type="hidden" name="settings[style][height]" value="<?php echo esc_attr($settings['style']['height']); ?>">
+                        <input type="hidden" name="settings[style][border_radius]" value="<?php echo esc_attr($settings['style']['border_radius']); ?>">
+                        <input type="hidden" name="settings[style][font_size]" value="<?php echo esc_attr($settings['style']['font_size']); ?>">
+                        <input type="hidden" name="settings[style][font_weight]" value="<?php echo esc_attr($settings['style']['font_weight'] ?? '400'); ?>">
+                        <input type="hidden" name="settings[style][icon_size]" value="<?php echo esc_attr($settings['style']['icon_size']); ?>">
+                        <input type="hidden" name="settings[style][padding]" value="<?php echo esc_attr($settings['style']['padding'] ?? '10'); ?>">
+                        <input type="hidden" name="settings[style][box_shadow]" value="<?php echo esc_attr($settings['style']['box_shadow']); ?>">
+                        <?php endif; ?>
+                        
+                        <?php if ($this->current_tab !== 'animations'): ?>
+                        <!-- Hidden fields to preserve animation settings on non-animation tabs -->
+                        <input type="hidden" name="settings[animations][enabled]" value="<?php echo $settings['animations']['enabled'] ? '1' : '0'; ?>">
+                        <input type="hidden" name="settings[animations][type]" value="<?php echo esc_attr($settings['animations']['type']); ?>">
+                        <input type="hidden" name="settings[animations][duration]" value="<?php echo esc_attr($settings['animations']['duration']); ?>">
+                        <?php endif; ?>
+                        
+                        <?php if ($this->current_tab !== 'presets'): ?>
+                        <!-- Hidden field to preserve preset selection on non-preset tabs -->
+                        <input type="hidden" name="settings[preset]" value="<?php echo esc_attr($settings['preset'] ?? 'minimal'); ?>">
+                        <?php endif; ?>
+                        
                         <div class="wpbnp-tab-content">
                             <?php $this->render_tab_content($this->current_tab, $settings); ?>
                         </div>
@@ -291,10 +318,30 @@ class WPBNP_Admin_UI {
                 </div>
                 
                 <div class="wpbnp-field">
+                    <label><?php esc_html_e('Font Weight', 'wp-bottom-navigation-pro'); ?></label>
+                    <select name="settings[style][font_weight]">
+                        <option value="300" <?php selected($style['font_weight'] ?? '400', '300'); ?>><?php esc_html_e('Light (300)', 'wp-bottom-navigation-pro'); ?></option>
+                        <option value="400" <?php selected($style['font_weight'] ?? '400', '400'); ?>><?php esc_html_e('Normal (400)', 'wp-bottom-navigation-pro'); ?></option>
+                        <option value="500" <?php selected($style['font_weight'] ?? '400', '500'); ?>><?php esc_html_e('Medium (500)', 'wp-bottom-navigation-pro'); ?></option>
+                        <option value="600" <?php selected($style['font_weight'] ?? '400', '600'); ?>><?php esc_html_e('Semi-Bold (600)', 'wp-bottom-navigation-pro'); ?></option>
+                        <option value="700" <?php selected($style['font_weight'] ?? '400', '700'); ?>><?php esc_html_e('Bold (700)', 'wp-bottom-navigation-pro'); ?></option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="wpbnp-field-group">
+                <div class="wpbnp-field">
                     <label><?php esc_html_e('Icon Size (px)', 'wp-bottom-navigation-pro'); ?></label>
                     <input type="number" name="settings[style][icon_size]" 
                            value="<?php echo esc_attr($style['icon_size']); ?>" 
                            min="16" max="40">
+                </div>
+                
+                <div class="wpbnp-field">
+                    <label><?php esc_html_e('Padding (px)', 'wp-bottom-navigation-pro'); ?></label>
+                    <input type="number" name="settings[style][padding]" 
+                           value="<?php echo esc_attr($style['padding'] ?? '10'); ?>" 
+                           min="0" max="30">
                 </div>
             </div>
             
