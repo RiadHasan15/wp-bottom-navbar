@@ -2015,3 +2015,41 @@ function wpbnp_get_badge_count($item_id) {
             return 0;
     }
 }
+
+/**
+ * Check if user can see navigation item
+ */
+function wpbnp_can_user_see_item($item) {
+    // Check if item is enabled
+    if (!isset($item['enabled']) || !$item['enabled']) {
+        return false;
+    }
+    
+    // Check user roles if specified
+    if (!empty($item['roles']) && is_array($item['roles'])) {
+        $current_user = wp_get_current_user();
+        
+        // If user is not logged in and roles are required
+        if (!$current_user->ID) {
+            return false;
+        }
+        
+        // Check if user has any of the required roles
+        $user_roles = $current_user->roles;
+        $has_required_role = false;
+        
+        foreach ($item['roles'] as $required_role) {
+            if (in_array($required_role, $user_roles)) {
+                $has_required_role = true;
+                break;
+            }
+        }
+        
+        if (!$has_required_role) {
+            return false;
+        }
+    }
+    
+    // Item is visible
+    return true;
+}
