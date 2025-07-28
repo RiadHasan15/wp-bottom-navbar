@@ -868,18 +868,18 @@ jQuery(document).ready(function($) {
         
         // Actual preset application logic (separated for performance)
         doApplyPreset: function(preset, presetKey, $target, originalEvent) {
-            // Define icon library mapping for each preset
+            // Define icon library mapping for each preset (theme-appropriate)
             const presetIconMapping = {
-                'minimal': 'bootstrap',
-                'dark': 'bootstrap', 
-                'material': 'material',
-                'ios': 'apple',
-                'glassmorphism': 'bootstrap',
-                'neumorphism': 'apple',
-                'cyberpunk': 'bootstrap',
-                'vintage': 'bootstrap',
-                'gradient': 'bootstrap',
-                'floating': 'apple'
+                'minimal': 'bootstrap',      // Modern, clean Bootstrap icons
+                'dark': 'bootstrap',         // Modern, clean Bootstrap icons
+                'material': 'material',      // Google Material Design icons
+                'ios': 'apple',              // Apple SF Symbols for iOS feel
+                'glassmorphism': 'bootstrap', // Modern Bootstrap for glass effect
+                'neumorphism': 'apple',      // Soft Apple icons for neumorphic design
+                'cyberpunk': 'fontawesome',  // Tech-focused FontAwesome icons
+                'vintage': 'dashicons',      // Classic WordPress Dashicons
+                'gradient': 'bootstrap',     // Modern Bootstrap icons
+                'floating': 'apple'          // Soft Apple icons for floating design
             };
             
             // Get recommended icon library for this preset
@@ -1086,15 +1086,15 @@ jQuery(document).ready(function($) {
                         {id: 'settings', label: 'Settings', icon: 'gearshape-fill', url: '#', enabled: true}
                     ],
                                          'cyberpunk': [
-                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                         {id: 'explore', label: 'Explore', icon: 'bi bi-search', url: '#', enabled: true},
-                         {id: 'notifications', label: 'Alerts', icon: 'bi bi-bell-fill', url: '#', enabled: true},
-                         {id: 'account', label: 'Account', icon: 'bi bi-person-circle', url: '#', enabled: true}
+                         {id: 'home', label: 'Home', icon: 'fas fa-home', url: wpbnp_admin.home_url, enabled: true},
+                         {id: 'explore', label: 'Explore', icon: 'fas fa-search', url: '#', enabled: true},
+                         {id: 'notifications', label: 'Alerts', icon: 'fas fa-bell', url: '#', enabled: true},
+                         {id: 'account', label: 'Account', icon: 'fas fa-user-circle', url: '#', enabled: true}
                      ],
                     'vintage': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'gallery', label: 'Gallery', icon: 'bi bi-images', url: '#', enabled: true},
-                        {id: 'contact', label: 'Contact', icon: 'bi bi-envelope-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'gallery', label: 'Gallery', icon: 'dashicons-format-gallery', url: '#', enabled: true},
+                        {id: 'contact', label: 'Contact', icon: 'dashicons-email', url: '#', enabled: true}
                     ],
                                          'gradient': [
                          {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
@@ -1109,6 +1109,7 @@ jQuery(document).ready(function($) {
                     ]
                 };
                 
+                // Use theme-appropriate default items, fallback to Bootstrap (modern default)
                 const defaultItems = defaultPresetItems[presetKey] || [
                     {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
                     {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
