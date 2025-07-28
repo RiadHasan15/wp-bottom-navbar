@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Icon Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/icons.css">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .icon-test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .icon-test {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+        .icon-test:hover {
+            border-color: #0073aa;
+            background: #f0f8ff;
+            transform: translateY(-2px);
+        }
+        .icon-preview {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: #333;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-name {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+        }
+        .icon-class {
+            font-size: 10px;
+            color: #999;
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .working { background: #d4edda; color: #155724; }
+        .broken { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Frontend Icon Libraries Test</h1>
+    <p>This tests all icon libraries on the frontend to ensure they render correctly in navigation bars.</p>
+    
+    <div class="icon-test-section">
+        <h2>📦 WordPress Dashicons <span class="status working">WORKING</span></h2>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="dashicons dashicons-admin-home"></span>
+            </div>
+            <div class="icon-name">Home</div>
+            <div class="icon-class">dashicons-admin-home</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="dashicons dashicons-cart"></span>
+            </div>
+            <div class="icon-name">Cart</div>
+            <div class="icon-class">dashicons-cart</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="dashicons dashicons-admin-users"></span>
+            </div>
+            <div class="icon-name">Users</div>
+            <div class="icon-class">dashicons-admin-users</div>
+        </div>
+    </div>
+    
+    <div class="icon-test-section">
+        <h2>⚡ FontAwesome Icons <span class="status working">SHOULD WORK</span></h2>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="fas fa-home"></i>
+            </div>
+            <div class="icon-name">Home</div>
+            <div class="icon-class">fas fa-home</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="icon-name">Shopping Cart</div>
+            <div class="icon-class">fas fa-shopping-cart</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="icon-name">User</div>
+            <div class="icon-class">fas fa-user</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="icon-name">Heart</div>
+            <div class="icon-class">fas fa-heart</div>
+        </div>
+    </div>
+    
+    <div class="icon-test-section">
+        <h2>🎯 Bootstrap Icons <span class="status working">SHOULD WORK</span></h2>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="bi bi-house"></i>
+            </div>
+            <div class="icon-name">House</div>
+            <div class="icon-class">bi bi-house</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="bi bi-cart"></i>
+            </div>
+            <div class="icon-name">Cart</div>
+            <div class="icon-class">bi bi-cart</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="bi bi-person"></i>
+            </div>
+            <div class="icon-name">Person</div>
+            <div class="icon-class">bi bi-person</div>
+        </div>
+    </div>
+    
+    <div class="icon-test-section">
+        <h2>🎨 Material Design Icons <span class="status working">SHOULD WORK</span></h2>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="material-icons">home</span>
+            </div>
+            <div class="icon-name">Home</div>
+            <div class="icon-class">home (material-icons)</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="material-icons">shopping_cart</span>
+            </div>
+            <div class="icon-name">Shopping Cart</div>
+            <div class="icon-class">shopping_cart</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="material-icons">person</span>
+            </div>
+            <div class="icon-name">Person</div>
+            <div class="icon-class">person</div>
+        </div>
+    </div>
+    
+    <div class="icon-test-section">
+        <h2>🍎 Apple SF Symbols (iOS) <span class="status working">SHOULD WORK</span></h2>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="apple-house-fill"></span>
+            </div>
+            <div class="icon-name">House Fill</div>
+            <div class="icon-class">apple-house-fill</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="apple-cart-fill"></span>
+            </div>
+            <div class="icon-name">Cart Fill</div>
+            <div class="icon-class">apple-cart-fill</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="apple-person-fill"></span>
+            </div>
+            <div class="icon-name">Person Fill</div>
+            <div class="icon-class">apple-person-fill</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <span class="apple-heart-fill"></span>
+            </div>
+            <div class="icon-name">Heart Fill</div>
+            <div class="icon-class">apple-heart-fill</div>
+        </div>
+    </div>
+    
+    <div class="icon-test-section">
+        <h2>✨ Feather Icons <span class="status working">NOW WORKING!</span></h2>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="feather-home"></i>
+            </div>
+            <div class="icon-name">Home</div>
+            <div class="icon-class">feather-home</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="feather-shopping-cart"></i>
+            </div>
+            <div class="icon-name">Shopping Cart</div>
+            <div class="icon-class">feather-shopping-cart</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="feather-user"></i>
+            </div>
+            <div class="icon-name">User</div>
+            <div class="icon-class">feather-user</div>
+        </div>
+        <div class="icon-test">
+            <div class="icon-preview">
+                <i class="feather-heart"></i>
+            </div>
+            <div class="icon-name">Heart</div>
+            <div class="icon-class">feather-heart</div>
+        </div>
+    </div>
+    
+    <div class="icon-test-section">
+        <h2>🧪 Test Results</h2>
+        <p><strong>Expected Results:</strong></p>
+        <ul>
+            <li>✅ <strong>Dashicons</strong> should display as WordPress native icons</li>
+            <li>✅ <strong>FontAwesome</strong> should display as solid filled icons</li>
+            <li>✅ <strong>Bootstrap</strong> should display as clean line icons</li>
+            <li>✅ <strong>Material</strong> should display using Google's Material font</li>
+            <li>✅ <strong>Apple SF</strong> should display as Unicode emoji symbols (🏠🛒👤❤️)</li>
+            <li>✅ <strong>Feather</strong> should display as line SVG icons</li>
+        </ul>
+        
+        <p><strong>If icons don't show:</strong></p>
+        <ul>
+            <li>Check browser console for CSS loading errors</li>
+            <li>Verify CDN links are loading properly</li>
+            <li>Ensure icons.css is loaded after CDN stylesheets</li>
+        </ul>
+        
+        <p><strong>Frontend Integration:</strong></p>
+        <p>These same icons should display correctly in the navigation bar when selected in the admin panel.</p>
+    </div>
+</body>
+</html>
