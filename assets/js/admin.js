@@ -720,7 +720,7 @@ jQuery(document).ready(function($) {
                     name: 'iOS Icons',
                     description: 'Apple SF Symbols style',
                     icons: wpbnp_admin.icon_libraries.apple,
-                    class: 'apple-',
+                    class: '',
                     badge: 'iOS'
                 },
                 'feather': {
@@ -776,8 +776,8 @@ jQuery(document).ready(function($) {
                         iconElement = `<span class="material-icons">${iconKey}</span>`;
                         saveValue = iconKey;
                     } else if (libKey === 'apple') {
-                        iconElement = `<span class="apple-${iconKey}"></span>`;
-                        saveValue = `apple-${iconKey}`;
+                        iconElement = `<span class="${iconKey}"></span>`;
+                        saveValue = iconKey;
                     } else if (libKey === 'feather') {
                         iconElement = `<i class="feather-${iconKey}"></i>`;
                         saveValue = `feather-${iconKey}`;
@@ -1006,8 +1006,8 @@ jQuery(document).ready(function($) {
                             currentIconType = 'feather';
                         } else if (item.icon.startsWith('dashicons-')) {
                             currentIconType = 'dashicons';
-                        } else if (item.icon.includes('-') && !item.icon.includes(' ') && !item.icon.includes('dashicons') && !item.icon.includes('fa-') && !item.icon.includes('bi-') && !item.icon.includes('feather-')) {
-                            // Apple icons like 'house-fill', 'person-fill'
+                        } else if (this.isAppleIcon(item.icon)) {
+                            // Apple SF Symbols like 'house-fill', 'person-circle'
                             currentIconType = 'apple';
                         } else if (!item.icon.includes('dashicons-') && !item.icon.includes('fa-') && !item.icon.includes('bi ') && !item.icon.includes('-') && !item.icon.includes('<')) {
                             // Material icons (single words like 'home', 'person')
@@ -1165,12 +1165,35 @@ jQuery(document).ready(function($) {
                 return `<i class="${iconClass}"></i>`;
             } else if (iconClass.startsWith('feather-')) {
                 return `<i class="${iconClass}"></i>`;
-            } else if (iconClass.startsWith('apple-')) {
+            } else if (this.isAppleIcon(iconClass)) {
+                // Apple SF Symbols (using direct class names like 'house-fill', 'person-circle')
                 return `<span class="${iconClass}"></span>`;
-            } else {
-                // Material icons (text content)
+            } else if (!iconClass.includes('-') && !iconClass.includes(' ') && !iconClass.includes('<')) {
+                // Material icons (single words like 'home', 'person')
                 return `<span class="material-icons">${iconClass}</span>`;
+            } else {
+                // Default fallback
+                return `<span class="wpbnp-custom-icon">${iconClass}</span>`;
             }
+        },
+        
+        // Helper function to identify Apple SF Symbols
+        isAppleIcon: function(iconClass) {
+            const appleIconPatterns = [
+                'house', 'building', 'map', 'person', 'cart', 'bag', 'message', 'phone', 'camera', 
+                'video', 'photo', 'music', 'play', 'pause', 'stop', 'list', 'grid', 'arrow', 
+                'chevron', 'plus', 'minus', 'multiply', 'xmark', 'checkmark', 'trash', 'heart', 
+                'star', 'bookmark', 'magnifying', 'eye', 'doc', 'folder', 'gear', 'lock', 'clock',
+                'alarm', 'timer', 'calendar', 'bell', 'wifi', 'airpods', 'homepod', 'tv', 'app',
+                'bolt', 'power', 'moon', 'sun', 'light', 'shield', 'key', 'info', 'exclamation',
+                'question', 'location', 'airplane', 'car', 'bicycle', 'facetime', 'touchid',
+                'briefcase', 'credit', 'dollar', 'tag', 'gift', 'envelope', 'paper', 'speaker',
+                'headphones', 'repeat', 'shuffle', 'rectangle', 'square', 'circle', 'archivebox',
+                'trophy', 'flag', 'binoculars', 'icloud', 'book', 'newspaper', 'wrench', 'hammer',
+                'scissors', 'hourglass'
+            ];
+            
+            return appleIconPatterns.some(pattern => iconClass.includes(pattern));
         },
         
         // Initialize color pickers
