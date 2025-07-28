@@ -689,124 +689,131 @@ jQuery(document).ready(function($) {
         createIconModal: function() {
             const iconLibraries = {
                 'dashicons': {
-                    name: 'Dashicons',
+                    name: 'WordPress Icons',
+                    description: 'WordPress native Dashicons',
                     icons: wpbnp_admin.icon_libraries.dashicons,
-                    class: 'dashicons'
+                    class: 'dashicons',
+                    badge: 'WP'
                 },
                 'fontawesome': {
                     name: 'FontAwesome',
+                    description: 'Most popular icon library',
                     icons: wpbnp_admin.icon_libraries.fontawesome,
-                    class: 'fas fa-'
+                    class: 'fas fa-',
+                    badge: 'FA'
                 },
                 'bootstrap': {
                     name: 'Bootstrap Icons',
+                    description: 'Clean and modern',
                     icons: wpbnp_admin.icon_libraries.bootstrap,
-                    class: 'bi bi-'
+                    class: 'bi bi-',
+                    badge: 'BI'
                 },
                 'material': {
-                    name: 'Material Icons',
+                    name: 'Material Design',
+                    description: 'Google Material Design',
                     icons: wpbnp_admin.icon_libraries.material,
-                    class: 'material-icons'
+                    class: 'material-icons',
+                    badge: 'MD'
+                },
+                'apple': {
+                    name: 'iOS Icons',
+                    description: 'Apple SF Symbols style',
+                    icons: wpbnp_admin.icon_libraries.apple,
+                    class: 'apple-',
+                    badge: 'iOS'
                 },
                 'feather': {
                     name: 'Feather Icons',
+                    description: 'Minimalist line icons',
                     icons: wpbnp_admin.icon_libraries.feather,
-                    class: 'feather-'
-                },
-                'apple': {
-                    name: 'Apple SF',
-                    icons: wpbnp_admin.icon_libraries.apple,
-                    class: 'apple-'
+                    class: 'feather-',
+                    badge: 'FE'
                 }
             };
             
-            // Generate tabs HTML
-            let tabsHtml = '<div class="wpbnp-icon-tabs">';
+            // Generate organized tabs HTML with badges and descriptions
+            let tabsHtml = '<div class="wpbnp-icon-tabs-container">';
+            tabsHtml += '<div class="wpbnp-icon-tabs">';
             Object.keys(iconLibraries).forEach(libKey => {
                 const lib = iconLibraries[libKey];
                 const iconCount = Object.keys(lib.icons).length;
                 tabsHtml += `
-                    <button type="button" class="wpbnp-icon-tab" data-library="${libKey}">
-                        ${lib.name} (${iconCount})
+                    <button type="button" class="wpbnp-icon-tab" data-library="${libKey}" title="${lib.description}">
+                        <span class="wpbnp-tab-badge">${lib.badge}</span>
+                        <span class="wpbnp-tab-name">${lib.name}</span>
+                        <span class="wpbnp-tab-count">${iconCount}</span>
                     </button>
                 `;
             });
             tabsHtml += '</div>';
+            tabsHtml += '<div class="wpbnp-library-info"><span id="wpbnp-current-library-desc">Select an icon library</span></div>';
+            tabsHtml += '</div>';
             
-            // Generate content HTML for each library
-            let contentHtml = '<div class="wpbnp-icon-content">';
+            // Generate organized content HTML for each library
+            let contentHtml = '<div class="wpbnp-icon-content-wrapper">';
             Object.keys(iconLibraries).forEach(libKey => {
                 const lib = iconLibraries[libKey];
                 contentHtml += `<div class="wpbnp-icon-library-content" data-library="${libKey}">`;
+                contentHtml += `<div class="wpbnp-icons-grid">`;
                 
                 Object.keys(lib.icons).forEach(iconKey => {
                     const iconName = lib.icons[iconKey];
-                    let iconClass = '';
                     let iconElement = '';
-                    
-                    // Generate proper icon markup based on library type
-                    if (libKey === 'dashicons') {
-                        iconClass = `dashicons ${iconKey}`;
-                        iconElement = `<span class="${iconClass}"></span>`;
-                    } else if (libKey === 'fontawesome') {
-                        iconClass = `fas fa-${iconKey}`;
-                        iconElement = `<i class="${iconClass}"></i>`;
-                    } else if (libKey === 'bootstrap') {
-                        iconClass = `bi bi-${iconKey}`;
-                        iconElement = `<i class="${iconClass}"></i>`;
-                    } else if (libKey === 'material') {
-                        iconClass = 'material-icons';
-                        iconElement = `<span class="${iconClass}">${iconKey}</span>`;
-                    } else if (libKey === 'feather') {
-                        iconClass = `feather-${iconKey}`;
-                        iconElement = `<i class="${iconClass}"></i>`;
-                    } else if (libKey === 'apple') {
-                        iconClass = `apple-${iconKey}`;
-                        iconElement = `<span class="${iconClass}"></span>`;
-                    }
-                    
-                    // Store the actual icon identifier for saving
                     let saveValue = '';
+                    
+                    // Generate proper icon markup and save value based on library type
                     if (libKey === 'dashicons') {
+                        iconElement = `<span class="dashicons ${iconKey}"></span>`;
                         saveValue = iconKey;
                     } else if (libKey === 'fontawesome') {
+                        iconElement = `<i class="fas fa-${iconKey}"></i>`;
                         saveValue = `fas fa-${iconKey}`;
                     } else if (libKey === 'bootstrap') {
+                        iconElement = `<i class="bi bi-${iconKey}"></i>`;
                         saveValue = `bi bi-${iconKey}`;
                     } else if (libKey === 'material') {
-                        saveValue = iconKey; // Material icons use the text content
-                    } else if (libKey === 'feather') {
-                        saveValue = `feather-${iconKey}`;
+                        iconElement = `<span class="material-icons">${iconKey}</span>`;
+                        saveValue = iconKey;
                     } else if (libKey === 'apple') {
+                        iconElement = `<span class="apple-${iconKey}"></span>`;
                         saveValue = `apple-${iconKey}`;
+                    } else if (libKey === 'feather') {
+                        iconElement = `<i class="feather-${iconKey}"></i>`;
+                        saveValue = `feather-${iconKey}`;
                     }
                     
                     contentHtml += `
                         <div class="wpbnp-icon-option" data-icon="${saveValue}" data-library="${libKey}" title="${iconName}">
-                            ${iconElement}
-                            <span class="wpbnp-icon-name">${iconName}</span>
+                            <div class="wpbnp-icon-preview">${iconElement}</div>
+                            <div class="wpbnp-icon-label">${iconName}</div>
                         </div>
                     `;
                 });
                 
-                contentHtml += '</div>';
+                contentHtml += '</div></div>';
             });
             contentHtml += '</div>';
             
-            // Complete modal HTML
+            // Complete organized modal HTML
             const modalHtml = `
                 <div id="wpbnp-icon-modal" class="wpbnp-modal" style="display: none;">
-                    <div class="wpbnp-modal-content">
+                    <div class="wpbnp-modal-backdrop"></div>
+                    <div class="wpbnp-modal-content wpbnp-icon-modal-content">
                         <div class="wpbnp-modal-header">
-                            <h3>Choose Icon</h3>
+                            <h3><i class="dashicons dashicons-admin-appearance"></i> Choose Icon</h3>
                             <button type="button" class="wpbnp-modal-close">&times;</button>
                         </div>
                         <div class="wpbnp-modal-body">
-                            <div class="wpbnp-icon-search-wrapper">
-                                <input type="text" id="wpbnp-icon-search" placeholder="Search icons..." />
-                                <div class="wpbnp-icon-stats">
-                                    <span id="wpbnp-current-library">All Icons</span> | 
+                            <div class="wpbnp-search-container">
+                                <div class="wpbnp-search-wrapper">
+                                    <i class="dashicons dashicons-search"></i>
+                                    <input type="text" id="wpbnp-icon-search" placeholder="Search icons..." />
+                                </div>
+                                <div class="wpbnp-search-stats">
                                     <span id="wpbnp-icon-count">0 icons</span>
+                                    <span class="wpbnp-search-separator">•</span>
+                                    <span id="wpbnp-visible-count">0 visible</span>
                                 </div>
                             </div>
                             ${tabsHtml}
@@ -824,6 +831,7 @@ jQuery(document).ready(function($) {
             $('.wpbnp-icon-tab').first().addClass('active');
             $('.wpbnp-icon-library-content').first().addClass('active');
             this.updateIconCount();
+            this.updateLibraryInfo();
             
             // Bind events
             this.bindIconModalEvents();
@@ -1147,6 +1155,28 @@ jQuery(document).ready(function($) {
             $('#wpbnp-icon-count').text(`${totalIcons} icons`);
         },
 
+        // Update library info in the modal
+        updateLibraryInfo: function() {
+            const currentLibrary = $('.wpbnp-icon-tab.active').data('library');
+            const currentLibraryName = $('.wpbnp-icon-tab.active .wpbnp-tab-name').text();
+            const currentLibraryDescription = $('.wpbnp-icon-tab.active').attr('title');
+            const currentLibraryBadge = $('.wpbnp-icon-tab.active .wpbnp-tab-badge').text();
+            const currentLibraryCount = $('.wpbnp-icon-tab.active .wpbnp-tab-count').text();
+
+            $('#wpbnp-current-library-desc').text(`${currentLibraryName} - ${currentLibraryDescription}`);
+            
+            // Update icon counts
+            this.updateIconCount();
+        },
+
+        // Update icon count display
+        updateIconCount: function() {
+            const totalIcons = $('.wpbnp-icon-library-content.active .wpbnp-icon-option').length;
+            const visibleIcons = $('.wpbnp-icon-library-content.active .wpbnp-icon-option:visible').length;
+            $('#wpbnp-icon-count').text(`${totalIcons} icons`);
+            $('#wpbnp-visible-count').text(`${visibleIcons} visible`);
+        },
+
         // Bind events for the icon picker modal
         bindIconModalEvents: function() {
             $(document).on('click', '.wpbnp-modal-close, .wpbnp-modal', function(e) {
@@ -1174,22 +1204,29 @@ jQuery(document).ready(function($) {
                 $('.wpbnp-icon-library-content').removeClass('active');
                 $(this).addClass('active');
                 $(`.wpbnp-icon-library-content[data-library="${library}"]`).addClass('active');
-                $('#wpbnp-current-library').text($(this).text());
-                WPBottomNavAdmin.updateIconCount();
+                WPBottomNavAdmin.updateLibraryInfo();
                 $('#wpbnp-icon-search').val('').trigger('input');
             });
 
             $(document).on('input', '#wpbnp-icon-search', function() {
                 const searchTerm = $(this).val().toLowerCase();
-                $('.wpbnp-icon-option').each(function() {
-                    const iconName = $(this).find('.wpbnp-icon-name').text().toLowerCase();
+                let visibleCount = 0;
+                
+                $('.wpbnp-icon-library-content.active .wpbnp-icon-option').each(function() {
+                    const iconName = $(this).find('.wpbnp-icon-label').text().toLowerCase();
                     const iconClass = $(this).data('icon').toLowerCase();
                     if (iconName.includes(searchTerm) || iconClass.includes(searchTerm)) {
                         $(this).show();
+                        visibleCount++;
                     } else {
                         $(this).hide();
                     }
                 });
+                
+                // Update visible count
+                const totalIcons = $('.wpbnp-icon-library-content.active .wpbnp-icon-option').length;
+                $('#wpbnp-icon-count').text(`${totalIcons} icons`);
+                $('#wpbnp-visible-count').text(`${visibleCount} visible`);
             });
         }
     };
