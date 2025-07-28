@@ -130,9 +130,9 @@ class WP_Bottom_Navigation_Pro {
         // Enqueue FontAwesome
         wp_enqueue_style(
             'fontawesome',
-            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
             array(),
-            '6.4.0'
+            '6.7.2'
         );
         
         // Enqueue Material Icons
@@ -857,13 +857,18 @@ class WP_Bottom_Navigation_Pro {
             return;
         }
         
-        // Enqueue FontAwesome for admin
+        // Enqueue FontAwesome for admin with preload
         wp_enqueue_style(
             'fontawesome-admin',
-            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
             array(),
-            '6.4.0'
+            '6.7.2'
         );
+        
+        // Add preload hint for FontAwesome
+        add_action('admin_head', function() {
+            echo '<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">';
+        });
         
         // Enqueue Material Icons for admin
         wp_enqueue_style(
