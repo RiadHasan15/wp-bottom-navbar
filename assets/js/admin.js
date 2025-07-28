@@ -1027,18 +1027,11 @@ jQuery(document).ready(function($) {
                         if (item.icon && this.needsIconConversion(item.icon, recommendedIconLibrary)) {
                             const convertedIcon = this.getSimpleIconConversion(item.icon, recommendedIconLibrary, index);
                             if (convertedIcon && convertedIcon !== item.icon) {
+                                console.log(`Converting icon: ${item.icon} → ${convertedIcon} (${recommendedIconLibrary})`);
                                 item.icon = convertedIcon;
                                 iconsChanged++;
                                 
-                                // Update the UI in batch (more efficient)
-                                const iconInput = $(`.wpbnp-nav-item-row:eq(${index}) .wpbnp-icon-input`);
-                                if (iconInput.length) {
-                                    iconInput.val(convertedIcon);
-                                    const iconPreview = iconInput.siblings('.wpbnp-icon-preview');
-                                    if (iconPreview.length) {
-                                        iconPreview.html(this.generateIconHTML(convertedIcon));
-                                    }
-                                }
+                                // Icon updated in memory, UI will be refreshed after loop
                             }
                         }
                     });
@@ -1055,6 +1048,9 @@ jQuery(document).ready(function($) {
                          };
                          const libraryName = libraryNames[recommendedIconLibrary] || recommendedIconLibrary.toUpperCase();
                          this.showNotification(`🎨 Converted ${iconsChanged} icon(s) to ${libraryName} for better theme consistency!`, 'success');
+                         
+                         // Refresh the items list to show the new icons
+                         this.refreshItemsList();
                      }
                 }
             }
@@ -1125,7 +1121,7 @@ jQuery(document).ready(function($) {
                 
                 // Re-render items list (batched)
                 setTimeout(() => {
-                    this.renderItemsList();
+                    this.refreshItemsList();
                 }, 10);
                 this.showNotification(`✨ Added ${defaultItems.length} default items for the ${preset.name} preset!`, 'info');
             }
@@ -1457,6 +1453,22 @@ jQuery(document).ready(function($) {
                 });
             });
             this.settings.items = items;
+        },
+        
+        // Refresh the items list display
+        refreshItemsList: function() {
+            // Clear existing items
+            $('#wpbnp-items-list').empty();
+            
+            // Re-render all items from current settings
+            if (this.settings.items && this.settings.items.length > 0) {
+                this.settings.items.forEach((item, index) => {
+                    this.addItemRow(item, index);
+                });
+            }
+            
+            // Re-setup sortable after refresh
+            this.setupSortable();
         },
         
         // Export settings
