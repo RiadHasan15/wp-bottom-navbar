@@ -56,8 +56,9 @@ function wpbnp_get_default_settings() {
         ),
         'style' => array(
             'background_color' => '#ffffff',
-            'text_color' => '#333333',
+            'text_color' => '#666666',
             'active_color' => '#0073aa',
+            'hover_color' => '#0085ba',
             'border_color' => '#e0e0e0',
             'height' => '60',
             'border_radius' => '0',
@@ -138,12 +139,13 @@ function wpbnp_sanitize_settings($settings) {
     if (isset($settings['style']) && is_array($settings['style'])) {
         $sanitized['style'] = array(
             'background_color' => sanitize_hex_color($settings['style']['background_color'] ?? '#ffffff'),
-            'text_color' => sanitize_hex_color($settings['style']['text_color'] ?? '#333333'),
+            'text_color' => sanitize_hex_color($settings['style']['text_color'] ?? '#666666'),
             'active_color' => sanitize_hex_color($settings['style']['active_color'] ?? '#0073aa'),
+            'hover_color' => sanitize_hex_color($settings['style']['hover_color'] ?? '#0085ba'),
             'border_color' => sanitize_hex_color($settings['style']['border_color'] ?? '#e0e0e0'),
             'height' => absint($settings['style']['height'] ?? 60),
             'border_radius' => absint($settings['style']['border_radius'] ?? 0),
-            'box_shadow' => sanitize_text_field($settings['style']['box_shadow'] ?? ''),
+            'box_shadow' => sanitize_text_field($settings['style']['box_shadow'] ?? '0 -2px 8px rgba(0,0,0,0.1)'),
             'font_size' => absint($settings['style']['font_size'] ?? 12),
             'font_weight' => sanitize_text_field($settings['style']['font_weight'] ?? '400'),
             'icon_size' => absint($settings['style']['icon_size'] ?? 20),
@@ -277,29 +279,48 @@ function wpbnp_get_presets() {
 }
 
 /**
- * Get available icon libraries and icons
+ * Get available icon libraries
  */
 function wpbnp_get_icon_libraries() {
     return array(
         'dashicons' => array(
-            'name' => __('Dashicons', 'wp-bottom-navigation-pro'),
-            'description' => __('WordPress default icons', 'wp-bottom-navigation-pro'),
-            'icons' => wpbnp_get_dashicons()
+            'name' => 'Dashicons',
+            'description' => 'WordPress native icons',
+            'class_prefix' => 'dashicons',
+            'type' => 'font'
         ),
-        'apple' => array(
-            'name' => __('Apple SF Symbols', 'wp-bottom-navigation-pro'),
-            'description' => __('iOS style system icons', 'wp-bottom-navigation-pro'),
-            'icons' => wpbnp_get_apple_icons()
+        'fontawesome' => array(
+            'name' => 'FontAwesome',
+            'description' => 'Most popular icon library',
+            'class_prefix' => 'fas fa-',
+            'type' => 'font',
+            'cdn' => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+        ),
+        'feather' => array(
+            'name' => 'Feather Icons',
+            'description' => 'Simple and beautiful icons',
+            'class_prefix' => 'feather-',
+            'type' => 'svg'
         ),
         'material' => array(
-            'name' => __('Material Icons', 'wp-bottom-navigation-pro'),
-            'description' => __('Google Material Design icons', 'wp-bottom-navigation-pro'),
-            'icons' => wpbnp_get_material_icons()
+            'name' => 'Material Icons',
+            'description' => 'Google Material Design',
+            'class_prefix' => 'material-icons',
+            'type' => 'font',
+            'cdn' => 'https://fonts.googleapis.com/icon?family=Material+Icons'
         ),
-        'custom' => array(
-            'name' => __('Custom Icons', 'wp-bottom-navigation-pro'),
-            'description' => __('Upload your own icons', 'wp-bottom-navigation-pro'),
-            'icons' => array()
+        'bootstrap' => array(
+            'name' => 'Bootstrap Icons',
+            'description' => 'Bootstrap icon library',
+            'class_prefix' => 'bi bi-',
+            'type' => 'font',
+            'cdn' => 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css'
+        ),
+        'apple' => array(
+            'name' => 'Apple SF Symbols',
+            'description' => 'iOS-style icons',
+            'class_prefix' => 'apple-',
+            'type' => 'custom'
         )
     );
 }
@@ -310,182 +331,264 @@ function wpbnp_get_icon_libraries() {
 function wpbnp_get_dashicons() {
     return array(
         // Navigation & Home
-        'dashicons-admin-home' => __('Home', 'wp-bottom-navigation-pro'),
-        'dashicons-dashboard' => __('Dashboard', 'wp-bottom-navigation-pro'),
-        'dashicons-menu' => __('Menu', 'wp-bottom-navigation-pro'),
-        'dashicons-menu-alt' => __('Menu Alt', 'wp-bottom-navigation-pro'),
-        'dashicons-arrow-up-alt' => __('Arrow Up', 'wp-bottom-navigation-pro'),
-        'dashicons-arrow-down-alt' => __('Arrow Down', 'wp-bottom-navigation-pro'),
+        'dashicons-admin-home' => 'Home',
+        'dashicons-dashboard' => 'Dashboard',
+        'dashicons-menu' => 'Menu',
+        'dashicons-menu-alt' => 'Menu Alt',
+        'dashicons-arrow-up-alt' => 'Arrow Up',
+        'dashicons-arrow-down-alt' => 'Arrow Down',
         
         // E-commerce
-        'dashicons-cart' => __('Cart', 'wp-bottom-navigation-pro'),
-        'dashicons-products' => __('Products', 'wp-bottom-navigation-pro'),
-        'dashicons-money' => __('Money', 'wp-bottom-navigation-pro'),
-        'dashicons-tag' => __('Tag', 'wp-bottom-navigation-pro'),
+        'dashicons-cart' => 'Cart',
+        'dashicons-products' => 'Products',
+        'dashicons-money' => 'Money',
+        'dashicons-tag' => 'Tag',
         
         // Social & Communication
-        'dashicons-admin-users' => __('Users', 'wp-bottom-navigation-pro'),
-        'dashicons-groups' => __('Groups', 'wp-bottom-navigation-pro'),
-        'dashicons-heart' => __('Heart', 'wp-bottom-navigation-pro'),
-        'dashicons-phone' => __('Phone', 'wp-bottom-navigation-pro'),
-        'dashicons-email' => __('Email', 'wp-bottom-navigation-pro'),
-        'dashicons-share' => __('Share', 'wp-bottom-navigation-pro'),
-        'dashicons-networking' => __('Network', 'wp-bottom-navigation-pro'),
+        'dashicons-admin-users' => 'Users',
+        'dashicons-groups' => 'Groups',
+        'dashicons-heart' => 'Heart',
+        'dashicons-phone' => 'Phone',
+        'dashicons-email' => 'Email',
+        'dashicons-share' => 'Share',
+        'dashicons-networking' => 'Network',
         
         // Content & Media
-        'dashicons-search' => __('Search', 'wp-bottom-navigation-pro'),
-        'dashicons-camera' => __('Camera', 'wp-bottom-navigation-pro'),
-        'dashicons-video-alt3' => __('Video', 'wp-bottom-navigation-pro'),
-        'dashicons-format-gallery' => __('Gallery', 'wp-bottom-navigation-pro'),
-        'dashicons-media-audio' => __('Audio', 'wp-bottom-navigation-pro'),
-        'dashicons-download' => __('Download', 'wp-bottom-navigation-pro'),
-        'dashicons-upload' => __('Upload', 'wp-bottom-navigation-pro'),
+        'dashicons-search' => 'Search',
+        'dashicons-camera' => 'Camera',
+        'dashicons-video-alt3' => 'Video',
+        'dashicons-format-gallery' => 'Gallery',
+        'dashicons-media-audio' => 'Audio',
+        'dashicons-download' => 'Download',
+        'dashicons-upload' => 'Upload',
         
         // Information & Status
-        'dashicons-info' => __('Info', 'wp-bottom-navigation-pro'),
-        'dashicons-star-filled' => __('Star', 'wp-bottom-navigation-pro'),
-        'dashicons-star-empty' => __('Star Empty', 'wp-bottom-navigation-pro'),
-        'dashicons-flag' => __('Flag', 'wp-bottom-navigation-pro'),
-        'dashicons-warning' => __('Warning', 'wp-bottom-navigation-pro'),
+        'dashicons-info' => 'Info',
+        'dashicons-star-filled' => 'Star',
+        'dashicons-star-empty' => 'Star Empty',
+        'dashicons-flag' => 'Flag',
+        'dashicons-warning' => 'Warning',
         
         // Time & Location
-        'dashicons-calendar' => __('Calendar', 'wp-bottom-navigation-pro'),
-        'dashicons-clock' => __('Clock', 'wp-bottom-navigation-pro'),
-        'dashicons-location' => __('Location', 'wp-bottom-navigation-pro'),
-        'dashicons-location-alt' => __('Location Alt', 'wp-bottom-navigation-pro'),
+        'dashicons-calendar' => 'Calendar',
+        'dashicons-clock' => 'Clock',
+        'dashicons-location' => 'Location',
+        'dashicons-location-alt' => 'Location Alt',
         
         // Settings & Tools
-        'dashicons-admin-settings' => __('Settings', 'wp-bottom-navigation-pro'),
-        'dashicons-admin-tools' => __('Tools', 'wp-bottom-navigation-pro'),
-        'dashicons-admin-generic' => __('Generic', 'wp-bottom-navigation-pro'),
-        'dashicons-filter' => __('Filter', 'wp-bottom-navigation-pro')
+        'dashicons-admin-settings' => 'Settings',
+        'dashicons-admin-tools' => 'Tools',
+        'dashicons-admin-generic' => 'Generic',
+        'dashicons-filter' => 'Filter'
     );
 }
 
 /**
- * Get Apple SF Symbols style icons
+ * Get FontAwesome icons
  */
-function wpbnp_get_apple_icons() {
+function wpbnp_get_fontawesome_icons() {
     return array(
         // Navigation & Home
-        'apple-house' => __('House', 'wp-bottom-navigation-pro'),
-        'apple-house-fill' => __('House Fill', 'wp-bottom-navigation-pro'),
-        'apple-square-grid-2x2' => __('Grid', 'wp-bottom-navigation-pro'),
-        'apple-list-bullet' => __('List', 'wp-bottom-navigation-pro'),
-        'apple-ellipsis' => __('More', 'wp-bottom-navigation-pro'),
+        'home' => 'Home',
+        'house' => 'House',
+        'dashboard' => 'Dashboard',
+        'menu' => 'Menu',
+        'bars' => 'Menu Bars',
+        'ellipsis' => 'More Options',
+        'grid' => 'Grid',
+        'th' => 'Grid View',
+        'list' => 'List',
         
         // E-commerce
-        'apple-cart' => __('Cart', 'wp-bottom-navigation-pro'),
-        'apple-cart-fill' => __('Cart Fill', 'wp-bottom-navigation-pro'),
-        'apple-bag' => __('Bag', 'wp-bottom-navigation-pro'),
-        'apple-bag-fill' => __('Bag Fill', 'wp-bottom-navigation-pro'),
-        'apple-creditcard' => __('Credit Card', 'wp-bottom-navigation-pro'),
+        'shopping-cart' => 'Shopping Cart',
+        'cart-shopping' => 'Shopping Cart',
+        'bag-shopping' => 'Shopping Bag',
+        'store' => 'Store',
+        'credit-card' => 'Credit Card',
+        'money-bill' => 'Money',
+        'tag' => 'Price Tag',
+        'percent' => 'Discount',
         
-        // Social & Communication  
-        'apple-person' => __('Person', 'wp-bottom-navigation-pro'),
-        'apple-person-fill' => __('Person Fill', 'wp-bottom-navigation-pro'),
-        'apple-person-2' => __('People', 'wp-bottom-navigation-pro'),
-        'apple-person-2-fill' => __('People Fill', 'wp-bottom-navigation-pro'),
-        'apple-heart' => __('Heart', 'wp-bottom-navigation-pro'),
-        'apple-heart-fill' => __('Heart Fill', 'wp-bottom-navigation-pro'),
-        'apple-message' => __('Message', 'wp-bottom-navigation-pro'),
-        'apple-message-fill' => __('Message Fill', 'wp-bottom-navigation-pro'),
-        'apple-phone' => __('Phone', 'wp-bottom-navigation-pro'),
-        'apple-phone-fill' => __('Phone Fill', 'wp-bottom-navigation-pro'),
-        'apple-envelope' => __('Mail', 'wp-bottom-navigation-pro'),
-        'apple-envelope-fill' => __('Mail Fill', 'wp-bottom-navigation-pro'),
+        // Social & Communication
+        'user' => 'User',
+        'users' => 'Users',
+        'user-circle' => 'User Profile',
+        'heart' => 'Heart',
+        'thumbs-up' => 'Like',
+        'message' => 'Message',
+        'comment' => 'Comment',
+        'phone' => 'Phone',
+        'envelope' => 'Email',
+        'share' => 'Share',
         
         // Content & Media
-        'apple-magnifyingglass' => __('Search', 'wp-bottom-navigation-pro'),
-        'apple-camera' => __('Camera', 'wp-bottom-navigation-pro'),
-        'apple-camera-fill' => __('Camera Fill', 'wp-bottom-navigation-pro'),
-        'apple-photo' => __('Photo', 'wp-bottom-navigation-pro'),
-        'apple-photo-fill' => __('Photo Fill', 'wp-bottom-navigation-pro'),
-        'apple-play' => __('Play', 'wp-bottom-navigation-pro'),
-        'apple-play-fill' => __('Play Fill', 'wp-bottom-navigation-pro'),
-        'apple-music-note' => __('Music', 'wp-bottom-navigation-pro'),
+        'search' => 'Search',
+        'camera' => 'Camera',
+        'image' => 'Image',
+        'video' => 'Video',
+        'music' => 'Music',
+        'play' => 'Play',
+        'pause' => 'Pause',
+        'download' => 'Download',
+        'upload' => 'Upload',
+        'file' => 'File',
         
         // Information & Status
-        'apple-info-circle' => __('Info', 'wp-bottom-navigation-pro'),
-        'apple-info-circle-fill' => __('Info Fill', 'wp-bottom-navigation-pro'),
-        'apple-star' => __('Star', 'wp-bottom-navigation-pro'),
-        'apple-star-fill' => __('Star Fill', 'wp-bottom-navigation-pro'),
-        'apple-bookmark' => __('Bookmark', 'wp-bottom-navigation-pro'),
-        'apple-bookmark-fill' => __('Bookmark Fill', 'wp-bottom-navigation-pro'),
+        'info' => 'Info',
+        'info-circle' => 'Info Circle',
+        'star' => 'Star',
+        'bookmark' => 'Bookmark',
+        'bell' => 'Notification',
+        'flag' => 'Flag',
+        'check' => 'Check',
+        'times' => 'Close',
+        'plus' => 'Add',
+        'minus' => 'Remove',
         
         // Time & Location
-        'apple-calendar' => __('Calendar', 'wp-bottom-navigation-pro'),
-        'apple-clock' => __('Clock', 'wp-bottom-navigation-pro'),
-        'apple-clock-fill' => __('Clock Fill', 'wp-bottom-navigation-pro'),
-        'apple-location' => __('Location', 'wp-bottom-navigation-pro'),
-        'apple-location-fill' => __('Location Fill', 'wp-bottom-navigation-pro'),
-        'apple-map' => __('Map', 'wp-bottom-navigation-pro'),
-        'apple-map-fill' => __('Map Fill', 'wp-bottom-navigation-pro'),
+        'calendar' => 'Calendar',
+        'clock' => 'Clock',
+        'map-marker' => 'Location',
+        'map' => 'Map',
+        'globe' => 'Globe',
         
         // Settings & Tools
-        'apple-gearshape' => __('Settings', 'wp-bottom-navigation-pro'),
-        'apple-gearshape-fill' => __('Settings Fill', 'wp-bottom-navigation-pro'),
-        'apple-wrench' => __('Tools', 'wp-bottom-navigation-pro'),
-        'apple-wrench-fill' => __('Tools Fill', 'wp-bottom-navigation-pro'),
-        'apple-slider-horizontal-3' => __('Controls', 'wp-bottom-navigation-pro')
+        'cog' => 'Settings',
+        'gear' => 'Gear',
+        'wrench' => 'Tools',
+        'sliders' => 'Controls',
+        'filter' => 'Filter',
+        'sort' => 'Sort',
+        'key' => 'Key',
+        'lock' => 'Lock',
+        'eye' => 'View',
+        'edit' => 'Edit'
     );
 }
 
 /**
- * Get Material Design icons
+ * Get Feather icons (SVG-based)
+ */
+function wpbnp_get_feather_icons() {
+    return array(
+        'home' => 'Home',
+        'menu' => 'Menu',
+        'grid' => 'Grid',
+        'shopping-cart' => 'Shopping Cart',
+        'shopping-bag' => 'Shopping Bag',
+        'user' => 'User',
+        'users' => 'Users',
+        'heart' => 'Heart',
+        'message-circle' => 'Message',
+        'phone' => 'Phone',
+        'mail' => 'Email',
+        'search' => 'Search',
+        'camera' => 'Camera',
+        'image' => 'Image',
+        'video' => 'Video',
+        'music' => 'Music',
+        'play' => 'Play',
+        'star' => 'Star',
+        'bookmark' => 'Bookmark',
+        'bell' => 'Bell',
+        'calendar' => 'Calendar',
+        'clock' => 'Clock',
+        'map-pin' => 'Location',
+        'settings' => 'Settings',
+        'tool' => 'Tools'
+    );
+}
+
+/**
+ * Get Material icons
  */
 function wpbnp_get_material_icons() {
     return array(
-        // Navigation & Home
-        'material-home' => __('Home', 'wp-bottom-navigation-pro'),
-        'material-dashboard' => __('Dashboard', 'wp-bottom-navigation-pro'),
-        'material-menu' => __('Menu', 'wp-bottom-navigation-pro'),
-        'material-more-vert' => __('More Vertical', 'wp-bottom-navigation-pro'),
-        'material-more-horiz' => __('More Horizontal', 'wp-bottom-navigation-pro'),
-        
-        // E-commerce
-        'material-shopping-cart' => __('Shopping Cart', 'wp-bottom-navigation-pro'),
-        'material-shopping-bag' => __('Shopping Bag', 'wp-bottom-navigation-pro'),
-        'material-store' => __('Store', 'wp-bottom-navigation-pro'),
-        'material-payment' => __('Payment', 'wp-bottom-navigation-pro'),
-        'material-local-offer' => __('Offer', 'wp-bottom-navigation-pro'),
-        
-        // Social & Communication
-        'material-person' => __('Person', 'wp-bottom-navigation-pro'),
-        'material-people' => __('People', 'wp-bottom-navigation-pro'),
-        'material-favorite' => __('Favorite', 'wp-bottom-navigation-pro'),
-        'material-favorite-border' => __('Favorite Border', 'wp-bottom-navigation-pro'),
-        'material-message' => __('Message', 'wp-bottom-navigation-pro'),
-        'material-phone' => __('Phone', 'wp-bottom-navigation-pro'),
-        'material-email' => __('Email', 'wp-bottom-navigation-pro'),
-        'material-share' => __('Share', 'wp-bottom-navigation-pro'),
-        
-        // Content & Media
-        'material-search' => __('Search', 'wp-bottom-navigation-pro'),
-        'material-camera-alt' => __('Camera', 'wp-bottom-navigation-pro'),
-        'material-photo-library' => __('Photo Library', 'wp-bottom-navigation-pro'),
-        'material-videocam' => __('Video Camera', 'wp-bottom-navigation-pro'),
-        'material-music-note' => __('Music', 'wp-bottom-navigation-pro'),
-        'material-play-arrow' => __('Play', 'wp-bottom-navigation-pro'),
-        
-        // Information & Status
-        'material-info' => __('Info', 'wp-bottom-navigation-pro'),
-        'material-star' => __('Star', 'wp-bottom-navigation-pro'),
-        'material-star-border' => __('Star Border', 'wp-bottom-navigation-pro'),
-        'material-bookmark' => __('Bookmark', 'wp-bottom-navigation-pro'),
-        'material-bookmark-border' => __('Bookmark Border', 'wp-bottom-navigation-pro'),
-        
-        // Time & Location
-        'material-event' => __('Event', 'wp-bottom-navigation-pro'),
-        'material-schedule' => __('Schedule', 'wp-bottom-navigation-pro'),
-        'material-location-on' => __('Location', 'wp-bottom-navigation-pro'),
-        'material-map' => __('Map', 'wp-bottom-navigation-pro'),
-        
-        // Settings & Tools
-        'material-settings' => __('Settings', 'wp-bottom-navigation-pro'),
-        'material-build' => __('Build', 'wp-bottom-navigation-pro'),
-        'material-tune' => __('Tune', 'wp-bottom-navigation-pro'),
-        'material-filter-list' => __('Filter', 'wp-bottom-navigation-pro')
+        'home' => 'Home',
+        'dashboard' => 'Dashboard',
+        'menu' => 'Menu',
+        'shopping_cart' => 'Shopping Cart',
+        'store' => 'Store',
+        'person' => 'Person',
+        'people' => 'People',
+        'favorite' => 'Favorite',
+        'message' => 'Message',
+        'phone' => 'Phone',
+        'email' => 'Email',
+        'search' => 'Search',
+        'camera_alt' => 'Camera',
+        'image' => 'Image',
+        'video_library' => 'Video',
+        'music_note' => 'Music',
+        'play_arrow' => 'Play',
+        'star' => 'Star',
+        'bookmark' => 'Bookmark',
+        'notifications' => 'Notifications',
+        'event' => 'Calendar',
+        'schedule' => 'Clock',
+        'location_on' => 'Location',
+        'settings' => 'Settings',
+        'build' => 'Tools'
+    );
+}
+
+/**
+ * Get Bootstrap icons
+ */
+function wpbnp_get_bootstrap_icons() {
+    return array(
+        'house' => 'House',
+        'house-fill' => 'House Fill',
+        'grid' => 'Grid',
+        'list' => 'List',
+        'cart' => 'Cart',
+        'bag' => 'Bag',
+        'person' => 'Person',
+        'people' => 'People',
+        'heart' => 'Heart',
+        'heart-fill' => 'Heart Fill',
+        'chat' => 'Chat',
+        'telephone' => 'Phone',
+        'envelope' => 'Email',
+        'search' => 'Search',
+        'camera' => 'Camera',
+        'image' => 'Image',
+        'play' => 'Play',
+        'star' => 'Star',
+        'star-fill' => 'Star Fill',
+        'bookmark' => 'Bookmark',
+        'bell' => 'Bell',
+        'calendar' => 'Calendar',
+        'clock' => 'Clock',
+        'geo-alt' => 'Location',
+        'gear' => 'Settings',
+        'tools' => 'Tools'
+    );
+}
+
+/**
+ * Get Apple SF Symbols (using Unicode and custom styling)
+ */
+function wpbnp_get_apple_icons() {
+    return array(
+        'house' => 'House',
+        'house-fill' => 'House Fill',
+        'cart' => 'Cart',
+        'cart-fill' => 'Cart Fill',
+        'person' => 'Person',
+        'person-fill' => 'Person Fill',
+        'heart' => 'Heart',
+        'heart-fill' => 'Heart Fill',
+        'message' => 'Message',
+        'phone' => 'Phone',
+        'envelope' => 'Mail',
+        'magnifyingglass' => 'Search',
+        'camera' => 'Camera',
+        'gearshape' => 'Settings',
+        'star' => 'Star',
+        'star-fill' => 'Star Fill',
+        'list-bullet' => 'Menu',
+        'square-grid-2x2' => 'Grid'
     );
 }
 
