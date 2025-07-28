@@ -149,9 +149,29 @@ class WPBNP_Admin_UI {
             
             <div class="wpbnp-field">
                 <label>
-                    <input type="checkbox" name="settings[enabled]" value="1" <?php checked($settings['enabled']); ?>>
+                    <input type="checkbox" name="settings[enabled]" value="1" <?php checked($settings['enabled']); ?> id="wpbnp-enabled-checkbox">
                     <?php esc_html_e('Enable Bottom Navigation', 'wp-bottom-navigation-pro'); ?>
                 </label>
+                
+                <!-- Critical: Restore checkbox state immediately -->
+                <script>
+                (function() {
+                    // Restore the checkbox state from localStorage immediately
+                    try {
+                        const savedState = localStorage.getItem('wpbnp_form_state');
+                        if (savedState) {
+                            const formData = JSON.parse(savedState);
+                            const checkbox = document.getElementById('wpbnp-enabled-checkbox');
+                            if (checkbox && formData['settings[enabled]'] !== undefined) {
+                                checkbox.checked = Boolean(formData['settings[enabled]']);
+                                console.log('Immediately restored enabled checkbox to:', checkbox.checked);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Error restoring checkbox state:', e);
+                    }
+                })();
+                </script>
             </div>
             
             <div id="wpbnp-items-list" class="wpbnp-sortable-list">
