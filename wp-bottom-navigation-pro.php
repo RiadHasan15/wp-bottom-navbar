@@ -914,7 +914,8 @@ class WP_Bottom_Navigation_Pro {
                 'error_occurred' => __('An error occurred. Please try again.', 'wp-bottom-navigation-pro')
             ),
             'icon_libraries' => $icon_libraries,
-            'presets' => wpbnp_get_presets()
+            'presets' => wpbnp_get_presets(),
+            'settings' => wpbnp_get_settings()
         ));
     }
     
