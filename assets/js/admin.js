@@ -641,8 +641,36 @@ jQuery(document).ready(function($) {
                 this.createIconModal();
             }
             
+            // Get current preset and determine recommended icon library
+            const currentPreset = $('input[name="settings[preset]"]').val() || 'minimal';
+            const presetIconMapping = {
+                'minimal': 'dashicons',
+                'dark': 'dashicons', 
+                'material': 'material',
+                'ios': 'apple',
+                'glassmorphism': 'apple',
+                'neumorphism': 'apple',
+                'cyberpunk': 'material',
+                'vintage': 'dashicons',
+                'gradient': 'apple',
+                'floating': 'apple'
+            };
+            
+            const recommendedLibrary = presetIconMapping[currentPreset] || 'dashicons';
+            
             // Show modal and store reference to input
             $('#wpbnp-icon-modal').show().data('target-input', input);
+            
+            // Automatically switch to recommended icon library tab
+            $('.wpbnp-icon-tab').removeClass('active');
+            $('.wpbnp-icon-library-content').removeClass('active');
+            $(`.wpbnp-icon-tab[data-library="${recommendedLibrary}"]`).addClass('active');
+            $(`.wpbnp-icon-library-content[data-library="${recommendedLibrary}"]`).addClass('active');
+            
+            // Update library indicator
+            const libraryName = $(`.wpbnp-icon-tab[data-library="${recommendedLibrary}"]`).text();
+            $('#wpbnp-current-library').text(`${libraryName} (Recommended for ${currentPreset})`);
+            this.updateIconCount();
             
             // Highlight current selection
             $('.wpbnp-icon-option').removeClass('selected');
@@ -650,6 +678,11 @@ jQuery(document).ready(function($) {
             
             // Focus search
             $('#wpbnp-icon-search').focus();
+            
+            // Show helpful message about recommended library
+            if (recommendedLibrary !== 'dashicons') {
+                this.showNotification(`💡 ${libraryName} icons work best with ${currentPreset} preset!`, 'info');
+            }
         },
         
         // Create enhanced icon picker modal with multiple libraries
@@ -827,6 +860,93 @@ jQuery(document).ready(function($) {
             
             if (!preset) return;
             
+            // Define icon library mapping for each preset
+            const presetIconMapping = {
+                'minimal': 'dashicons',
+                'dark': 'dashicons', 
+                'material': 'material',
+                'ios': 'apple',
+                'glassmorphism': 'apple',
+                'neumorphism': 'apple',
+                'cyberpunk': 'material',
+                'vintage': 'dashicons',
+                'gradient': 'apple',
+                'floating': 'apple'
+            };
+            
+            // Get recommended icon library for this preset
+            const recommendedIconLibrary = presetIconMapping[presetKey] || 'dashicons';
+            
+            // Icon conversion mapping between libraries
+            const iconConversion = {
+                // Common icon mappings
+                'home': {
+                    'dashicons': 'dashicons-admin-home',
+                    'apple': 'apple-house-fill',
+                    'material': 'material-home'
+                },
+                'cart': {
+                    'dashicons': 'dashicons-cart',
+                    'apple': 'apple-cart-fill',
+                    'material': 'material-shopping-cart'
+                },
+                'user': {
+                    'dashicons': 'dashicons-admin-users',
+                    'apple': 'apple-person-fill',
+                    'material': 'material-person'
+                },
+                'heart': {
+                    'dashicons': 'dashicons-heart',
+                    'apple': 'apple-heart-fill',
+                    'material': 'material-favorite'
+                },
+                'search': {
+                    'dashicons': 'dashicons-search',
+                    'apple': 'apple-magnifyingglass',
+                    'material': 'material-search'
+                },
+                'settings': {
+                    'dashicons': 'dashicons-admin-settings',
+                    'apple': 'apple-gearshape-fill',
+                    'material': 'material-settings'
+                },
+                'phone': {
+                    'dashicons': 'dashicons-phone',
+                    'apple': 'apple-phone-fill',
+                    'material': 'material-phone'
+                },
+                'email': {
+                    'dashicons': 'dashicons-email',
+                    'apple': 'apple-envelope-fill',
+                    'material': 'material-email'
+                },
+                'calendar': {
+                    'dashicons': 'dashicons-calendar',
+                    'apple': 'apple-calendar',
+                    'material': 'material-event'
+                },
+                'location': {
+                    'dashicons': 'dashicons-location',
+                    'apple': 'apple-location-fill',
+                    'material': 'material-location-on'
+                },
+                'star': {
+                    'dashicons': 'dashicons-star-filled',
+                    'apple': 'apple-star-fill',
+                    'material': 'material-star'
+                },
+                'camera': {
+                    'dashicons': 'dashicons-camera',
+                    'apple': 'apple-camera-fill',
+                    'material': 'material-camera-alt'
+                },
+                'menu': {
+                    'dashicons': 'dashicons-menu',
+                    'apple': 'apple-list-bullet',
+                    'material': 'material-menu'
+                }
+            };
+            
             // Apply style settings
             if (preset.style) {
                 Object.keys(preset.style).forEach(key => {
@@ -854,12 +974,67 @@ jQuery(document).ready(function($) {
                 });
             }
             
+            // CRITICAL: Auto-convert existing item icons to match preset's icon library
+            if (this.settings.items && this.settings.items.length > 0) {
+                let iconsChanged = 0;
+                
+                this.settings.items.forEach((item, index) => {
+                    if (item.icon) {
+                        // Detect current icon type
+                        let currentIconType = 'dashicons';
+                        if (item.icon.startsWith('apple-')) {
+                            currentIconType = 'apple';
+                        } else if (item.icon.startsWith('material-')) {
+                            currentIconType = 'material';
+                        }
+                        
+                        // Only convert if different from recommended library
+                        if (currentIconType !== recommendedIconLibrary) {
+                            // Try to find a matching icon in the conversion table
+                            let convertedIcon = null;
+                            
+                            // Search through conversion mappings
+                            Object.keys(iconConversion).forEach(iconType => {
+                                const mapping = iconConversion[iconType];
+                                if (mapping[currentIconType] === item.icon) {
+                                    convertedIcon = mapping[recommendedIconLibrary];
+                                }
+                            });
+                            
+                            // If we found a conversion, apply it
+                            if (convertedIcon) {
+                                item.icon = convertedIcon;
+                                iconsChanged++;
+                                
+                                // Update the UI immediately
+                                const iconInput = $(`.wpbnp-nav-item-row:eq(${index}) .wpbnp-icon-input`);
+                                if (iconInput.length) {
+                                    iconInput.val(convertedIcon);
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Show notification about icon conversions
+                if (iconsChanged > 0) {
+                    this.showNotification(`Converted ${iconsChanged} icon(s) to ${recommendedIconLibrary.toUpperCase()} library for ${preset.name} preset!`, 'info');
+                    
+                    // Update the items data
+                    this.updateItemsData();
+                }
+            }
+            
             // Update preset selector
             $('input[name="settings[preset]"]').val(presetKey);
             $('.wpbnp-preset-card').removeClass('active');
             $(`.wpbnp-preset-card[data-preset="${presetKey}"]`).addClass('active');
             
-            this.showNotification(`${preset.name} preset applied!`, 'success');
+            // Show success notification with icon library info
+            this.showNotification(`🎨 ${preset.name} preset applied! Using ${recommendedIconLibrary.toUpperCase()} icons for optimal design.`, 'success');
+            
+            // Auto-save the form after preset application
+            this.saveFormState();
         },
         
         // Initialize color pickers

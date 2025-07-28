@@ -345,16 +345,34 @@ class WP_Bottom_Navigation_Pro {
             case 'rotate':
                 $css .= "
                 .wpbnp-nav-item:hover .wpbnp-nav-icon {
-                    transform: rotate(15deg) !important;
-                    transition: transform {$duration}ms ease !important;
+                    transform: rotate(8deg) scale(1.05) !important;
+                    transition: transform {$duration}ms cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
                 }
                 .wpbnp-nav-item:active {
-                    animation: wpbnp-click-rotate {$duration}ms ease !important;
+                    animation: wpbnp-click-rotate {$duration}ms cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
                 }
                 @keyframes wpbnp-click-rotate {
-                    0% { transform: rotate(0deg); }
-                    50% { transform: rotate(180deg); }
-                    100% { transform: rotate(360deg); }
+                    0% { transform: rotate(0deg) scale(1); }
+                    25% { transform: rotate(90deg) scale(1.1); }
+                    50% { transform: rotate(180deg) scale(1.05); }
+                    75% { transform: rotate(270deg) scale(1.1); }
+                    100% { transform: rotate(360deg) scale(1); }
+                }
+                /* Enhanced rotation for floating pill preset */
+                .wpbnp-preset-floating .wpbnp-nav-item:hover .wpbnp-nav-icon {
+                    transform: rotate(12deg) scale(1.08) translateY(-2px) !important;
+                    transition: transform {$duration}ms cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+                }
+                .wpbnp-preset-floating .wpbnp-nav-item:active {
+                    animation: wpbnp-floating-rotate {$duration}ms cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+                }
+                @keyframes wpbnp-floating-rotate {
+                    0% { transform: rotate(0deg) scale(1) translateY(0); }
+                    20% { transform: rotate(72deg) scale(1.15) translateY(-3px); }
+                    40% { transform: rotate(144deg) scale(1.1) translateY(-2px); }
+                    60% { transform: rotate(216deg) scale(1.15) translateY(-3px); }
+                    80% { transform: rotate(288deg) scale(1.05) translateY(-1px); }
+                    100% { transform: rotate(360deg) scale(1) translateY(0); }
                 }";
                 break;
                 
@@ -478,16 +496,27 @@ class WP_Bottom_Navigation_Pro {
                 
             case 'dark':
                 $css .= "
-                    /* Dark mode enhancements */
+                    /* Dark mode enhancements - Force dark background */
+                    background-color: #1f2937 !important;
                     border-top: 1px solid rgba(55, 65, 81, 0.8) !important;
+                    /* Ensure proper positioning */
+                    position: fixed !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                }
+                .wpbnp-preset-dark .wpbnp-nav-item {
+                    color: #9ca3af !important;
                 }
                 .wpbnp-preset-dark .wpbnp-nav-item:hover {
                     background-color: rgba(75, 85, 99, 0.3) !important;
                     border-radius: 8px !important;
+                    color: #60a5fa !important;
                 }
                 .wpbnp-preset-dark .wpbnp-nav-item.active {
                     background-color: rgba(96, 165, 250, 0.2) !important;
                     border-radius: 8px !important;
+                    color: #60a5fa !important;
                 }";
                 break;
                 
@@ -594,7 +623,10 @@ class WP_Bottom_Navigation_Pro {
                     box-shadow: 
                         0 -4px 20px rgba(0,255,136,0.4), 
                         inset 0 1px 0 rgba(0,255,136,0.3) !important;
-                    position: relative !important;
+                    position: fixed !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
                 }
                 .wpbnp-preset-cyberpunk:before {
                     content: '';
@@ -664,7 +696,10 @@ class WP_Bottom_Navigation_Pro {
                     box-shadow: 
                         0 -4px 20px rgba(102,126,234,0.4),
                         0 0 0 1px rgba(255,255,255,0.1) !important;
-                    position: relative !important;
+                    position: fixed !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
                     overflow: hidden !important;
                 }
                 .wpbnp-preset-gradient:before {
