@@ -1052,6 +1052,7 @@ jQuery(document).ready(function($) {
             
             // If no items exist, create default preset-appropriate items
             if (!this.settings.items || this.settings.items.length === 0) {
+                // Same 3 default items (Home, Shop, Account) but with theme-appropriate icons
                 const defaultPresetItems = {
                     'minimal': [
                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
@@ -1060,52 +1061,48 @@ jQuery(document).ready(function($) {
                     ],
                     'dark': [
                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'search', label: 'Search', icon: 'bi bi-search', url: '#', enabled: true},
-                        {id: 'profile', label: 'Profile', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
                     ],
                     'material': [
                         {id: 'home', label: 'Home', icon: 'home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'explore', label: 'Explore', icon: 'explore', url: '#', enabled: true},
-                        {id: 'favorite', label: 'Favorites', icon: 'favorite', url: '#', enabled: true},
-                        {id: 'person', label: 'Profile', icon: 'person', url: '#', enabled: true}
+                        {id: 'shop', label: 'Shop', icon: 'shopping_cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'person', url: '#', enabled: true}
                     ],
                     'ios': [
                         {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'search', label: 'Search', icon: 'magnifyingglass', url: '#', enabled: true},
-                        {id: 'heart', label: 'Favorites', icon: 'heart-fill', url: '#', enabled: true},
-                        {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
+                        {id: 'shop', label: 'Shop', icon: 'cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'person-fill', url: '#', enabled: true}
                     ],
-                                         'glassmorphism': [
-                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                         {id: 'bookmark', label: 'Saved', icon: 'bi bi-bookmark-fill', url: '#', enabled: true},
-                         {id: 'person', label: 'Profile', icon: 'bi bi-person-fill', url: '#', enabled: true}
-                     ],
+                    'glassmorphism': [
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                    ],
                     'neumorphism': [
                         {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'message', label: 'Messages', icon: 'envelope-fill', url: '#', enabled: true},
-                        {id: 'settings', label: 'Settings', icon: 'gearshape-fill', url: '#', enabled: true}
+                        {id: 'shop', label: 'Shop', icon: 'cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'person-fill', url: '#', enabled: true}
                     ],
-                                         'cyberpunk': [
-                         {id: 'home', label: 'Home', icon: 'fas fa-home', url: wpbnp_admin.home_url, enabled: true},
-                         {id: 'explore', label: 'Explore', icon: 'fas fa-search', url: '#', enabled: true},
-                         {id: 'notifications', label: 'Alerts', icon: 'fas fa-bell', url: '#', enabled: true},
-                         {id: 'account', label: 'Account', icon: 'fas fa-user-circle', url: '#', enabled: true}
-                     ],
+                    'cyberpunk': [
+                        {id: 'home', label: 'Home', icon: 'fas fa-home', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'fas fa-shopping-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'fas fa-user', url: '#', enabled: true}
+                    ],
                     'vintage': [
                         {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'gallery', label: 'Gallery', icon: 'dashicons-format-gallery', url: '#', enabled: true},
-                        {id: 'contact', label: 'Contact', icon: 'dashicons-email', url: '#', enabled: true}
+                        {id: 'shop', label: 'Shop', icon: 'dashicons-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'dashicons-admin-users', url: '#', enabled: true}
                     ],
-                                         'gradient': [
-                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                         {id: 'star', label: 'Featured', icon: 'bi bi-star-fill', url: '#', enabled: true},
-                         {id: 'person', label: 'Profile', icon: 'bi bi-person-fill', url: '#', enabled: true}
-                     ],
+                    'gradient': [
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                    ],
                     'floating': [
                         {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'heart', label: 'Likes', icon: 'heart-fill', url: '#', enabled: true},
-                        {id: 'bookmark', label: 'Saved', icon: 'bookmark-fill', url: '#', enabled: true},
-                        {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
+                        {id: 'shop', label: 'Shop', icon: 'cart-fill', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'person-fill', url: '#', enabled: true}
                     ]
                 };
                 
