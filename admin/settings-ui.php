@@ -59,6 +59,34 @@ class WPBNP_Admin_UI {
                     <form id="wpbnp-settings-form" method="post">
                         <?php wp_nonce_field('wpbnp_admin_nonce', 'wpbnp_nonce'); ?>
                         
+                        <?php if ($this->current_tab !== 'items'): ?>
+                        <!-- Hidden field to preserve Enable Bottom Navigation state on non-Items tabs -->
+                        <input type="hidden" name="settings[enabled]" value="<?php echo $settings['enabled'] ? '1' : '0'; ?>" id="wpbnp-enabled-hidden">
+                        
+                        <!-- Critical: Restore hidden field state immediately -->
+                        <script>
+                        (function() {
+                            // Restore the hidden field state from localStorage immediately
+                            try {
+                                const savedState = localStorage.getItem('wpbnp_form_state');
+                                if (savedState) {
+                                    const formData = JSON.parse(savedState);
+                                    if (formData['settings[enabled]'] !== undefined) {
+                                        const shouldBeChecked = Boolean(formData['settings[enabled]']);
+                                        const hiddenField = document.getElementById('wpbnp-enabled-hidden');
+                                        if (hiddenField) {
+                                            hiddenField.value = shouldBeChecked ? '1' : '0';
+                                            console.log('Immediately restored enabled hidden field to:', shouldBeChecked);
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn('Error restoring hidden field state:', e);
+                            }
+                        })();
+                        </script>
+                        <?php endif; ?>
+                        
                         <div class="wpbnp-tab-content">
                             <?php $this->render_tab_content($this->current_tab, $settings); ?>
                         </div>
@@ -161,10 +189,22 @@ class WPBNP_Admin_UI {
                         const savedState = localStorage.getItem('wpbnp_form_state');
                         if (savedState) {
                             const formData = JSON.parse(savedState);
-                            const checkbox = document.getElementById('wpbnp-enabled-checkbox');
-                            if (checkbox && formData['settings[enabled]'] !== undefined) {
-                                checkbox.checked = Boolean(formData['settings[enabled]']);
-                                console.log('Immediately restored enabled checkbox to:', checkbox.checked);
+                            if (formData['settings[enabled]'] !== undefined) {
+                                const shouldBeChecked = Boolean(formData['settings[enabled]']);
+                                
+                                // Handle visible checkbox
+                                const checkbox = document.getElementById('wpbnp-enabled-checkbox');
+                                if (checkbox) {
+                                    checkbox.checked = shouldBeChecked;
+                                    console.log('Immediately restored enabled checkbox (visible) to:', checkbox.checked);
+                                }
+                                
+                                // Also ensure hidden field is updated if it exists
+                                const hiddenField = document.getElementById('wpbnp-enabled-hidden');
+                                if (hiddenField) {
+                                    hiddenField.value = shouldBeChecked ? '1' : '0';
+                                    console.log('Immediately restored enabled checkbox (hidden) to:', shouldBeChecked);
+                                }
                             }
                         }
                     } catch (e) {
