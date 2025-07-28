@@ -66,15 +66,16 @@ class WPBNP_Frontend {
                         $icon = $item['icon'];
                         if (strpos($icon, 'dashicons-') === 0): ?>
                             <span class="dashicons <?php echo esc_attr($icon); ?>" aria-hidden="true"></span>
-                        <?php elseif (strpos($icon, 'fas fa-') === 0): ?>
+                        <?php elseif (strpos($icon, 'fas fa-') === 0 || strpos($icon, 'far fa-') === 0 || strpos($icon, 'fab fa-') === 0): ?>
                             <i class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></i>
                         <?php elseif (strpos($icon, 'bi bi-') === 0): ?>
                             <i class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></i>
                         <?php elseif (strpos($icon, 'feather-') === 0): ?>
                             <i class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></i>
-                        <?php elseif (strpos($icon, 'apple-') === 0): ?>
+                        <?php elseif ($this->is_apple_icon($icon)): ?>
+                            <!-- Apple SF Symbols (direct class names like 'house-fill', 'cart-fill') -->
                             <span class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></span>
-                        <?php elseif (!empty($icon) && !strpos($icon, '<') && !strpos($icon, 'fa-') && !strpos($icon, 'bi-')): ?>
+                        <?php elseif (!empty($icon) && !strpos($icon, '<') && !strpos($icon, 'fa-') && !strpos($icon, 'bi-') && !strpos($icon, '-')): ?>
                             <!-- Material Icons (text content) -->
                             <span class="material-icons" aria-hidden="true"><?php echo esc_attr($icon); ?></span>
                         <?php else: ?>
@@ -110,5 +111,14 @@ class WPBNP_Frontend {
         $current_url = home_url(add_query_arg(array(), $GLOBALS['wp']->request));
         
         return $current_url === $url || trailingslashit($current_url) === trailingslashit($url);
+    }
+    
+    /**
+     * Check if icon is an Apple SF Symbol
+     */
+    private function is_apple_icon($icon_class) {
+        // Get the list of valid Apple icons from functions.php
+        $apple_icons = wpbnp_get_apple_icons();
+        return array_key_exists($icon_class, $apple_icons);
     }
 }
