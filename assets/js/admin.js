@@ -851,11 +851,11 @@ jQuery(document).ready(function($) {
                 'dark': 'dashicons', 
                 'material': 'material',
                 'ios': 'apple',
-                'glassmorphism': 'apple',
+                'glassmorphism': 'bootstrap',
                 'neumorphism': 'apple',
-                'cyberpunk': 'material',
+                'cyberpunk': 'bootstrap',
                 'vintage': 'dashicons',
-                'gradient': 'apple',
+                'gradient': 'bootstrap',
                 'floating': 'apple'
             };
             
@@ -998,9 +998,7 @@ jQuery(document).ready(function($) {
                     if (item.icon) {
                         // Detect current icon type more accurately
                         let currentIconType = 'dashicons';
-                        if (item.icon.startsWith('apple-')) {
-                            currentIconType = 'apple';
-                        } else if (item.icon.startsWith('fas fa-') || item.icon.startsWith('far fa-') || item.icon.startsWith('fab fa-')) {
+                        if (item.icon.startsWith('fas fa-') || item.icon.startsWith('far fa-') || item.icon.startsWith('fab fa-')) {
                             currentIconType = 'fontawesome';
                         } else if (item.icon.startsWith('bi bi-')) {
                             currentIconType = 'bootstrap';
@@ -1008,7 +1006,11 @@ jQuery(document).ready(function($) {
                             currentIconType = 'feather';
                         } else if (item.icon.startsWith('dashicons-')) {
                             currentIconType = 'dashicons';
-                        } else if (!item.icon.includes('dashicons-') && !item.icon.includes('fa-') && !item.icon.includes('bi-') && !item.icon.includes('apple-') && !item.icon.includes('feather-')) {
+                        } else if (item.icon.includes('-') && !item.icon.includes(' ') && !item.icon.includes('dashicons') && !item.icon.includes('fa-') && !item.icon.includes('bi-') && !item.icon.includes('feather-')) {
+                            // Apple icons like 'house-fill', 'person-fill'
+                            currentIconType = 'apple';
+                        } else if (!item.icon.includes('dashicons-') && !item.icon.includes('fa-') && !item.icon.includes('bi ') && !item.icon.includes('-') && !item.icon.includes('<')) {
+                            // Material icons (single words like 'home', 'person')
                             currentIconType = 'material';
                         }
                         
@@ -1028,17 +1030,17 @@ jQuery(document).ready(function($) {
                             // If no direct conversion found, use default preset-appropriate icons
                             if (!convertedIcon) {
                                 const defaultIcons = {
-                                    'dashicons': ['dashicons-admin-home', 'dashicons-cart', 'dashicons-admin-users'],
-                                    'material': ['home', 'shopping_cart', 'person'],
-                                    'apple': ['house-fill', 'cart-fill', 'person-fill'],
-                                    'fontawesome': ['fas fa-home', 'fas fa-shopping-cart', 'fas fa-user'],
-                                    'bootstrap': ['bi bi-house-door-fill', 'bi bi-cart-fill', 'bi bi-person-fill'],
-                                    'feather': ['home', 'shopping-cart', 'user']
+                                    'dashicons': ['dashicons-admin-home', 'dashicons-cart', 'dashicons-admin-users', 'dashicons-heart', 'dashicons-search'],
+                                    'material': ['home', 'shopping_cart', 'person', 'favorite', 'search'],
+                                    'apple': ['house-fill', 'cart-fill', 'person-fill', 'heart-fill', 'magnifyingglass'],
+                                    'fontawesome': ['fas fa-home', 'fas fa-shopping-cart', 'fas fa-user', 'fas fa-heart', 'fas fa-search'],
+                                    'bootstrap': ['bi bi-house-door-fill', 'bi bi-cart-fill', 'bi bi-person-fill', 'bi bi-heart-fill', 'bi bi-search'],
+                                    'feather': ['feather-home', 'feather-shopping-cart', 'feather-user', 'feather-heart', 'feather-search']
                                 };
                                 
                                 // Use appropriate default icon based on item index
                                 const defaultIconsForLibrary = defaultIcons[recommendedIconLibrary] || defaultIcons['dashicons'];
-                                convertedIcon = defaultIconsForLibrary[index] || defaultIconsForLibrary[0];
+                                convertedIcon = defaultIconsForLibrary[index % defaultIconsForLibrary.length] || defaultIconsForLibrary[0];
                             }
                             
                             // Apply the conversion
@@ -1096,32 +1098,32 @@ jQuery(document).ready(function($) {
                         {id: 'heart', label: 'Favorites', icon: 'heart-fill', url: '#', enabled: true},
                         {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
                     ],
-                    'glassmorphism': [
-                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'bookmark', label: 'Saved', icon: 'bookmark-fill', url: '#', enabled: true},
-                        {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
-                    ],
+                                         'glassmorphism': [
+                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                         {id: 'bookmark', label: 'Saved', icon: 'bi bi-bookmark-fill', url: '#', enabled: true},
+                         {id: 'person', label: 'Profile', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                     ],
                     'neumorphism': [
                         {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
                         {id: 'message', label: 'Messages', icon: 'envelope-fill', url: '#', enabled: true},
                         {id: 'settings', label: 'Settings', icon: 'gearshape-fill', url: '#', enabled: true}
                     ],
-                    'cyberpunk': [
-                        {id: 'home', label: 'Home', icon: 'home', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'explore', label: 'Explore', icon: 'explore', url: '#', enabled: true},
-                        {id: 'notifications', label: 'Alerts', icon: 'notifications', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'account_circle', url: '#', enabled: true}
-                    ],
+                                         'cyberpunk': [
+                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                         {id: 'explore', label: 'Explore', icon: 'bi bi-search', url: '#', enabled: true},
+                         {id: 'notifications', label: 'Alerts', icon: 'bi bi-bell-fill', url: '#', enabled: true},
+                         {id: 'account', label: 'Account', icon: 'bi bi-person-circle', url: '#', enabled: true}
+                     ],
                     'vintage': [
                         {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
                         {id: 'gallery', label: 'Gallery', icon: 'dashicons-format-gallery', url: '#', enabled: true},
                         {id: 'contact', label: 'Contact', icon: 'dashicons-email', url: '#', enabled: true}
                     ],
-                    'gradient': [
-                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'star', label: 'Featured', icon: 'star-fill', url: '#', enabled: true},
-                        {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
-                    ],
+                                         'gradient': [
+                         {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
+                         {id: 'star', label: 'Featured', icon: 'bi bi-star-fill', url: '#', enabled: true},
+                         {id: 'person', label: 'Profile', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                     ],
                     'floating': [
                         {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
                         {id: 'heart', label: 'Likes', icon: 'heart-fill', url: '#', enabled: true},
