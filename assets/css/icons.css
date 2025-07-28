@@ -234,45 +234,7 @@
 .phone-arrow-down-left:before { content: "📞"; }
 .phone-down:before, .phone-down-fill:before, .phone-down-circle:before { content: "📵"; }
 
-/* Universal Fallback for Apple-style Icons */
-/* This catches any Apple icon that doesn't have a specific definition above */
-
-/* Generic fallback that applies to common Apple icon patterns */
-span[class*="-fill"]:before,
-span[class*="-circle"]:before,
-span[class*="badge-"]:before,
-span[class*="crop-"]:before,
-span[class*="text-"]:before,
-span[class*="wave-"]:before,
-span[class*="line-"]:before,
-span[class*="arrow-"]:before,
-span[class*="square-"]:before,
-span[class*="side-"]:before {
-    content: "📱"; /* Default iOS-style emoji for undefined Apple icons */
-    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Symbol", sans-serif !important;
-    font-weight: normal;
-    font-style: normal;
-    font-size: inherit;
-    line-height: 1;
-    display: inline-block;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-}
-
-/* Catch-all for any unrecognized Apple-style class that might be used as an icon */
-.wpbnp-icon-preview span:not(.dashicons):not(.material-icons):not([class*="feather-"]):not([class*="fa-"]):not([class*="bi-"]):before {
-    content: "📱";
-    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Symbol", sans-serif !important;
-    font-weight: normal;
-    font-style: normal;
-    font-size: 16px;
-    line-height: 1;
-    display: inline-block;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-}
+/* No universal fallback - only show icons that have proper CSS definitions */
 
 /* Base styling for Apple-style icons (now using emoji) */
 [class*="house"]:before,

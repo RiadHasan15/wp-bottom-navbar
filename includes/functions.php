@@ -3114,6 +3114,7 @@ function wpbnp_get_bootstrap_icons() {
  * Get Apple SF Symbols (iOS) icons data
  */
 function wpbnp_get_apple_icons() {
+    // Only includes icons with proper CSS definitions and previews
     return array(
         // Navigation & Home
         'house' => 'House',
@@ -3124,8 +3125,6 @@ function wpbnp_get_apple_icons() {
         'building-fill' => 'Building Fill',
         'building-2' => 'Building 2',
         'building-2-fill' => 'Building 2 Fill',
-        'building-columns' => 'Building Columns',
-        'building-columns-fill' => 'Building Columns Fill',
         'map' => 'Map',
         'map-fill' => 'Map Fill',
         'mappin' => 'Map Pin',
