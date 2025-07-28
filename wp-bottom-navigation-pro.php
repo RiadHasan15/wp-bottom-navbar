@@ -225,8 +225,12 @@ class WP_Bottom_Navigation_Pro {
         
         update_option('wpbnp_settings', $sanitized_settings);
         
+        // Get the complete updated settings
+        $updated_settings = wpbnp_get_settings();
+        
         wp_send_json_success(array(
-            'message' => __('Settings saved successfully!', 'wp-bottom-navigation-pro')
+            'message' => __('Settings saved successfully!', 'wp-bottom-navigation-pro'),
+            'settings' => $updated_settings
         ));
     }
     

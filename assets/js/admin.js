@@ -17,11 +17,22 @@ jQuery(document).ready(function($) {
         
         init: function() {
             this.currentTab = this.getCurrentTab();
-            this.initializeItems();
             this.bindEvents();
             this.initializeColorPickers();
             this.setupSortable();
-            this.loadFormData();
+            
+            // Initialize form data after DOM is ready
+            setTimeout(() => {
+                this.loadFormData();
+                this.initializeItems();
+                
+                // Restore form state if switching tabs (delay to ensure elements are ready)
+                if (localStorage.getItem('wpbnp_form_state')) {
+                    setTimeout(() => {
+                        this.restoreFormState();
+                    }, 100);
+                }
+            }, 100);
         },
         
         // Get current tab from URL or default
@@ -39,8 +50,12 @@ jQuery(document).ready(function($) {
         populateFormFields: function() {
             const settings = this.settings;
             
-            // Populate enabled checkbox
-            $('input[name="settings[enabled]"]').prop('checked', settings.enabled);
+            // First, populate the main enabled checkbox - this is critical
+            const enabledCheckbox = $('input[name="settings[enabled]"]');
+            if (enabledCheckbox.length) {
+                enabledCheckbox.prop('checked', Boolean(settings.enabled));
+                console.log('Set enabled checkbox to:', Boolean(settings.enabled));
+            }
             
             // Populate style fields
             if (settings.style) {
@@ -61,7 +76,7 @@ jQuery(document).ready(function($) {
                     const input = $(`input[name="settings[animations][${key}]"], select[name="settings[animations][${key}]"]`);
                     if (input.length) {
                         if (input.attr('type') === 'checkbox') {
-                            input.prop('checked', settings.animations[key]);
+                            input.prop('checked', Boolean(settings.animations[key]));
                         } else {
                             input.val(settings.animations[key]);
                         }
@@ -76,7 +91,7 @@ jQuery(document).ready(function($) {
                         const input = $(`input[name="settings[devices][${device}][${key}]"]`);
                         if (input.length) {
                             if (input.attr('type') === 'checkbox') {
-                                input.prop('checked', settings.devices[device][key]);
+                                input.prop('checked', Boolean(settings.devices[device][key]));
                             } else {
                                 input.val(settings.devices[device][key]);
                             }
@@ -89,6 +104,9 @@ jQuery(document).ready(function($) {
             if (settings.display_rules) {
                 Object.keys(settings.display_rules).forEach(key => {
                     if (key === 'user_roles' && Array.isArray(settings.display_rules[key])) {
+                        // Clear all first
+                        $(`input[name="settings[display_rules][user_roles][]"]`).prop('checked', false);
+                        // Then set the selected ones
                         settings.display_rules[key].forEach(role => {
                             $(`input[name="settings[display_rules][user_roles][]"][value="${role}"]`).prop('checked', true);
                         });
@@ -96,7 +114,7 @@ jQuery(document).ready(function($) {
                         const input = $(`input[name="settings[display_rules][${key}]"]`);
                         if (input.length) {
                             if (input.attr('type') === 'checkbox') {
-                                input.prop('checked', settings.display_rules[key]);
+                                input.prop('checked', Boolean(settings.display_rules[key]));
                             } else {
                                 input.val(settings.display_rules[key]);
                             }
@@ -111,7 +129,7 @@ jQuery(document).ready(function($) {
                     const input = $(`input[name="settings[badges][${key}]"], select[name="settings[badges][${key}]"]`);
                     if (input.length) {
                         if (input.attr('type') === 'checkbox') {
-                            input.prop('checked', settings.badges[key]);
+                            input.prop('checked', Boolean(settings.badges[key]));
                         } else {
                             input.val(settings.badges[key]);
                             if (input.hasClass('wpbnp-color-picker')) {
@@ -131,6 +149,8 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
+            
+            console.log('Form fields populated with settings:', settings);
         },
         
         // Initialize navigation items
@@ -233,12 +253,46 @@ jQuery(document).ready(function($) {
             
             // Handle tab switching with state preservation
             $(document).on('click', '.wpbnp-tab', this.handleTabSwitch.bind(this));
+            
+            // Auto-save form state when any field changes (CRITICAL for Enable Bottom Navigation)
+            $(document).on('change input', '#wpbnp-settings-form input, #wpbnp-settings-form select, #wpbnp-settings-form textarea', this.debounce(() => {
+                this.saveFormState();
+                console.log('Auto-saved form state due to field change');
+            }, 500));
+            
+            // Specific handler for the Enable Bottom Navigation checkbox
+            $(document).on('change', 'input[name="settings[enabled]"]', () => {
+                this.saveFormState();
+                console.log('Saved state due to Enable Bottom Navigation change');
+            });
+        },
+        
+        // Debounce function to prevent excessive saves
+        debounce: function(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         },
         
         // Handle tab switching while preserving form state
         handleTabSwitch: function(e) {
-            // Let the default navigation happen, but preserve current form state
+            // Save current form state before switching tabs
             this.saveFormState();
+            
+            // Small delay to ensure state is saved before navigation
+            setTimeout(() => {
+                // Let the navigation proceed
+                window.location.href = e.target.href;
+            }, 50);
+            
+            // Prevent immediate navigation to allow state saving
+            e.preventDefault();
         },
         
         // Save current form state to localStorage
@@ -258,6 +312,7 @@ jQuery(document).ready(function($) {
                 const name = $input.attr('name');
                 if (name) {
                     if ($input.attr('type') === 'checkbox') {
+                        // For checkboxes, always store the state (checked or not)
                         formData[name] = $input.is(':checked');
                     } else if ($input.attr('type') === 'radio') {
                         if ($input.is(':checked')) {
@@ -269,6 +324,9 @@ jQuery(document).ready(function($) {
                 }
             });
             
+            // Also store the items data specifically
+            formData['wpbnp_items_data'] = JSON.stringify(this.settings.items || []);
+            
             return formData;
         },
         
@@ -278,11 +336,28 @@ jQuery(document).ready(function($) {
             if (savedState) {
                 try {
                     const formData = JSON.parse(savedState);
+                    
+                    // Restore regular form fields
                     Object.keys(formData).forEach(name => {
+                        if (name === 'wpbnp_items_data') {
+                            // Handle items data separately
+                            try {
+                                const itemsData = JSON.parse(formData[name]);
+                                if (Array.isArray(itemsData) && itemsData.length > 0) {
+                                    this.settings.items = itemsData;
+                                    this.initializeItems();
+                                }
+                            } catch (e) {
+                                console.warn('Error parsing items data:', e);
+                            }
+                            return;
+                        }
+                        
                         const $input = $(`[name="${name}"]`);
                         if ($input.length) {
                             if ($input.attr('type') === 'checkbox') {
-                                $input.prop('checked', formData[name]);
+                                // Properly handle checkbox state
+                                $input.prop('checked', Boolean(formData[name]));
                             } else {
                                 $input.val(formData[name]);
                                 if ($input.hasClass('wpbnp-color-picker')) {
@@ -291,8 +366,12 @@ jQuery(document).ready(function($) {
                             }
                         }
                     });
+                    
+                    console.log('Form state restored successfully');
                 } catch (e) {
                     console.error('Error restoring form state:', e);
+                    // Clear corrupted state
+                    localStorage.removeItem('wpbnp_form_state');
                 }
             }
         },
@@ -302,6 +381,18 @@ jQuery(document).ready(function($) {
             e.preventDefault();
             
             const formData = new FormData(e.target);
+            
+            // Critical fix: Ensure unchecked checkboxes are handled properly
+            // FormData doesn't include unchecked checkboxes, so we need to explicitly add them
+            $('#wpbnp-settings-form input[type="checkbox"]').each(function() {
+                const checkbox = $(this);
+                const name = checkbox.attr('name');
+                if (name && !formData.has(name)) {
+                    // If checkbox is not in FormData (meaning it's unchecked), add it as '0'
+                    formData.append(name, '0');
+                }
+            });
+            
             formData.append('action', 'wpbnp_save_settings');
             formData.append('nonce', this.nonce);
             
@@ -319,12 +410,21 @@ jQuery(document).ready(function($) {
                 success: (response) => {
                     if (response.success) {
                         this.showNotification(wpbnp_admin.strings.saved || 'Settings saved successfully!', 'success');
-                        // Update local settings
+                        // Update local settings from response
                         if (response.data && response.data.settings) {
                             this.settings = response.data.settings;
+                            console.log('Updated local settings:', this.settings);
+                        } else {
+                            // If no settings in response, merge current form data with existing settings
+                            const currentFormData = this.getFormData();
+                            // Update enabled state specifically
+                            if (currentFormData['settings[enabled]'] !== undefined) {
+                                this.settings.enabled = currentFormData['settings[enabled]'];
+                            }
                         }
-                        // Clear saved form state
+                        // Clear saved form state after successful save
                         localStorage.removeItem('wpbnp_form_state');
+                        console.log('Settings saved and form state cleared');
                     } else {
                         this.showNotification(response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings', 'error');
                     }
@@ -712,7 +812,8 @@ jQuery(document).ready(function($) {
     if (localStorage.getItem('wpbnp_form_state')) {
         setTimeout(() => {
             WPBottomNavAdmin.restoreFormState();
-        }, 500); // Delay to ensure color pickers are initialized
+            console.log('Restored form state on page load');
+        }, 800); // Longer delay to ensure all elements are ready
     }
     
     // Make it globally available
