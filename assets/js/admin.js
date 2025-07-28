@@ -1052,11 +1052,32 @@ jQuery(document).ready(function($) {
                          // Refresh the items list to show the new icons
                          this.refreshItemsList();
                          
-                         // Auto-save the converted icons to database
+                         // Also manually update form inputs to ensure they have the correct values
+                         this.settings.items.forEach((item, index) => {
+                             const iconInput = $(`.wpbnp-nav-item-row:eq(${index}) .wpbnp-icon-input`);
+                             if (iconInput.length && iconInput.val() !== item.icon) {
+                                 console.log(`Manually updating input ${index}: ${iconInput.val()} → ${item.icon}`);
+                                 iconInput.val(item.icon);
+                             }
+                         });
+                         
+                         // Auto-save the converted icons to database (increased timeout to ensure DOM is updated)
                          setTimeout(() => {
                              this.showNotification('💾 Saving converted icons...', 'info');
+                             
+                             // Debug: Check what's actually in the form before saving
+                             console.log('Current settings before save:', this.settings);
+                             const formData = new FormData(document.getElementById('wpbnp-settings-form'));
+                             console.log('Form data items before save:');
+                             for (let i = 0; i < 10; i++) {
+                                 const iconValue = formData.get(`settings[items][${i}][icon]`);
+                                 if (iconValue) {
+                                     console.log(`Item ${i} icon in form:`, iconValue);
+                                 }
+                             }
+                             
                              this.saveSettings();
-                         }, 100);
+                         }, 300);
                      }
                 }
             }
@@ -1463,18 +1484,29 @@ jQuery(document).ready(function($) {
         
         // Refresh the items list display
         refreshItemsList: function() {
+            console.log('Refreshing items list with:', this.settings.items);
+            
             // Clear existing items
             $('#wpbnp-items-list').empty();
             
             // Re-render all items from current settings
             if (this.settings.items && this.settings.items.length > 0) {
                 this.settings.items.forEach((item, index) => {
+                    console.log(`Adding item ${index}:`, item);
                     this.addItemRow(item, index);
                 });
             }
             
             // Re-setup sortable after refresh
             this.setupSortable();
+            
+            // Debug: Verify form inputs after refresh
+            setTimeout(() => {
+                console.log('Form inputs after refresh:');
+                $('.wpbnp-icon-input').each(function(i) {
+                    console.log(`Input ${i}:`, $(this).attr('name'), '=', $(this).val());
+                });
+            }, 50);
         },
         
         // Save settings programmatically (for auto-save after conversions)
@@ -1509,6 +1541,16 @@ jQuery(document).ready(function($) {
                 success: (response) => {
                     if (response.success) {
                         console.log('Settings auto-saved successfully after icon conversion');
+                        console.log('Server response:', response);
+                        
+                        // Check what icons were actually saved
+                        if (response.data && response.data.settings && response.data.settings.items) {
+                            console.log('Saved items with icons:');
+                            response.data.settings.items.forEach((item, i) => {
+                                console.log(`Saved item ${i}: ${item.id} = ${item.icon}`);
+                            });
+                        }
+                        
                         this.showNotification('✅ Icons saved! Changes will appear on frontend.', 'success');
                         // Update local settings from response
                         if (response.data && response.data.settings) {
