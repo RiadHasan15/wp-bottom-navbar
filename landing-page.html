@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WP Bottom Navigation Pro - Modern WordPress Navigation Plugin</title>
+    <meta name="description" content="Transform your WordPress site with a modern bottom navigation bar. 10 premium presets, 800+ Bootstrap icons, mobile-first design, and complete customization.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Styles -->
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary-color: #64748b;
+            --accent-color: #10b981;
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+            --light-bg: #ffffff;
+            --light-card: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--light-bg);
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .cta-button {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 0 4rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Section */
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--light-card);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            background: var(--gradient-primary);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Presets Showcase */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .preset-card {
+            background: var(--light-card);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .preset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .preset-preview {
+            height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-minimal { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); }
+        .preset-dark { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        .preset-material { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .preset-ios { background: linear-gradient(135deg, #f2f2f7 0%, #e5e5ea 100%); }
+        .preset-glass { background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%); }
+        .preset-neuro { background: linear-gradient(135deg, #e0e5ec 0%, #c5ccd6 100%); }
+        .preset-cyber { background: linear-gradient(135deg, #0d1117 0%, #39ff14 100%); }
+        .preset-vintage { background: linear-gradient(135deg, #f5f1e8 0%, #d2b48c 100%); }
+        .preset-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .preset-floating { background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); }
+
+        .preset-nav {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .preset-nav-item {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+        }
+
+        .preset-info {
+            padding: 1.5rem;
+        }
+
+        .preset-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .preset-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--dark-bg);
+            color: #e2e8f0;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'Code';
+            position: absolute;
+            top: 0.75rem;
+            right: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Stats */
+        .stats {
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Installation Steps */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--light-card);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .step-number {
+            width: 3rem;
+            height: 3rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-bg);
+            color: white;
+            padding: 3rem 0 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            margin-bottom: 2rem;
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-card);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">WP Bottom Navigation Pro</a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#presets">Presets</a></li>
+                <li><a href="#installation">Installation</a></li>
+                <li><a href="#documentation">Docs</a></li>
+            </ul>
+            <a href="#download" class="cta-button">Download Plugin</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="fade-in-up">Modern Bottom Navigation for WordPress</h1>
+            <p class="fade-in-up">Transform your WordPress site with a beautiful, mobile-first bottom navigation bar. 10 premium presets, 800+ Bootstrap icons, and complete customization.</p>
+            <div class="hero-buttons fade-in-up">
+                <a href="#download" class="btn-primary">
+                    <i class="bi bi-download"></i>
+                    Download Now
+                </a>
+                <a href="#demo" class="btn-secondary">
+                    <i class="bi bi-play-circle"></i>
+                    View Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">10</div>
+                    <div class="stat-label">Premium Presets</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">800+</div>
+                    <div class="stat-label">Bootstrap Icons</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Icon Libraries</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Mobile Responsive</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Powerful Features</h2>
+                <p class="section-subtitle">Everything you need to create stunning bottom navigation bars for your WordPress site</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-palette"></i>
+                    </div>
+                    <h3 class="feature-title">10 Premium Presets</h3>
+                    <p class="feature-description">Choose from beautifully designed presets including Minimal, Dark Mode, Material Design, iOS Native, Glassmorphism, and more.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-bootstrap"></i>
+                    </div>
+                    <h3 class="feature-title">800+ Bootstrap Icons</h3>
+                    <p class="feature-description">Access to the complete Bootstrap Icons library with modern outline icons that look perfect on any device.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-phone"></i>
+                    </div>
+                    <h3 class="feature-title">Mobile-First Design</h3>
+                    <p class="feature-description">Optimized for mobile devices with touch-friendly interactions and responsive design that works on all screen sizes.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-sliders"></i>
+                    </div>
+                    <h3 class="feature-title">Complete Customization</h3>
+                    <p class="feature-description">Customize colors, fonts, spacing, animations, and more with an intuitive admin interface.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-mouse"></i>
+                    </div>
+                    <h3 class="feature-title">Drag & Drop Builder</h3>
+                    <p class="feature-description">Easy-to-use drag and drop interface for managing navigation items with sortable functionality.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3 class="feature-title">User Role Control</h3>
+                    <p class="feature-description">Control visibility of navigation items based on user roles and permissions for advanced access control.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-badge"></i>
+                    </div>
+                    <h3 class="feature-title">Badge System</h3>
+                    <p class="feature-description">Show notification counts and badges on navigation items to highlight important content.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-magic"></i>
+                    </div>
+                    <h3 class="feature-title">Smooth Animations</h3>
+                    <p class="feature-description">Multiple animation types including bounce, fade, slide, scale, rotate, and pulse effects.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-download"></i>
+                    </div>
+                    <h3 class="feature-title">Import/Export</h3>
+                    <p class="feature-description">Backup and share your configurations with import/export functionality and quick reset options.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Presets Showcase -->
+    <section id="presets" class="section" style="background: var(--light-card);">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Beautiful Presets</h2>
+                <p class="section-subtitle">Choose from 10 professionally designed presets, each with its own unique style and personality</p>
+            </div>
+            
+            <div class="presets-grid">
+                <div class="preset-card">
+                    <div class="preset-preview preset-minimal">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Minimal</h3>
+                        <p class="preset-description">Clean and simple design perfect for professional websites</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-dark">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Dark Mode</h3>
+                        <p class="preset-description">Elegant dark theme perfect for night-time browsing</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-material">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Material Design</h3>
+                        <p class="preset-description">Google's Material Design with elevation and bold colors</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-ios">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">iOS Native</h3>
+                        <p class="preset-description">Apple iOS style with precise spacing and native feel</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-glass">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Glassmorphism</h3>
+                        <p class="preset-description">Modern glass effect with backdrop blur and transparency</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-neuro">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Neumorphism</h3>
+                        <p class="preset-description">Soft UI with subtle shadows and modern depth</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-cyber">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Cyberpunk</h3>
+                        <p class="preset-description">Futuristic neon design with glowing effects</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-vintage">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Vintage</h3>
+                        <p class="preset-description">Classic retro design with warm colors</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-gradient">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Gradient Flow</h3>
+                        <p class="preset-description">Dynamic gradient backgrounds with smooth transitions</p>
+                    </div>
+                </div>
+                
+                <div class="preset-card">
+                    <div class="preset-preview preset-floating">
+                        <div class="preset-nav">
+                            <div class="preset-nav-item"><i class="bi bi-house-door"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-cart"></i></div>
+                            <div class="preset-nav-item"><i class="bi bi-person"></i></div>
+                        </div>
+                    </div>
+                    <div class="preset-info">
+                        <h3 class="preset-name">Floating Pill</h3>
+                        <p class="preset-description">Rounded floating design with elegant spacing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Easy Installation</h2>
+                <p class="section-subtitle">Get started with WP Bottom Navigation Pro in just a few simple steps</p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Download Plugin</h3>
+                    <p class="step-description">Download the WP Bottom Navigation Pro plugin ZIP file from the link below</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Upload & Activate</h3>
+                    <p class="step-description">Go to WordPress Admin → Plugins → Add New → Upload Plugin and activate</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Configure Settings</h3>
+                    <p class="step-description">Navigate to Appearance → Bottom Navigation to configure your navigation bar</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Choose Preset</h3>
+                    <p class="step-description">Select from 10 beautiful presets or customize your own design</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Section -->
+    <section id="documentation" class="section" style="background: var(--light-card);">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Documentation & Usage</h2>
+                <p class="section-subtitle">Learn how to use all the features and customize your bottom navigation</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">Basic Usage</h3>
+                    <p class="feature-description">The plugin automatically adds the navigation to your site once enabled. No coding required!</p>
+                    <div class="code-block">
+                        <pre>1. Go to Appearance → Bottom Navigation
+2. Check "Enable Bottom Navigation"
+3. Add your navigation items
+4. Choose a preset or customize
+5. Save settings</pre>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <h3 class="feature-title">Shortcode Support</h3>
+                    <p class="feature-description">Display the navigation anywhere on your site using the shortcode:</p>
+                    <div class="code-block">
+                        <pre>[wp_bottom_navigation]</pre>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <h3 class="feature-title">PHP Functions</h3>
+                    <p class="feature-description">Check if the plugin is active and enabled programmatically:</p>
+                    <div class="code-block">
+                        <pre>&lt;?php
+if (function_exists('wpbnp_is_enabled')) {
+    if (wpbnp_is_enabled()) {
+        // Navigation is active
+        echo 'Bottom navigation is enabled';
+    }
+}
+?&gt;</pre>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <h3 class="feature-title">Custom CSS</h3>
+                    <p class="feature-description">Add custom styling using the base selector:</p>
+                    <div class="code-block">
+                        <pre>.wpbnp-bottom-nav {
+    /* Your custom styles */
+    border-top: 2px solid #3b82f6;
+}
+
+.wpbnp-nav-item:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <h3 class="feature-title">Icon Libraries</h3>
+                    <p class="feature-description">Access multiple icon libraries:</p>
+                    <ul style="margin-top: 1rem; color: var(--text-secondary);">
+                        <li>• Bootstrap Icons (800+ icons)</li>
+                        <li>• FontAwesome (300+ icons)</li>
+                        <li>• Material Design (400+ icons)</li>
+                        <li>• Apple SF Symbols (300+ icons)</li>
+                        <li>• Dashicons (180+ icons)</li>
+                        <li>• Feather Icons (200+ icons)</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h3 class="feature-title">Device Targeting</h3>
+                    <p class="feature-description">Control visibility on different devices:</p>
+                    <ul style="margin-top: 1rem; color: var(--text-secondary);">
+                        <li>• Mobile: Show/hide on mobile devices</li>
+                        <li>• Tablet: Control tablet display</li>
+                        <li>• Desktop: Desktop-specific settings</li>
+                        <li>• Custom breakpoints supported</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Ready to Get Started?</h2>
+                <p class="section-subtitle">Download WP Bottom Navigation Pro and transform your WordPress site today</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="#" class="btn-primary" style="font-size: 1.25rem; padding: 1.5rem 3rem;">
+                    <i class="bi bi-download"></i>
+                    Download WP Bottom Navigation Pro
+                </a>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">
+                    Compatible with WordPress 5.0+ | PHP 7.4+ | All Modern Browsers
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <h3 class="footer-title">WP Bottom Navigation Pro</h3>
+                <div class="footer-links">
+                    <a href="#features">Features</a>
+                    <a href="#presets">Presets</a>
+                    <a href="#installation">Installation</a>
+                    <a href="#documentation">Documentation</a>
+                    <a href="https://riadhasan.info/" target="_blank">Developer</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Made with ❤️ by <a href="https://riadhasan.info/" target="_blank" style="color: var(--primary-color);">Riad Hasan</a> for the WordPress community</p>
+                <p>© 2024 WP Bottom Navigation Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Smooth scroll script -->
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document.querySelectorAll('.feature-card, .preset-card, .step-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
