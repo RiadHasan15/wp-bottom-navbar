@@ -848,15 +848,15 @@ jQuery(document).ready(function($) {
             // Define icon library mapping for each preset
             const presetIconMapping = {
                 'minimal': 'dashicons',
-                'dark': 'fontawesome', 
+                'dark': 'dashicons', 
                 'material': 'material',
                 'ios': 'apple',
-                'glassmorphism': 'bootstrap',
+                'glassmorphism': 'apple',
                 'neumorphism': 'apple',
-                'cyberpunk': 'fontawesome',
+                'cyberpunk': 'material',
                 'vintage': 'dashicons',
-                'gradient': 'bootstrap',
-                'floating': 'fontawesome'
+                'gradient': 'apple',
+                'floating': 'apple'
             };
             
             // Get recommended icon library for this preset
@@ -868,72 +868,98 @@ jQuery(document).ready(function($) {
                 'home': {
                     'dashicons': 'dashicons-admin-home',
                     'fontawesome': 'fas fa-home',
-                    'bootstrap': 'bi bi-house',
+                    'bootstrap': 'bi bi-house-door-fill',
                     'material': 'home',
-                    'apple': 'apple-house-fill'
+                    'apple': 'house-fill',
+                    'feather': 'home'
                 },
                 'cart': {
                     'dashicons': 'dashicons-cart',
                     'fontawesome': 'fas fa-shopping-cart',
-                    'bootstrap': 'bi bi-cart',
+                    'bootstrap': 'bi bi-cart-fill',
                     'material': 'shopping_cart',
-                    'apple': 'apple-cart-fill'
+                    'apple': 'cart-fill',
+                    'feather': 'shopping-cart'
                 },
                 'user': {
                     'dashicons': 'dashicons-admin-users',
                     'fontawesome': 'fas fa-user',
-                    'bootstrap': 'bi bi-person',
+                    'bootstrap': 'bi bi-person-fill',
                     'material': 'person',
-                    'apple': 'apple-person-fill'
+                    'apple': 'person-fill',
+                    'feather': 'user'
                 },
                 'heart': {
                     'dashicons': 'dashicons-heart',
                     'fontawesome': 'fas fa-heart',
                     'bootstrap': 'bi bi-heart-fill',
                     'material': 'favorite',
-                    'apple': 'apple-heart-fill'
+                    'apple': 'heart-fill',
+                    'feather': 'heart'
                 },
                 'search': {
                     'dashicons': 'dashicons-search',
                     'fontawesome': 'fas fa-search',
                     'bootstrap': 'bi bi-search',
                     'material': 'search',
-                    'apple': 'apple-magnifyingglass'
+                    'apple': 'magnifyingglass',
+                    'feather': 'search'
                 },
                 'settings': {
                     'dashicons': 'dashicons-admin-settings',
                     'fontawesome': 'fas fa-cog',
-                    'bootstrap': 'bi bi-gear',
+                    'bootstrap': 'bi bi-gear-fill',
                     'material': 'settings',
-                    'apple': 'apple-gearshape'
+                    'apple': 'gearshape-fill',
+                    'feather': 'settings'
                 },
                 'star': {
                     'dashicons': 'dashicons-star-filled',
                     'fontawesome': 'fas fa-star',
                     'bootstrap': 'bi bi-star-fill',
                     'material': 'star',
-                    'apple': 'apple-star-fill'
+                    'apple': 'star-fill',
+                    'feather': 'star'
                 },
                 'message': {
                     'dashicons': 'dashicons-email',
-                    'fontawesome': 'fas fa-message',
-                    'bootstrap': 'bi bi-chat',
-                    'material': 'message',
-                    'apple': 'apple-message'
+                    'fontawesome': 'fas fa-envelope',
+                    'bootstrap': 'bi bi-envelope-fill',
+                    'material': 'mail',
+                    'apple': 'envelope-fill',
+                    'feather': 'mail'
                 },
                 'camera': {
                     'dashicons': 'dashicons-camera',
                     'fontawesome': 'fas fa-camera',
-                    'bootstrap': 'bi bi-camera',
+                    'bootstrap': 'bi bi-camera-fill',
                     'material': 'camera_alt',
-                    'apple': 'apple-camera'
+                    'apple': 'camera-fill',
+                    'feather': 'camera'
                 },
                 'menu': {
                     'dashicons': 'dashicons-menu',
                     'fontawesome': 'fas fa-bars',
                     'bootstrap': 'bi bi-list',
                     'material': 'menu',
-                    'apple': 'apple-list-bullet'
+                    'apple': 'list-bullet',
+                    'feather': 'menu'
+                },
+                'phone': {
+                    'dashicons': 'dashicons-phone',
+                    'fontawesome': 'fas fa-phone',
+                    'bootstrap': 'bi bi-telephone-fill',
+                    'material': 'phone',
+                    'apple': 'phone-fill',
+                    'feather': 'phone'
+                },
+                'info': {
+                    'dashicons': 'dashicons-info',
+                    'fontawesome': 'fas fa-info-circle',
+                    'bootstrap': 'bi bi-info-circle-fill',
+                    'material': 'info',
+                    'apple': 'info-circle-fill',
+                    'feather': 'info'
                 }
             };
             
@@ -970,15 +996,23 @@ jQuery(document).ready(function($) {
                 
                 this.settings.items.forEach((item, index) => {
                     if (item.icon) {
-                        // Detect current icon type
+                        // Detect current icon type more accurately
                         let currentIconType = 'dashicons';
                         if (item.icon.startsWith('apple-')) {
                             currentIconType = 'apple';
-                        } else if (item.icon.startsWith('material-')) {
+                        } else if (item.icon.startsWith('fas fa-') || item.icon.startsWith('far fa-') || item.icon.startsWith('fab fa-')) {
+                            currentIconType = 'fontawesome';
+                        } else if (item.icon.startsWith('bi bi-')) {
+                            currentIconType = 'bootstrap';
+                        } else if (item.icon.startsWith('feather-')) {
+                            currentIconType = 'feather';
+                        } else if (item.icon.startsWith('dashicons-')) {
+                            currentIconType = 'dashicons';
+                        } else if (!item.icon.includes('dashicons-') && !item.icon.includes('fa-') && !item.icon.includes('bi-') && !item.icon.includes('apple-') && !item.icon.includes('feather-')) {
                             currentIconType = 'material';
                         }
                         
-                        // Only convert if different from recommended library
+                        // Always convert icons to match the preset's recommended library
                         if (currentIconType !== recommendedIconLibrary) {
                             // Try to find a matching icon in the conversion table
                             let convertedIcon = null;
@@ -991,7 +1025,23 @@ jQuery(document).ready(function($) {
                                 }
                             });
                             
-                            // If we found a conversion, apply it
+                            // If no direct conversion found, use default preset-appropriate icons
+                            if (!convertedIcon) {
+                                const defaultIcons = {
+                                    'dashicons': ['dashicons-admin-home', 'dashicons-cart', 'dashicons-admin-users'],
+                                    'material': ['home', 'shopping_cart', 'person'],
+                                    'apple': ['house-fill', 'cart-fill', 'person-fill'],
+                                    'fontawesome': ['fas fa-home', 'fas fa-shopping-cart', 'fas fa-user'],
+                                    'bootstrap': ['bi bi-house-door-fill', 'bi bi-cart-fill', 'bi bi-person-fill'],
+                                    'feather': ['home', 'shopping-cart', 'user']
+                                };
+                                
+                                // Use appropriate default icon based on item index
+                                const defaultIconsForLibrary = defaultIcons[recommendedIconLibrary] || defaultIcons['dashicons'];
+                                convertedIcon = defaultIconsForLibrary[index] || defaultIconsForLibrary[0];
+                            }
+                            
+                            // Apply the conversion
                             if (convertedIcon) {
                                 item.icon = convertedIcon;
                                 iconsChanged++;
@@ -1000,6 +1050,12 @@ jQuery(document).ready(function($) {
                                 const iconInput = $(`.wpbnp-nav-item-row:eq(${index}) .wpbnp-icon-input`);
                                 if (iconInput.length) {
                                     iconInput.val(convertedIcon);
+                                    
+                                    // Update the icon preview
+                                    const iconPreview = iconInput.siblings('.wpbnp-icon-preview');
+                                    if (iconPreview.length) {
+                                        iconPreview.html(this.generateIconHTML(convertedIcon));
+                                    }
                                 }
                             }
                         }
@@ -1008,13 +1064,80 @@ jQuery(document).ready(function($) {
                 
                 // Show notification about icon conversions
                 if (iconsChanged > 0) {
-                    this.showNotification(`Converted ${iconsChanged} icon(s) to ${recommendedIconLibrary.toUpperCase()} library for ${preset.name} preset!`, 'info');
+                    this.showNotification(`🎨 Updated ${iconsChanged} icon(s) to ${recommendedIconLibrary.toUpperCase()} library for the ${preset.name} preset!`, 'success');
                     
                     // Update the items data
                     this.updateItemsData();
                 }
             }
             
+            // If no items exist, create default preset-appropriate items
+            if (!this.settings.items || this.settings.items.length === 0) {
+                const defaultPresetItems = {
+                    'minimal': [
+                        {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'dashicons-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'dashicons-admin-users', url: '#', enabled: true}
+                    ],
+                    'dark': [
+                        {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'search', label: 'Search', icon: 'dashicons-search', url: '#', enabled: true},
+                        {id: 'profile', label: 'Profile', icon: 'dashicons-admin-users', url: '#', enabled: true}
+                    ],
+                    'material': [
+                        {id: 'home', label: 'Home', icon: 'home', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'explore', label: 'Explore', icon: 'explore', url: '#', enabled: true},
+                        {id: 'favorite', label: 'Favorites', icon: 'favorite', url: '#', enabled: true},
+                        {id: 'person', label: 'Profile', icon: 'person', url: '#', enabled: true}
+                    ],
+                    'ios': [
+                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'search', label: 'Search', icon: 'magnifyingglass', url: '#', enabled: true},
+                        {id: 'heart', label: 'Favorites', icon: 'heart-fill', url: '#', enabled: true},
+                        {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
+                    ],
+                    'glassmorphism': [
+                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'bookmark', label: 'Saved', icon: 'bookmark-fill', url: '#', enabled: true},
+                        {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
+                    ],
+                    'neumorphism': [
+                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'message', label: 'Messages', icon: 'envelope-fill', url: '#', enabled: true},
+                        {id: 'settings', label: 'Settings', icon: 'gearshape-fill', url: '#', enabled: true}
+                    ],
+                    'cyberpunk': [
+                        {id: 'home', label: 'Home', icon: 'home', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'explore', label: 'Explore', icon: 'explore', url: '#', enabled: true},
+                        {id: 'notifications', label: 'Alerts', icon: 'notifications', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'account_circle', url: '#', enabled: true}
+                    ],
+                    'vintage': [
+                        {id: 'home', label: 'Home', icon: 'dashicons-admin-home', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'gallery', label: 'Gallery', icon: 'dashicons-format-gallery', url: '#', enabled: true},
+                        {id: 'contact', label: 'Contact', icon: 'dashicons-email', url: '#', enabled: true}
+                    ],
+                    'gradient': [
+                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'star', label: 'Featured', icon: 'star-fill', url: '#', enabled: true},
+                        {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
+                    ],
+                    'floating': [
+                        {id: 'home', label: 'Home', icon: 'house-fill', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'heart', label: 'Likes', icon: 'heart-fill', url: '#', enabled: true},
+                        {id: 'bookmark', label: 'Saved', icon: 'bookmark-fill', url: '#', enabled: true},
+                        {id: 'person', label: 'Profile', icon: 'person-fill', url: '#', enabled: true}
+                    ]
+                };
+                
+                const defaultItems = defaultPresetItems[presetKey] || defaultPresetItems['minimal'];
+                this.settings.items = [...defaultItems];
+                
+                // Re-render items list
+                this.renderItemsList();
+                this.showNotification(`✨ Added ${defaultItems.length} default items for the ${preset.name} preset!`, 'info');
+            }
+
             // Update preset selector
             $('input[name="settings[preset]"]').val(presetKey);
             $('.wpbnp-preset-card').removeClass('active');
@@ -1025,6 +1148,27 @@ jQuery(document).ready(function($) {
             
             // Auto-save the form after preset application
             this.saveFormState();
+        },
+        
+        // Generate HTML for icon preview
+        generateIconHTML: function(iconClass) {
+            if (!iconClass) return '';
+            
+            // Handle different icon types
+            if (iconClass.startsWith('dashicons-')) {
+                return `<span class="dashicons ${iconClass}"></span>`;
+            } else if (iconClass.startsWith('fas fa-') || iconClass.startsWith('far fa-') || iconClass.startsWith('fab fa-')) {
+                return `<i class="${iconClass}"></i>`;
+            } else if (iconClass.startsWith('bi bi-')) {
+                return `<i class="${iconClass}"></i>`;
+            } else if (iconClass.startsWith('feather-')) {
+                return `<i class="${iconClass}"></i>`;
+            } else if (iconClass.startsWith('apple-')) {
+                return `<span class="${iconClass}"></span>`;
+            } else {
+                // Material icons (text content)
+                return `<span class="material-icons">${iconClass}</span>`;
+            }
         },
         
         // Initialize color pickers
