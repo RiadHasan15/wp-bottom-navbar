@@ -230,7 +230,7 @@ jQuery(document).ready(function($) {
             const defaultItem = {
                 id: `item_${index}`,
                 label: 'New Item',
-                icon: 'dashicons-admin-home',
+                icon: 'bi bi-house-door',
                 url: '#',
                 enabled: true
             };
@@ -667,9 +667,9 @@ jQuery(document).ready(function($) {
             $(`.wpbnp-icon-tab[data-library="${recommendedLibrary}"]`).addClass('active');
             $(`.wpbnp-icon-library-content[data-library="${recommendedLibrary}"]`).addClass('active');
             
-            // Update library indicator
+            // Update library indicator (Bootstrap for all presets)
             const libraryName = $(`.wpbnp-icon-tab[data-library="${recommendedLibrary}"]`).text();
-            $('#wpbnp-current-library').text(`${libraryName} (Recommended for ${currentPreset})`);
+            $('#wpbnp-current-library').text(`${libraryName}`);
             this.updateIconCount();
             
             // Highlight current selection
@@ -679,10 +679,7 @@ jQuery(document).ready(function($) {
             // Focus search
             $('#wpbnp-icon-search').focus();
             
-            // Show helpful message about recommended library
-            if (recommendedLibrary !== 'dashicons') {
-                this.showNotification(`💡 ${libraryName} icons work best with ${currentPreset} preset!`, 'info');
-            }
+            // Icon library notifications disabled (using Bootstrap for all presets)
         },
         
         // Create enhanced icon picker modal with multiple libraries
@@ -887,9 +884,9 @@ jQuery(document).ready(function($) {
             
             // Icon conversion mapping between libraries
             const iconConversion = {
-                // Common icon mappings (Bootstrap as preferred default)
+                // Common icon mappings (Bootstrap outline icons as preferred default)
                 'home': {
-                    'bootstrap': 'bi bi-house-door-fill',
+                    'bootstrap': 'bi bi-house-door',
                     'dashicons': 'dashicons-admin-home',
                     'fontawesome': 'fas fa-home',
                     'material': 'home',
@@ -897,7 +894,7 @@ jQuery(document).ready(function($) {
                     'feather': 'home'
                 },
                 'cart': {
-                    'bootstrap': 'bi bi-cart-fill',
+                    'bootstrap': 'bi bi-cart',
                     'dashicons': 'dashicons-cart',
                     'fontawesome': 'fas fa-shopping-cart',
                     'material': 'shopping_cart',
@@ -905,7 +902,7 @@ jQuery(document).ready(function($) {
                     'feather': 'shopping-cart'
                 },
                 'user': {
-                    'bootstrap': 'bi bi-person-fill',
+                    'bootstrap': 'bi bi-person',
                     'dashicons': 'dashicons-admin-users',
                     'fontawesome': 'fas fa-user',
                     'material': 'person',
@@ -913,7 +910,7 @@ jQuery(document).ready(function($) {
                     'feather': 'user'
                 },
                 'heart': {
-                    'bootstrap': 'bi bi-heart-fill',
+                    'bootstrap': 'bi bi-heart',
                     'dashicons': 'dashicons-heart',
                     'fontawesome': 'fas fa-heart',
                     'material': 'favorite',
@@ -929,7 +926,7 @@ jQuery(document).ready(function($) {
                     'feather': 'search'
                 },
                 'settings': {
-                    'bootstrap': 'bi bi-gear-fill',
+                    'bootstrap': 'bi bi-gear',
                     'dashicons': 'dashicons-admin-settings',
                     'fontawesome': 'fas fa-cog',
                     'material': 'settings',
@@ -937,7 +934,7 @@ jQuery(document).ready(function($) {
                     'feather': 'settings'
                 },
                 'star': {
-                    'bootstrap': 'bi bi-star-fill',
+                    'bootstrap': 'bi bi-star',
                     'dashicons': 'dashicons-star-filled',
                     'fontawesome': 'fas fa-star',
                     'material': 'star',
@@ -945,7 +942,7 @@ jQuery(document).ready(function($) {
                     'feather': 'star'
                 },
                 'message': {
-                    'bootstrap': 'bi bi-envelope-fill',
+                    'bootstrap': 'bi bi-envelope',
                     'dashicons': 'dashicons-email',
                     'fontawesome': 'fas fa-envelope',
                     'material': 'mail',
@@ -953,7 +950,7 @@ jQuery(document).ready(function($) {
                     'feather': 'mail'
                 },
                 'camera': {
-                    'bootstrap': 'bi bi-camera-fill',
+                    'bootstrap': 'bi bi-camera',
                     'dashicons': 'dashicons-camera',
                     'fontawesome': 'fas fa-camera',
                     'material': 'camera_alt',
@@ -969,7 +966,7 @@ jQuery(document).ready(function($) {
                     'feather': 'menu'
                 },
                 'phone': {
-                    'bootstrap': 'bi bi-telephone-fill',
+                    'bootstrap': 'bi bi-telephone',
                     'dashicons': 'dashicons-phone',
                     'fontawesome': 'fas fa-phone',
                     'material': 'phone',
@@ -977,7 +974,7 @@ jQuery(document).ready(function($) {
                     'feather': 'phone'
                 },
                 'info': {
-                    'bootstrap': 'bi bi-info-circle-fill',
+                    'bootstrap': 'bi bi-info-circle',
                     'dashicons': 'dashicons-info',
                     'fontawesome': 'fas fa-info-circle',
                     'material': 'info',
@@ -1040,65 +1037,65 @@ jQuery(document).ready(function($) {
             
             // If no items exist, create default preset-appropriate items
             if (!this.settings.items || this.settings.items.length === 0) {
-                // Same 3 default items (Home, Shop, Account) with Bootstrap Icons for all presets
+                // Same 3 default items (Home, Shop, Account) with Bootstrap outline icons for all presets
                 const defaultPresetItems = {
                     'minimal': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'dark': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'material': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'ios': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'glassmorphism': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'neumorphism': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'cyberpunk': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'vintage': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'gradient': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ],
                     'floating': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                     ]
                 };
                 
-                // Use theme-appropriate default items, fallback to Bootstrap (modern default)
+                // Use preset default items, fallback to Bootstrap outline icons
                 const defaultItems = defaultPresetItems[presetKey] || [
-                    {id: 'home', label: 'Home', icon: 'bi bi-house-door-fill', url: wpbnp_admin.home_url, enabled: true},
-                    {id: 'shop', label: 'Shop', icon: 'bi bi-cart-fill', url: '#', enabled: true},
-                    {id: 'account', label: 'Account', icon: 'bi bi-person-fill', url: '#', enabled: true}
+                    {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
+                    {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
+                    {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
                 ];
                 this.settings.items = [...defaultItems];
                 
@@ -1148,10 +1145,10 @@ jQuery(document).ready(function($) {
         
         // Simple icon conversion (basic mapping only)
         getSimpleIconConversion: function(iconClass, targetLibrary, index) {
-            // Basic conversion map for common icons only (Bootstrap as preferred default)
+            // Basic conversion map for common icons only (Bootstrap outline icons as default)
             const basicConversions = {
                 'home': {
-                    'bootstrap': 'bi bi-house-door-fill',
+                    'bootstrap': 'bi bi-house-door',
                     'dashicons': 'dashicons-admin-home',
                     'fontawesome': 'fas fa-home',
                     'material': 'home',
@@ -1159,7 +1156,7 @@ jQuery(document).ready(function($) {
                     'feather': 'feather-home'
                 },
                 'user': {
-                    'bootstrap': 'bi bi-person-fill',
+                    'bootstrap': 'bi bi-person',
                     'dashicons': 'dashicons-admin-users',
                     'fontawesome': 'fas fa-user',
                     'material': 'person',
@@ -1167,7 +1164,7 @@ jQuery(document).ready(function($) {
                     'feather': 'feather-user'
                 },
                 'account': {  // Added account mapping
-                    'bootstrap': 'bi bi-person-fill',
+                    'bootstrap': 'bi bi-person',
                     'dashicons': 'dashicons-admin-users',
                     'fontawesome': 'fas fa-user',
                     'material': 'person',
@@ -1183,7 +1180,7 @@ jQuery(document).ready(function($) {
                     'feather': 'feather-search'
                 },
                 'cart': {
-                    'bootstrap': 'bi bi-cart-fill',
+                    'bootstrap': 'bi bi-cart',
                     'dashicons': 'dashicons-cart',
                     'fontawesome': 'fas fa-shopping-cart',
                     'material': 'shopping_cart',
@@ -1191,7 +1188,7 @@ jQuery(document).ready(function($) {
                     'feather': 'feather-shopping-cart'
                 },
                 'shop': {  // Added shop mapping
-                    'bootstrap': 'bi bi-cart-fill',
+                    'bootstrap': 'bi bi-cart',
                     'dashicons': 'dashicons-cart',
                     'fontawesome': 'fas fa-shopping-cart',
                     'material': 'shopping_cart',
@@ -1199,7 +1196,7 @@ jQuery(document).ready(function($) {
                     'feather': 'feather-shopping-cart'
                 },
                 'heart': {
-                    'bootstrap': 'bi bi-heart-fill',
+                    'bootstrap': 'bi bi-heart',
                     'dashicons': 'dashicons-heart',
                     'fontawesome': 'fas fa-heart',
                     'material': 'favorite',
@@ -1207,7 +1204,7 @@ jQuery(document).ready(function($) {
                     'feather': 'feather-heart'
                 },
                 'settings': {
-                    'bootstrap': 'bi bi-gear-fill',
+                    'bootstrap': 'bi bi-gear',
                     'dashicons': 'dashicons-admin-settings',
                     'fontawesome': 'fas fa-cog',
                     'material': 'settings',
@@ -1225,12 +1222,12 @@ jQuery(document).ready(function($) {
             
             // Special handling for common Bootstrap to Apple conversions
             const bootstrapToAppleMap = {
-                'bi bi-house-door-fill': 'house-fill',
-                'bi bi-cart-fill': 'cart-fill', 
-                'bi bi-person-fill': 'person-fill',
+                'bi bi-house-door': 'house-fill',
+                'bi bi-cart': 'cart-fill', 
+                'bi bi-person': 'person-fill',
                 'bi bi-search': 'magnifyingglass',
-                'bi bi-heart-fill': 'heart-fill',
-                'bi bi-gear-fill': 'gearshape-fill'
+                'bi bi-heart': 'heart-fill',
+                'bi bi-gear': 'gearshape-fill'
             };
             
             // Special handling for common Dashicons to Apple conversions  
@@ -1254,12 +1251,12 @@ jQuery(document).ready(function($) {
             } else if (targetLibrary === 'bootstrap') {
                 // Reverse mappings for converting TO Bootstrap
                 const appleToBootstrapMap = {
-                    'house-fill': 'bi bi-house-door-fill',
-                    'cart-fill': 'bi bi-cart-fill',
-                    'person-fill': 'bi bi-person-fill',
+                    'house-fill': 'bi bi-house-door',
+                    'cart-fill': 'bi bi-cart',
+                    'person-fill': 'bi bi-person',
                     'magnifyingglass': 'bi bi-search',
-                    'heart-fill': 'bi bi-heart-fill',
-                    'gearshape-fill': 'bi bi-gear-fill'
+                    'heart-fill': 'bi bi-heart',
+                    'gearshape-fill': 'bi bi-gear'
                 };
                 if (appleToBootstrapMap[iconClass]) {
                     return appleToBootstrapMap[iconClass];
@@ -1267,9 +1264,9 @@ jQuery(document).ready(function($) {
             } else if (targetLibrary === 'material') {
                 // Common conversions to Material
                 const toMaterialMap = {
-                    'bi bi-house-door-fill': 'home',
-                    'bi bi-cart-fill': 'shopping_cart',
-                    'bi bi-person-fill': 'person',
+                    'bi bi-house-door': 'home',
+                    'bi bi-cart': 'shopping_cart',
+                    'bi bi-person': 'person',
                     'house-fill': 'home',
                     'cart-fill': 'shopping_cart',
                     'person-fill': 'person',
