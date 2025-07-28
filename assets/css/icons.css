@@ -361,6 +361,21 @@
 .wpbnp-icon-preview i[class*="fa-"] {
     font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "Font Awesome 5 Pro" !important;
     font-size: 16px;
+    font-weight: 900 !important; /* FontAwesome solid icons need font-weight 900 */
+    font-style: normal !important;
+}
+
+/* Additional FontAwesome fixes */
+.wpbnp-icon-preview i.fas,
+.wpbnp-icon-preview i.far,
+.wpbnp-icon-preview i.fab {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+}
+
+.wpbnp-icon-preview i.far {
+    font-weight: 400 !important; /* Regular icons use 400 */
 }
 
 /* Ensure Feather icons display properly */
