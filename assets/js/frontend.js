@@ -129,15 +129,53 @@
                 return;
             }
             
+            // Detect iPad specifically
+            const isIPad = /iPad/.test(navigator.userAgent) || 
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
             // Force repositioning
             const repositionNav = () => {
-                $nav.css({
-                    'position': 'fixed',
-                    'bottom': '0',
-                    'left': '0',
-                    'right': '0',
-                    'z-index': '9999'
-                });
+                if (isIPad) {
+                    // iPad specific positioning
+                    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+                    const navHeight = 70;
+                    
+                    $nav.css({
+                        'position': 'fixed',
+                        'bottom': '0px',
+                        'left': '0px',
+                        'right': '0px',
+                        'z-index': '99999',
+                        'transform': 'translate3d(0, 0, 0)',
+                        '-webkit-transform': 'translate3d(0, 0, 0)',
+                        'top': 'auto',
+                        'height': navHeight + 'px',
+                        'margin': '0',
+                        'padding-bottom': '0px'
+                    });
+                    
+                    // Force to bottom of actual viewport
+                    const forceToBottom = () => {
+                        const currentViewportHeight = window.innerHeight;
+                        $nav.css({
+                            'bottom': '0px',
+                            'position': 'fixed',
+                            'transform': `translateY(${Math.max(0, currentViewportHeight - navHeight)}px)`
+                        });
+                    };
+                    
+                    setTimeout(forceToBottom, 10);
+                    
+                } else {
+                    // Standard positioning for other devices
+                    $nav.css({
+                        'position': 'fixed',
+                        'bottom': '0',
+                        'left': '0',
+                        'right': '0',
+                        'z-index': '9999'
+                    });
+                }
                 
                 // Add viewport meta if not present
                 if (!$('meta[name="viewport"]').length) {
@@ -148,18 +186,53 @@
             // Apply on load
             repositionNav();
             
-            // Reapply on resize and orientation change
-            $(window).on('resize orientationchange', function() {
-                setTimeout(repositionNav, 100);
-            });
-            
-            // Handle iOS Safari viewport changes
-            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-                $(window).on('scroll', function() {
-                    if (window.pageYOffset === 0) {
-                        setTimeout(repositionNav, 50);
-                    }
+            // Enhanced iPad handling
+            if (isIPad) {
+                // Handle viewport changes on iPad
+                let resizeTimer;
+                $(window).on('resize orientationchange', function() {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        repositionNav();
+                        // Double check after orientation change
+                        setTimeout(repositionNav, 300);
+                    }, 100);
                 });
+                
+                // Handle scroll events that might affect viewport
+                let scrollTimer;
+                $(window).on('scroll', function() {
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(repositionNav, 50);
+                });
+                
+                // Handle focus events that might change viewport
+                $(document).on('focusin focusout', 'input, textarea, select', function() {
+                    setTimeout(repositionNav, 300);
+                });
+                
+                // Periodic check for iPad (in case viewport changes aren't detected)
+                setInterval(function() {
+                    const currentBottom = parseInt($nav.css('bottom'), 10) || 0;
+                    if (currentBottom < 0 || !$nav.is(':visible') || $nav.offset().top > window.innerHeight) {
+                        repositionNav();
+                    }
+                }, 2000);
+                
+            } else {
+                // Standard handling for non-iPad devices
+                $(window).on('resize orientationchange', function() {
+                    setTimeout(repositionNav, 100);
+                });
+                
+                // Handle iOS Safari viewport changes
+                if (/iPhone|iPod/.test(navigator.userAgent)) {
+                    $(window).on('scroll', function() {
+                        if (window.pageYOffset === 0) {
+                            setTimeout(repositionNav, 50);
+                        }
+                    });
+                }
             }
         },
         
