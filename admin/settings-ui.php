@@ -957,73 +957,61 @@ class WPBNP_Admin_UI {
     private function render_page_selector($conditions, $index) {
         $selected_pages = isset($conditions['pages']) ? $conditions['pages'] : array();
         
-        // Get all published pages
-        $pages = get_pages(array(
-            'sort_order' => 'ASC',
-            'sort_column' => 'post_title',
+        // Get all pages first
+        $pages = get_posts(array(
+            'post_type' => 'page',
             'post_status' => 'publish',
-            'number' => 0, // Get all pages
-            'hierarchical' => 1
+            'numberposts' => -1,
+            'orderby' => 'title',
+            'order' => 'ASC'
         ));
         
-        // Debug information
-        error_log('WPBNP: Pages found with get_pages(): ' . count($pages));
-        
-        // If no pages found with get_pages(), try get_posts() as fallback
+        // If no pages, try posts
         if (empty($pages)) {
             $pages = get_posts(array(
-                'post_type' => 'page',
+                'post_type' => 'post',
                 'post_status' => 'publish',
                 'numberposts' => -1,
                 'orderby' => 'title',
                 'order' => 'ASC'
             ));
-            error_log('WPBNP: Pages found with get_posts() fallback: ' . count($pages));
         }
         
-        // If still no pages, try to get any content (posts, pages, etc.)
-        if (empty($pages)) {
-            $all_content = get_posts(array(
-                'post_type' => array('page', 'post'),
+        // If still nothing, create a sample page for testing
+        if (empty($pages) && current_user_can('edit_pages')) {
+            $sample_page_id = wp_insert_post(array(
+                'post_title' => 'Sample Page',
+                'post_content' => 'This is a sample page created for testing the page targeting feature.',
                 'post_status' => 'publish',
-                'numberposts' => -1,
-                'orderby' => 'title',
-                'order' => 'ASC'
+                'post_type' => 'page'
             ));
-            error_log('WPBNP: All content found (pages + posts): ' . count($all_content));
-            $pages = $all_content;
+            
+            if ($sample_page_id && !is_wp_error($sample_page_id)) {
+                // Refresh the pages list
+                $pages = get_posts(array(
+                    'post_type' => 'page',
+                    'post_status' => 'publish',
+                    'numberposts' => -1,
+                    'orderby' => 'title',
+                    'order' => 'ASC'
+                ));
+            }
         }
         
         ?>
+        <!-- DEBUG: Found <?php echo count($pages); ?> pages/posts -->
         <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
-            <option value=""><?php esc_html_e('Select pages...', 'wp-bottom-navigation-pro'); ?></option>
             <?php if (empty($pages)): ?>
-                <option value="" disabled><?php esc_html_e('No pages found - Please create some pages in WordPress admin', 'wp-bottom-navigation-pro'); ?></option>
+                <option value="" disabled><?php esc_html_e('No pages found - Create some pages first', 'wp-bottom-navigation-pro'); ?></option>
             <?php else: ?>
+                <option value=""><?php esc_html_e('Select pages...', 'wp-bottom-navigation-pro'); ?></option>
                 <?php foreach ($pages as $page): ?>
                     <option value="<?php echo esc_attr($page->ID); ?>" <?php selected(in_array($page->ID, $selected_pages)); ?>>
-                        <?php 
-                        $post_type_label = ($page->post_type === 'post') ? ' (Post)' : '';
-                        echo esc_html($page->post_title . $post_type_label); 
-                        ?>
+                        <?php echo esc_html($page->post_title); ?> (ID: <?php echo $page->ID; ?>)
                     </option>
                 <?php endforeach; ?>
             <?php endif; ?>
         </select>
-        
-        <?php if (empty($pages)): ?>
-            <p class="description" style="color: #d63638; margin-top: 5px;">
-                <strong><?php esc_html_e('No pages available!', 'wp-bottom-navigation-pro'); ?></strong><br>
-                <?php esc_html_e('To use page targeting, you need to create some pages first. Go to Pages → Add New in your WordPress admin.', 'wp-bottom-navigation-pro'); ?>
-            </p>
-        <?php else: ?>
-            <p class="description" style="margin-top: 5px;">
-                <?php printf(
-                    esc_html__('Found %d page(s). Hold Ctrl/Cmd to select multiple pages.', 'wp-bottom-navigation-pro'),
-                    count($pages)
-                ); ?>
-            </p>
-        <?php endif; ?>
         <?php
     }
     
