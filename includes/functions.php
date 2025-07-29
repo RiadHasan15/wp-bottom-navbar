@@ -64,7 +64,7 @@ function wpbnp_get_default_settings() {
             'height' => '60',
             'border_radius' => '0',
             'box_shadow' => '0 -2px 8px rgba(0,0,0,0.1)',
-            'font_size' => '12',
+            'font_size' => '14',
             'font_weight' => '400',
             'icon_size' => '20',
             'padding' => '10'
