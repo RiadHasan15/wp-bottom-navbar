@@ -2073,35 +2073,251 @@ jQuery(document).ready(function ($) {
 
         // Create new custom preset
         createCustomPreset: function () {
-            const presetName = prompt('Enter preset name:', 'My Custom Preset');
-            if (!presetName) return;
+            this.showCreatePresetModal();
+        },
 
-            const presetDescription = prompt('Enter preset description (optional):', '');
-            const presetId = 'preset_' + Date.now();
+        // Show create preset modal
+        showCreatePresetModal: function () {
+            // Remove existing modal if any
+            $('#wpbnp-create-preset-modal').remove();
 
-            // Get current navigation items as the base for the new preset
+            // Create modal HTML
+            const modalHtml = `
+                <div id="wpbnp-create-preset-modal" class="wpbnp-modal-overlay">
+                    <div class="wpbnp-modal">
+                        <div class="wpbnp-modal-header">
+                            <h3>🚀 Create New Custom Preset</h3>
+                            <button type="button" class="wpbnp-modal-close" title="Close">×</button>
+                        </div>
+                        <div class="wpbnp-modal-body">
+                            <form id="wpbnp-create-preset-form">
+                                <div class="wpbnp-form-group">
+                                    <label for="preset-name">Preset Name *</label>
+                                    <input type="text" id="preset-name" name="preset-name" 
+                                           placeholder="Enter a descriptive name for your preset" 
+                                           required maxlength="50">
+                                    <small>This will be the name displayed in the preset selector</small>
+                                </div>
+                                
+                                <div class="wpbnp-form-group">
+                                    <label for="preset-description">Description (Optional)</label>
+                                    <textarea id="preset-description" name="preset-description" 
+                                              placeholder="Describe what this preset is for..." 
+                                              rows="3" maxlength="200"></textarea>
+                                    <small>Help others understand what this preset is for</small>
+                                </div>
+                                
+                                <div class="wpbnp-form-group">
+                                    <label>Current Navigation Items</label>
+                                    <div class="wpbnp-current-items-preview">
+                                        <div class="wpbnp-items-count">
+                                            <span class="wpbnp-count-badge">0</span> items will be included
+                                        </div>
+                                        <div class="wpbnp-items-list"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="wpbnp-form-group">
+                                    <div class="wpbnp-checkbox-group">
+                                        <label>
+                                            <input type="checkbox" id="preset-include-disabled" name="include-disabled">
+                                            Include disabled items
+                                        </label>
+                                        <small>Disabled items will be included but marked as disabled in the preset</small>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="wpbnp-modal-footer">
+                            <button type="button" class="wpbnp-btn wpbnp-btn-secondary wpbnp-modal-cancel">Cancel</button>
+                            <button type="button" class="wpbnp-btn wpbnp-btn-primary wpbnp-create-preset-btn" disabled>
+                                <span class="wpbnp-btn-text">Create Preset</span>
+                                <span class="wpbnp-btn-loading" style="display: none;">Creating...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add modal to body
+            $('body').append(modalHtml);
+
+            // Initialize modal functionality
+            this.initCreatePresetModal();
+
+            // Show modal with animation
+            setTimeout(() => {
+                $('#wpbnp-create-preset-modal').addClass('wpbnp-modal-show');
+            }, 10);
+        },
+
+        // Initialize create preset modal
+        initCreatePresetModal: function () {
+            const $modal = $('#wpbnp-create-preset-modal');
+            const $form = $('#wpbnp-create-preset-form');
+            const $nameInput = $('#preset-name');
+            const $descriptionInput = $('#preset-description');
+            const $createBtn = $('.wpbnp-create-preset-btn');
+            const $cancelBtn = $('.wpbnp-modal-cancel, .wpbnp-modal-close');
+
+            // Update items preview
+            this.updateCreatePresetItemsPreview();
+
+            // Handle name input validation
+            $nameInput.on('input', function() {
+                const isValid = $(this).val().trim().length > 0;
+                $createBtn.prop('disabled', !isValid);
+            });
+
+            // Handle include disabled items checkbox
+            $('#preset-include-disabled').on('change', () => {
+                this.updateCreatePresetItemsPreview();
+            });
+
+            // Handle form submission
+            $createBtn.on('click', (e) => {
+                e.preventDefault();
+                this.handleCreatePresetSubmit();
+            });
+
+            // Handle cancel/close
+            $cancelBtn.on('click', (e) => {
+                e.preventDefault();
+                this.closeCreatePresetModal();
+            });
+
+            // Handle escape key
+            $(document).on('keydown.wpbnp-create-preset', (e) => {
+                if (e.key === 'Escape') {
+                    this.closeCreatePresetModal();
+                }
+            });
+
+            // Handle click outside modal
+            $modal.on('click', (e) => {
+                if (e.target === $modal[0]) {
+                    this.closeCreatePresetModal();
+                }
+            });
+
+            // Focus on name input
+            $nameInput.focus();
+        },
+
+        // Update items preview in create preset modal
+        updateCreatePresetItemsPreview: function () {
             const currentItems = this.getCurrentNavigationItems();
+            const $itemsList = $('.wpbnp-items-list');
+            const $countBadge = $('.wpbnp-count-badge');
+            const includeDisabled = $('#preset-include-disabled').is(':checked');
 
+            // Filter items based on include disabled setting
+            const itemsToShow = includeDisabled ? currentItems : currentItems.filter(item => item.enabled);
+
+            // Update count
+            $countBadge.text(itemsToShow.length);
+
+            // Update items list
+            $itemsList.empty();
+            itemsToShow.forEach(item => {
+                const itemHtml = `
+                    <div class="wpbnp-preview-item ${!item.enabled ? 'wpbnp-disabled' : ''}">
+                        <span class="wpbnp-item-icon">${item.icon || '📱'}</span>
+                        <span class="wpbnp-item-label">${item.label || 'Unnamed Item'}</span>
+                        ${!item.enabled ? '<span class="wpbnp-disabled-badge">Disabled</span>' : ''}
+                    </div>
+                `;
+                $itemsList.append(itemHtml);
+            });
+
+            // Update count badge color based on item count
+            if (itemsToShow.length === 0) {
+                $countBadge.addClass('wpbnp-count-empty');
+            } else if (itemsToShow.length < 3) {
+                $countBadge.addClass('wpbnp-count-warning');
+            } else {
+                $countBadge.removeClass('wpbnp-count-empty wpbnp-count-warning');
+            }
+        },
+
+        // Handle create preset form submission
+        handleCreatePresetSubmit: function () {
+            const $modal = $('#wpbnp-create-preset-modal');
+            const $form = $('#wpbnp-create-preset-form');
+            const $createBtn = $('.wpbnp-create-preset-btn');
+            const $btnText = $createBtn.find('.wpbnp-btn-text');
+            const $btnLoading = $createBtn.find('.wpbnp-btn-loading');
+
+            const presetName = $('#preset-name').val().trim();
+            const presetDescription = $('#preset-description').val().trim();
+            const includeDisabled = $('#preset-include-disabled').is(':checked');
+
+            if (!presetName) {
+                this.showNotification('Please enter a preset name', 'error');
+                $('#preset-name').focus();
+                return;
+            }
+
+            // Show loading state
+            $createBtn.prop('disabled', true);
+            $btnText.hide();
+            $btnLoading.show();
+
+            // Get current navigation items
+            const currentItems = this.getCurrentNavigationItems();
+            const itemsToInclude = includeDisabled ? currentItems : currentItems.filter(item => item.enabled);
+
+            if (itemsToInclude.length === 0) {
+                this.showNotification('No items to include in the preset. Please add some navigation items first.', 'error');
+                $createBtn.prop('disabled', false);
+                $btnText.show();
+                $btnLoading.hide();
+                return;
+            }
+
+            // Create the preset
+            const presetId = 'preset_' + Date.now();
             const newPreset = {
                 id: presetId,
                 name: presetName,
                 description: presetDescription,
                 created_at: Math.floor(Date.now() / 1000),
-                items: currentItems
+                items: itemsToInclude
             };
 
+            // Add to DOM
             this.addPresetToDOM(newPreset);
             this.updateAllPresetSelectors();
 
-            // Save form state to preserve the new preset
+            // Save form state
             this.saveFormState();
 
-            this.showNotification(`Custom preset "${presetName}" created successfully!`, 'success');
+            // Close modal
+            this.closeCreatePresetModal();
 
-            // Important reminder to save
+            // Show success notification
+            this.showNotification(`✅ Custom preset "${presetName}" created successfully!`, 'success');
+
+            // Important reminder
             setTimeout(() => {
                 this.showNotification(`⚠️ Remember to click "Save Changes" to permanently save your custom preset!`, 'warning', 5000);
             }, 2000);
+        },
+
+        // Close create preset modal
+        closeCreatePresetModal: function () {
+            const $modal = $('#wpbnp-create-preset-modal');
+            
+            // Remove event listeners
+            $(document).off('keydown.wpbnp-create-preset');
+            
+            // Hide modal with animation
+            $modal.removeClass('wpbnp-modal-show');
+            
+            // Remove modal after animation
+            setTimeout(() => {
+                $modal.remove();
+            }, 300);
         },
 
         // Get current navigation items
@@ -2270,26 +2486,160 @@ jQuery(document).ready(function ($) {
 
         // Edit custom preset name/description
         editCustomPreset: function (presetId) {
+            this.showEditPresetModal(presetId);
+        },
+
+        // Show edit preset modal
+        showEditPresetModal: function (presetId) {
             const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
             const currentName = presetItem.find('.wpbnp-preset-name').text();
             const currentDescription = presetItem.find('.wpbnp-preset-description').text();
 
-            const newName = prompt('Enter preset name:', currentName);
-            if (!newName) return;
+            // Remove existing modal if any
+            $('#wpbnp-edit-preset-modal').remove();
 
-            const newDescription = prompt('Enter preset description (optional):', currentDescription);
+            // Create modal HTML
+            const modalHtml = `
+                <div id="wpbnp-edit-preset-modal" class="wpbnp-modal-overlay">
+                    <div class="wpbnp-modal">
+                        <div class="wpbnp-modal-header">
+                            <h3>✏️ Edit Custom Preset</h3>
+                            <button type="button" class="wpbnp-modal-close" title="Close">×</button>
+                        </div>
+                        <div class="wpbnp-modal-body">
+                            <form id="wpbnp-edit-preset-form">
+                                <div class="wpbnp-form-group">
+                                    <label for="edit-preset-name">Preset Name *</label>
+                                    <input type="text" id="edit-preset-name" name="edit-preset-name" 
+                                           value="${currentName}" placeholder="Enter a descriptive name for your preset" 
+                                           required maxlength="50">
+                                    <small>This will be the name displayed in the preset selector</small>
+                                </div>
+                                
+                                <div class="wpbnp-form-group">
+                                    <label for="edit-preset-description">Description (Optional)</label>
+                                    <textarea id="edit-preset-description" name="edit-preset-description" 
+                                              placeholder="Describe what this preset is for..." 
+                                              rows="3" maxlength="200">${currentDescription}</textarea>
+                                    <small>Help others understand what this preset is for</small>
+                                </div>
+                                
+                                <div class="wpbnp-form-group">
+                                    <label>Current Preset Info</label>
+                                    <div class="wpbnp-current-items-preview">
+                                        <div class="wpbnp-items-count">
+                                            <span class="wpbnp-count-badge">${presetItem.find('.wpbnp-preset-meta').text().match(/\d+/)[0]}</span> items in this preset
+                                        </div>
+                                        <div class="wpbnp-preset-info-display">
+                                            <p><strong>Created:</strong> ${presetItem.find('.wpbnp-preset-meta').text().split('•')[1]}</p>
+                                            <p><strong>Current Name:</strong> ${currentName}</p>
+                                            ${currentDescription ? `<p><strong>Current Description:</strong> ${currentDescription}</p>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="wpbnp-modal-footer">
+                            <button type="button" class="wpbnp-btn wpbnp-btn-secondary wpbnp-modal-cancel">Cancel</button>
+                            <button type="button" class="wpbnp-btn wpbnp-btn-primary wpbnp-edit-preset-btn">
+                                <span class="wpbnp-btn-text">Update Preset</span>
+                                <span class="wpbnp-btn-loading" style="display: none;">Updating...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add modal to body
+            $('body').append(modalHtml);
+
+            // Initialize modal functionality
+            this.initEditPresetModal(presetId);
+
+            // Show modal with animation
+            setTimeout(() => {
+                $('#wpbnp-edit-preset-modal').addClass('wpbnp-modal-show');
+            }, 10);
+        },
+
+        // Initialize edit preset modal
+        initEditPresetModal: function (presetId) {
+            const $modal = $('#wpbnp-edit-preset-modal');
+            const $nameInput = $('#edit-preset-name');
+            const $descriptionInput = $('#edit-preset-description');
+            const $editBtn = $('.wpbnp-edit-preset-btn');
+            const $cancelBtn = $('.wpbnp-modal-cancel, .wpbnp-modal-close');
+
+            // Handle name input validation
+            $nameInput.on('input', function() {
+                const isValid = $(this).val().trim().length > 0;
+                $editBtn.prop('disabled', !isValid);
+            });
+
+            // Handle form submission
+            $editBtn.on('click', (e) => {
+                e.preventDefault();
+                this.handleEditPresetSubmit(presetId);
+            });
+
+            // Handle cancel/close
+            $cancelBtn.on('click', (e) => {
+                e.preventDefault();
+                this.closeEditPresetModal();
+            });
+
+            // Handle escape key
+            $(document).on('keydown.wpbnp-edit-preset', (e) => {
+                if (e.key === 'Escape') {
+                    this.closeEditPresetModal();
+                }
+            });
+
+            // Handle click outside modal
+            $modal.on('click', (e) => {
+                if (e.target === $modal[0]) {
+                    this.closeEditPresetModal();
+                }
+            });
+
+            // Focus on name input
+            $nameInput.focus();
+            $nameInput.select();
+        },
+
+        // Handle edit preset form submission
+        handleEditPresetSubmit: function (presetId) {
+            const $modal = $('#wpbnp-edit-preset-modal');
+            const $editBtn = $('.wpbnp-edit-preset-btn');
+            const $btnText = $editBtn.find('.wpbnp-btn-text');
+            const $btnLoading = $editBtn.find('.wpbnp-btn-loading');
+
+            const presetName = $('#edit-preset-name').val().trim();
+            const presetDescription = $('#edit-preset-description').val().trim();
+
+            if (!presetName) {
+                this.showNotification('Please enter a preset name', 'error');
+                $('#edit-preset-name').focus();
+                return;
+            }
+
+            // Show loading state
+            $editBtn.prop('disabled', true);
+            $btnText.hide();
+            $btnLoading.show();
 
             // Update DOM
-            presetItem.find('.wpbnp-preset-name').text(newName);
-            presetItem.find('input[name*="[name]"]').val(newName);
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            presetItem.find('.wpbnp-preset-name').text(presetName);
+            presetItem.find('input[name*="[name]"]').val(presetName);
 
-            if (newDescription) {
+            if (presetDescription) {
                 if (presetItem.find('.wpbnp-preset-description').length) {
-                    presetItem.find('.wpbnp-preset-description').text(newDescription);
+                    presetItem.find('.wpbnp-preset-description').text(presetDescription);
                 } else {
-                    presetItem.find('.wpbnp-preset-meta').after(`<p class="wpbnp-preset-description">${newDescription}</p>`);
+                    presetItem.find('.wpbnp-preset-meta').after(`<p class="wpbnp-preset-description">${presetDescription}</p>`);
                 }
-                presetItem.find('input[name*="[description]"]').val(newDescription);
+                presetItem.find('input[name*="[description]"]').val(presetDescription);
             } else {
                 presetItem.find('.wpbnp-preset-description').remove();
                 presetItem.find('input[name*="[description]"]').val('');
@@ -2297,10 +2647,30 @@ jQuery(document).ready(function ($) {
 
             this.updateAllPresetSelectors();
 
-            // Save form state to preserve the changes
+            // Save form state
             this.saveFormState();
 
-            this.showNotification(`Preset "${newName}" updated successfully!`, 'success');
+            // Close modal
+            this.closeEditPresetModal();
+
+            // Show success notification
+            this.showNotification(`✅ Preset "${presetName}" updated successfully!`, 'success');
+        },
+
+        // Close edit preset modal
+        closeEditPresetModal: function () {
+            const $modal = $('#wpbnp-edit-preset-modal');
+            
+            // Remove event listeners
+            $(document).off('keydown.wpbnp-edit-preset');
+            
+            // Hide modal with animation
+            $modal.removeClass('wpbnp-modal-show');
+            
+            // Remove modal after animation
+            setTimeout(() => {
+                $modal.remove();
+            }, 300);
         },
 
         // Duplicate custom preset
