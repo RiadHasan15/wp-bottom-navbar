@@ -1100,6 +1100,15 @@ class WPBNP_Admin_UI {
         $settings = wpbnp_get_settings();
         $custom_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
         
+        // Debug information
+        error_log('WPBNP: Rendering preset selector - Selected: ' . $selected_preset);
+        error_log('WPBNP: Custom presets count: ' . count($custom_presets));
+        if (!empty($custom_presets)) {
+            foreach ($custom_presets as $preset) {
+                error_log('WPBNP: Preset - ID: ' . ($preset['id'] ?? 'no-id') . ', Name: ' . ($preset['name'] ?? 'no-name'));
+            }
+        }
+        
         ?>
         <select name="settings[page_targeting][configurations][<?php echo $index; ?>][preset_id]" class="wpbnp-preset-selector">
             <option value="default" <?php selected($selected_preset, 'default'); ?>>
@@ -1123,6 +1132,19 @@ class WPBNP_Admin_UI {
                 </option>
             <?php endif; ?>
         </select>
+        
+        <!-- Ensure this selector gets populated -->
+        <script>
+        jQuery(document).ready(function($) {
+            // Ensure this specific selector gets populated
+            const $selector = $('select[name="settings[page_targeting][configurations][<?php echo $index; ?>][preset_id]"]');
+            if ($selector.length && typeof WPBottomNavAdmin !== 'undefined') {
+                setTimeout(() => {
+                    WPBottomNavAdmin.populatePresetSelector($selector);
+                }, 50);
+            }
+        });
+        </script>
         <?php
     }
     
