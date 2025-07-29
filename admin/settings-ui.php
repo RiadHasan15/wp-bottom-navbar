@@ -809,7 +809,8 @@ class WPBNP_Admin_UI {
                 <!-- PRO Features - Page Targeting Interface -->
                 <div class="wpbnp-page-targeting-interface">
                     
-                    <!-- Debug Info (temporary) -->
+                    <!-- Debug Info (can be removed in production) -->
+                    <?php if (defined('WP_DEBUG') && WP_DEBUG): ?>
                     <div style="background: #f0f0f0; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 12px;">
                         <strong>🔍 Debug Info:</strong> 
                         <?php 
@@ -825,6 +826,7 @@ class WPBNP_Admin_UI {
                         }
                         ?>
                     </div>
+                    <?php endif; ?>
                     
                     <div class="wpbnp-targeting-header">
                         <h3><?php esc_html_e('Navigation Configurations', 'wp-bottom-navigation-pro'); ?></h3>
