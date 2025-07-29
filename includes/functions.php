@@ -211,6 +211,56 @@ function wpbnp_sanitize_settings($settings) {
         );
     }
     
+    // Page targeting settings (Pro feature)
+    if (isset($settings['page_targeting']) && is_array($settings['page_targeting'])) {
+        $sanitized['page_targeting'] = array(
+            'enabled' => !empty($settings['page_targeting']['enabled']),
+            'configurations' => array()
+        );
+        
+        // Sanitize configurations
+        if (isset($settings['page_targeting']['configurations']) && is_array($settings['page_targeting']['configurations'])) {
+            foreach ($settings['page_targeting']['configurations'] as $config) {
+                if (is_array($config)) {
+                    $sanitized_config = array(
+                        'id' => sanitize_key($config['id'] ?? ''),
+                        'name' => sanitize_text_field($config['name'] ?? ''),
+                        'priority' => absint($config['priority'] ?? 1),
+                        'conditions' => array(
+                            'pages' => array(),
+                            'post_types' => array(),
+                            'categories' => array(),
+                            'user_roles' => array()
+                        )
+                    );
+                    
+                    // Sanitize conditions
+                    if (isset($config['conditions']) && is_array($config['conditions'])) {
+                        $conditions = $config['conditions'];
+                        
+                        if (isset($conditions['pages']) && is_array($conditions['pages'])) {
+                            $sanitized_config['conditions']['pages'] = array_map('absint', array_filter($conditions['pages']));
+                        }
+                        
+                        if (isset($conditions['post_types']) && is_array($conditions['post_types'])) {
+                            $sanitized_config['conditions']['post_types'] = array_map('sanitize_key', array_filter($conditions['post_types']));
+                        }
+                        
+                        if (isset($conditions['categories']) && is_array($conditions['categories'])) {
+                            $sanitized_config['conditions']['categories'] = array_map('absint', array_filter($conditions['categories']));
+                        }
+                        
+                        if (isset($conditions['user_roles']) && is_array($conditions['user_roles'])) {
+                            $sanitized_config['conditions']['user_roles'] = array_map('sanitize_key', array_filter($conditions['user_roles']));
+                        }
+                    }
+                    
+                    $sanitized['page_targeting']['configurations'][] = $sanitized_config;
+                }
+            }
+        }
+    }
+    
     return apply_filters('wpbnp_sanitize_settings', $sanitized, $settings);
 }
 
