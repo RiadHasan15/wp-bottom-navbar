@@ -1987,21 +1987,46 @@ jQuery(document).ready(function ($) {
                 console.log('Configuration added successfully');
                 console.log('Total configs now:', $('.wpbnp-config-item').length);
 
-                // Populate all selectors in the new configuration
-                const $newConfig = $('.wpbnp-config-item').last();
+                // Add a small delay to ensure DOM is fully rendered
+                setTimeout(() => {
+                    // Populate all selectors in the new configuration
+                    const $newConfig = $('.wpbnp-config-item').last();
 
                 // Populate custom presets
                 const newPresetSelector = $newConfig.find('.wpbnp-preset-selector');
                 console.log('New preset selector found:', newPresetSelector.length);
                 this.populatePresetSelector(newPresetSelector);
 
-                // Populate pages selector
-                const pagesSelector = $newConfig.find('select[name*="pages"]');
+                // Debug: Log the entire new config HTML
+                console.log('New config HTML:', $newConfig.html());
+                
+                // Populate pages selector - try multiple selector approaches
+                let pagesSelector = $newConfig.find('select[name*="pages"]');
+                if (!pagesSelector.length) {
+                    pagesSelector = $newConfig.find('select').filter(function() {
+                        return $(this).attr('name') && $(this).attr('name').includes('pages');
+                    });
+                }
+                if (!pagesSelector.length) {
+                    pagesSelector = $newConfig.find('select').filter(function() {
+                        return $(this).attr('name') && $(this).attr('name').indexOf('pages') !== -1;
+                    });
+                }
                 console.log('Pages selector found:', pagesSelector.length, pagesSelector.attr('name'));
                 this.populatePagesSelector(pagesSelector, configIndex);
 
-                // Populate categories selector  
-                const categoriesSelector = $newConfig.find('select[name*="categories"]');
+                // Populate categories selector - try multiple selector approaches
+                let categoriesSelector = $newConfig.find('select[name*="categories"]');
+                if (!categoriesSelector.length) {
+                    categoriesSelector = $newConfig.find('select').filter(function() {
+                        return $(this).attr('name') && $(this).attr('name').includes('categories');
+                    });
+                }
+                if (!categoriesSelector.length) {
+                    categoriesSelector = $newConfig.find('select').filter(function() {
+                        return $(this).attr('name') && $(this).attr('name').indexOf('categories') !== -1;
+                    });
+                }
                 console.log('Categories selector found:', categoriesSelector.length, categoriesSelector.attr('name'));
                 this.populateCategoriesSelector(categoriesSelector, configIndex);
                 console.log('Selector population completed');
@@ -2010,6 +2035,7 @@ jQuery(document).ready(function ($) {
                 this.saveFormState();
 
                 this.showNotification('New configuration added!', 'success');
+                }, 100); // 100ms delay
             } catch (error) {
                 console.error('Error adding configuration:', error);
                 this.showNotification('Error adding configuration: ' + error.message, 'error');
