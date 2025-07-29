@@ -20,7 +20,8 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WPBNP_VERSION', '1.1.5');
+// NOTE: When merging with pro branch, use semantic versioning (e.g., 1.2.0)
+define('WPBNP_VERSION', '1.1.6'); // Ready for pro branch merge
 define('WPBNP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPBNP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WPBNP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -113,6 +114,7 @@ class WP_Bottom_Navigation_Pro {
         add_action('wp_ajax_nopriv_wpbnp_get_cart_count', array($this, 'get_cart_count'));
         
         // Pro feature AJAX handlers
+        // NOTE: When merging with pro branch, ensure these don't conflict with existing handlers
         add_action('wp_ajax_wpbnp_activate_license', array($this, 'activate_license'));
         add_action('wp_ajax_wpbnp_deactivate_license', array($this, 'deactivate_license'));
         
