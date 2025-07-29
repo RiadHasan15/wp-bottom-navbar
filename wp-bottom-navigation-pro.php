@@ -984,18 +984,27 @@ class WP_Bottom_Navigation_Pro {
      * Save settings via AJAX
      */
     public function save_settings() {
+        error_log('WPBNP: Save settings called');
+        
         check_ajax_referer('wpbnp_admin_nonce', 'nonce');
         
         if (!current_user_can('manage_options')) {
             wp_die(__('Insufficient permissions', 'wp-bottom-navigation-pro'));
         }
         
+        error_log('WPBNP: POST data received: ' . print_r($_POST, true));
+        
         $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array();
+        error_log('WPBNP: Settings from POST: ' . print_r($settings, true));
         
         // CRITICAL: Handle custom presets data from form submission
         if (isset($_POST['wpbnp_custom_presets_data'])) {
+            error_log('WPBNP: Custom presets data found in POST');
             $custom_presets_data = wp_unslash($_POST['wpbnp_custom_presets_data']);
+            error_log('WPBNP: Raw custom presets data: ' . $custom_presets_data);
+            
             $custom_presets = json_decode($custom_presets_data, true);
+            error_log('WPBNP: Decoded custom presets: ' . print_r($custom_presets, true));
             
             if (json_last_error() === JSON_ERROR_NONE && is_array($custom_presets)) {
                 // Ensure custom_presets structure exists
@@ -1006,22 +1015,33 @@ class WP_Bottom_Navigation_Pro {
                 $settings['custom_presets']['enabled'] = true;
                 
                 error_log('WPBNP: Custom presets data saved: ' . count($custom_presets) . ' presets');
+                error_log('WPBNP: Settings after adding custom presets: ' . print_r($settings, true));
             } else {
                 error_log('WPBNP: Error parsing custom presets data: ' . json_last_error_msg());
             }
+        } else {
+            error_log('WPBNP: No custom presets data found in POST');
         }
         
+        error_log('WPBNP: About to sanitize settings');
         $sanitized_settings = wpbnp_sanitize_settings($settings);
+        error_log('WPBNP: Settings after sanitization: ' . print_r($sanitized_settings, true));
         
+        error_log('WPBNP: About to update option');
         update_option('wpbnp_settings', $sanitized_settings);
+        error_log('WPBNP: Option updated successfully');
         
         // Get the complete updated settings
         $updated_settings = wpbnp_get_settings();
+        error_log('WPBNP: Retrieved updated settings: ' . print_r($updated_settings, true));
         
-        wp_send_json_success(array(
+        $response_data = array(
             'message' => __('Settings saved successfully!', 'wp-bottom-navigation-pro'),
             'settings' => $updated_settings
-        ));
+        );
+        
+        error_log('WPBNP: Sending response: ' . print_r($response_data, true));
+        wp_send_json_success($response_data);
     }
     
     /**
