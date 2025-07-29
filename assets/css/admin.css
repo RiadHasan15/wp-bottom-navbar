@@ -1818,6 +1818,7 @@ input:checked + .wpbnp-toggle-slider:before {
     will-change: opacity, visibility;
     /* Override any parent container styles */
     overflow: visible !important;
+    pointer-events: none;
 }
 
 #wpbnp-create-preset-modal.wpbnp-modal-show,
@@ -1826,17 +1827,19 @@ input:checked + .wpbnp-toggle-slider:before {
     visibility: visible;
     /* Ensure modal is properly positioned when shown */
     transform: translateZ(0);
+    pointer-events: auto;
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal,
 #wpbnp-edit-preset-modal .wpbnp-modal {
-    background: white;
+    background: white !important;
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     max-width: 600px;
     width: 90%;
     max-height: 80vh;
-    overflow: hidden;
+    min-height: 400px;
+    overflow: visible !important;
     transform: scale(0.9);
     transition: transform 0.3s ease;
     position: relative;
@@ -1844,11 +1847,14 @@ input:checked + .wpbnp-toggle-slider:before {
     /* Ensure modal is not clipped */
     transform-origin: center center;
     border: 1px solid #e1e5e9;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 #wpbnp-create-preset-modal.wpbnp-modal-show .wpbnp-modal,
 #wpbnp-edit-preset-modal.wpbnp-modal-show .wpbnp-modal {
     transform: scale(1) translateZ(0);
+    pointer-events: auto;
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal-header,
@@ -1860,6 +1866,8 @@ input:checked + .wpbnp-toggle-slider:before {
     justify-content: space-between !important;
     align-items: center !important;
     flex-direction: row !important;
+    flex-shrink: 0 !important;
+    min-height: 60px !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal-header h3,
@@ -1869,6 +1877,9 @@ input:checked + .wpbnp-toggle-slider:before {
     font-weight: 600;
     flex: 1;
     text-align: left;
+    color: white !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal-close,
@@ -1888,6 +1899,8 @@ input:checked + .wpbnp-toggle-slider:before {
     transition: background 0.2s ease;
     flex-shrink: 0;
     margin-left: auto;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal-close:hover,
@@ -1897,27 +1910,55 @@ input:checked + .wpbnp-toggle-slider:before {
 
 #wpbnp-create-preset-modal .wpbnp-modal-body,
 #wpbnp-edit-preset-modal .wpbnp-modal-body {
-    padding: 30px;
-    max-height: 60vh;
-    overflow-y: auto;
-    background: #fafbfc;
+    padding: 30px !important;
+    max-height: 60vh !important;
+    min-height: 200px !important;
+    overflow-y: auto !important;
+    background: #fafbfc !important;
+    flex: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    border: 2px solid red !important; /* Debug border */
 }
 
 #wpbnp-create-preset-modal .wpbnp-form-group,
 #wpbnp-edit-preset-modal .wpbnp-form-group {
-    margin-bottom: 25px;
-    background: white;
-    padding: 20px;
+    margin-bottom: 25px !important;
+    background: white !important;
+    padding: 20px !important;
     border-radius: 8px;
     border: 1px solid #e1e5e9;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 2 !important;
+    border: 2px solid blue !important; /* Debug border */
 }
 
 #wpbnp-create-preset-modal .wpbnp-form-group label,
 #wpbnp-edit-preset-modal .wpbnp-form-group label {
-    display: block;
-    margin-bottom: 8px;
+    display: block !important;
+    margin-bottom: 8px !important;
     font-weight: 600;
-    color: #333;
+    color: #333 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure the form is visible */
+#wpbnp-create-preset-modal #wpbnp-create-preset-form,
+#wpbnp-edit-preset-modal #wpbnp-edit-preset-form {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 3 !important;
+    width: 100% !important;
+    border: 2px solid green !important; /* Debug border */
 }
 
 #wpbnp-create-preset-modal .wpbnp-form-group input[type="text"],
@@ -1933,6 +1974,8 @@ input:checked + .wpbnp-toggle-slider:before {
     box-sizing: border-box !important;
     display: block !important;
     min-width: 300px;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-form-group input[type="text"]:focus,
@@ -1950,6 +1993,8 @@ input:checked + .wpbnp-toggle-slider:before {
     margin-top: 6px;
     color: #666;
     font-size: 12px;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-current-items-preview,
@@ -1958,6 +2003,8 @@ input:checked + .wpbnp-toggle-slider:before {
     border: 2px solid #e9ecef;
     border-radius: 8px;
     padding: 16px;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-items-count,
@@ -1968,6 +2015,8 @@ input:checked + .wpbnp-toggle-slider:before {
     margin-bottom: 12px;
     font-weight: 600;
     color: #333;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-count-badge,
@@ -1979,18 +2028,19 @@ input:checked + .wpbnp-toggle-slider:before {
     font-size: 12px;
     font-weight: bold;
     min-width: 20px;
-    text-align: center;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-count-badge.wpbnp-count-empty,
 #wpbnp-edit-preset-modal .wpbnp-count-badge.wpbnp-count-empty {
-    background: #dc3545;
+    background: #6c757d;
 }
 
 #wpbnp-create-preset-modal .wpbnp-count-badge.wpbnp-count-warning,
 #wpbnp-edit-preset-modal .wpbnp-count-badge.wpbnp-count-warning {
     background: #ffc107;
-    color: #333;
+    color: #212529;
 }
 
 #wpbnp-create-preset-modal .wpbnp-items-list,
@@ -2000,6 +2050,8 @@ input:checked + .wpbnp-toggle-slider:before {
     gap: 8px;
     max-height: 200px;
     overflow-y: auto;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-preview-item,
@@ -2007,17 +2059,19 @@ input:checked + .wpbnp-toggle-slider:before {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 12px;
+    padding: 12px;
     background: white;
-    border-radius: 6px;
     border: 1px solid #e9ecef;
+    border-radius: 6px;
     transition: all 0.2s ease;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-preview-item:hover,
 #wpbnp-edit-preset-modal .wpbnp-preview-item:hover {
+    background: #f8f9fa;
     border-color: #667eea;
-    background: #f8f9ff;
 }
 
 #wpbnp-create-preset-modal .wpbnp-preview-item.wpbnp-disabled,
@@ -2028,16 +2082,23 @@ input:checked + .wpbnp-toggle-slider:before {
 
 #wpbnp-create-preset-modal .wpbnp-item-icon,
 #wpbnp-edit-preset-modal .wpbnp-item-icon {
-    font-size: 16px;
-    width: 20px;
-    text-align: center;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-item-label,
 #wpbnp-edit-preset-modal .wpbnp-item-label {
     flex: 1;
-    font-size: 14px;
+    font-weight: 500;
     color: #333;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-disabled-badge,
@@ -2048,22 +2109,28 @@ input:checked + .wpbnp-toggle-slider:before {
     border-radius: 4px;
     font-size: 10px;
     font-weight: bold;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-preset-info-display,
 #wpbnp-edit-preset-modal .wpbnp-preset-info-display {
-    background: white;
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
     border-radius: 6px;
     padding: 12px;
-    margin-top: 8px;
-    border: 1px solid #e9ecef;
+    margin-top: 16px;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-preset-info-display p,
 #wpbnp-edit-preset-modal .wpbnp-preset-info-display p {
     margin: 0 0 8px 0;
     font-size: 13px;
-    color: #333;
+    color: #1976d2;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-preset-info-display p:last-child,
@@ -2073,8 +2140,9 @@ input:checked + .wpbnp-toggle-slider:before {
 
 #wpbnp-create-preset-modal .wpbnp-preset-info-display strong,
 #wpbnp-edit-preset-modal .wpbnp-preset-info-display strong {
-    color: #667eea;
     font-weight: 600;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-checkbox-group,
@@ -2082,10 +2150,12 @@ input:checked + .wpbnp-toggle-slider:before {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 12px;
+    padding: 16px;
     background: #f8f9fa;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid #e9ecef;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-checkbox-group label,
@@ -2093,16 +2163,20 @@ input:checked + .wpbnp-toggle-slider:before {
     display: flex;
     align-items: flex-start;
     gap: 8px;
+    font-weight: 500;
+    color: #333;
     cursor: pointer;
     margin: 0;
-    font-weight: normal;
-    color: #333;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-checkbox-group input[type="checkbox"],
 #wpbnp-edit-preset-modal .wpbnp-checkbox-group input[type="checkbox"] {
     margin: 0;
     margin-top: 2px;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal-footer,
@@ -2114,6 +2188,10 @@ input:checked + .wpbnp-toggle-slider:before {
     justify-content: flex-end;
     gap: 15px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0 !important;
+    min-height: 60px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-btn,
@@ -2130,6 +2208,8 @@ input:checked + .wpbnp-toggle-slider:before {
     gap: 8px;
     min-width: 80px;
     justify-content: center;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 #wpbnp-create-preset-modal .wpbnp-btn:disabled,
