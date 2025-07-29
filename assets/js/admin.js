@@ -1724,7 +1724,7 @@ jQuery(document).ready(function($) {
                 console.log('Add configuration button clicked');
                 console.log('Button element:', this);
                 console.log('Configurations list exists:', $('#wpbnp-configurations-list').length > 0);
-                alert('Add Configuration button clicked!'); // Temporary debug
+                // alert('Add Configuration button clicked!'); // Temporary debug
                 WPBottomNavAdmin.addPageTargetingConfig();
             });
             
@@ -1766,11 +1766,13 @@ jQuery(document).ready(function($) {
                             <span class="wpbnp-config-priority">Priority: 1</span>
                         </div>
                         <div class="wpbnp-config-actions">
-                            <button type="button" class="wpbnp-config-toggle">
+                            <button type="button" class="wpbnp-config-toggle" title="Toggle Configuration">
                                 <span class="dashicons dashicons-arrow-down"></span>
+                                <span class="wpbnp-fallback-text" style="display: none;">▼</span>
                             </button>
-                            <button type="button" class="wpbnp-config-delete">
+                            <button type="button" class="wpbnp-config-delete" title="Delete Configuration">
                                 <span class="dashicons dashicons-trash"></span>
+                                <span class="wpbnp-fallback-text" style="display: none;">🗑</span>
                             </button>
                         </div>
                     </div>
@@ -1853,11 +1855,45 @@ jQuery(document).ready(function($) {
                 $('#wpbnp-configurations-list').append(configHtml);
                 console.log('Configuration added successfully');
                 console.log('Total configs now:', $('.wpbnp-config-item').length);
+                
+                // Check if dashicons loaded, if not show fallback
+                setTimeout(() => {
+                    this.checkDashiconsLoaded();
+                }, 100);
+                
                 this.showNotification('New configuration added!', 'success');
             } catch (error) {
                 console.error('Error adding configuration:', error);
                 this.showNotification('Error adding configuration: ' + error.message, 'error');
             }
+        },
+        
+        // Check if dashicons loaded properly
+        checkDashiconsLoaded: function() {
+            $('.wpbnp-config-toggle, .wpbnp-config-delete').each(function() {
+                const $button = $(this);
+                const $dashicon = $button.find('.dashicons');
+                const $fallback = $button.find('.wpbnp-fallback-text');
+                
+                if ($dashicon.length && $fallback.length) {
+                    // Check if dashicons font is loaded by measuring width
+                    const testElement = $('<span class="dashicons" style="position:absolute;visibility:hidden;font-size:16px;">test</span>');
+                    $('body').append(testElement);
+                    const dashiconWidth = testElement.width();
+                    testElement.remove();
+                    
+                    // If dashicons didn't load properly, show fallback
+                    if (dashiconWidth < 10) {
+                        console.log('Dashicons not loaded, showing fallback');
+                        $dashicon.hide();
+                        $fallback.show();
+                    } else {
+                        console.log('Dashicons loaded successfully');
+                        $dashicon.show();
+                        $fallback.hide();
+                    }
+                }
+            });
         },
         
         // Reindex configurations after deletion
@@ -1878,11 +1914,16 @@ jQuery(document).ready(function($) {
         }
     };
     
-    // Initialize admin
-    WPBottomNavAdmin.init();
-    
-    // Initialize pro features
-    WPBottomNavAdmin.initProFeatures();
+            // Initialize admin
+        WPBottomNavAdmin.init();
+        
+        // Initialize pro features
+        WPBottomNavAdmin.initProFeatures();
+        
+        // Check dashicons after page load
+        setTimeout(() => {
+            WPBottomNavAdmin.checkDashiconsLoaded();
+        }, 500);
     
     // Handle file import when file is selected
     $('#wpbnp-import-file').on('change', function(e) {

@@ -1352,6 +1352,34 @@ input:checked + .wpbnp-toggle-slider:before {
     width: 16px;
     height: 16px;
     line-height: 1;
+    font-family: dashicons !important;
+    text-decoration: none !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    vertical-align: top !important;
+    text-align: center !important;
+    -webkit-transition: color .1s ease-in 0 !important;
+    transition: color .1s ease-in 0 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Fallback if dashicons don't load */
+.wpbnp-config-toggle .dashicons:before {
+    content: "▼" !important;
+}
+
+.wpbnp-config-delete .dashicons:before {
+    content: "🗑" !important;
+}
+
+/* Override with proper dashicons if loaded */
+.wpbnp-config-toggle .dashicons-arrow-down:before {
+    content: "\f140" !important;
+}
+
+.wpbnp-config-delete .dashicons-trash:before {
+    content: "\f182" !important;
 }
 
 .wpbnp-config-toggle:hover {
