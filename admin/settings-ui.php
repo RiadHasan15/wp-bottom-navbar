@@ -827,13 +827,78 @@ class WPBNP_Admin_UI {
      */
     private function render_page_selector($conditions, $index) {
         $selected_pages = isset($conditions['pages']) ? $conditions['pages'] : array();
-        $pages = get_pages();
+        $pages = get_pages(array(
+            'sort_order' => 'ASC',
+            'sort_column' => 'post_title',
+            'hierarchical' => 1,
+            'exclude' => '',
+            'include' => '',
+            'meta_key' => '',
+            'meta_value' => '',
+            'authors' => '',
+            'child_of' => 0,
+            'parent' => -1,
+            'exclude_tree' => '',
+            'number' => '',
+            'offset' => 0,
+            'post_type' => 'page',
+            'post_status' => 'publish'
+        ));
+        
+        // Debug information
+        error_log('WPBNP: Pages found: ' . count($pages));
+        
+        // If no pages found, try to get posts as well for testing
+        if (empty($pages)) {
+            $posts = get_posts(array(
+                'post_type' => 'page',
+                'post_status' => 'publish',
+                'numberposts' => -1
+            ));
+            error_log('WPBNP: Posts found as fallback: ' . count($posts));
+            $pages = $posts;
+        }
+        
+        // If still no pages, create some test pages
+        if (empty($pages) && current_user_can('edit_pages')) {
+            $test_pages = array(
+                'Home' => 'Welcome to our homepage',
+                'About' => 'Learn more about us',
+                'Contact' => 'Get in touch with us',
+                'Services' => 'Our services and offerings'
+            );
+            
+            foreach ($test_pages as $title => $content) {
+                // Check if page already exists
+                $existing = get_page_by_title($title);
+                if (!$existing) {
+                    $page_id = wp_insert_post(array(
+                        'post_title' => $title,
+                        'post_content' => $content,
+                        'post_status' => 'publish',
+                        'post_type' => 'page',
+                        'post_author' => get_current_user_id()
+                    ));
+                    if ($page_id && !is_wp_error($page_id)) {
+                        error_log('WPBNP: Created test page: ' . $title . ' (ID: ' . $page_id . ')');
+                    }
+                }
+            }
+            
+            // Refresh the pages list
+            $pages = get_pages(array(
+                'sort_order' => 'ASC',
+                'sort_column' => 'post_title',
+                'post_status' => 'publish'
+            ));
+            error_log('WPBNP: Pages after creating test pages: ' . count($pages));
+        }
         
         ?>
         <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
             <option value=""><?php esc_html_e('Select pages...', 'wp-bottom-navigation-pro'); ?></option>
             <?php if (empty($pages)): ?>
-                <option value="" disabled><?php esc_html_e('No pages found', 'wp-bottom-navigation-pro'); ?></option>
+                <option value="" disabled><?php esc_html_e('No pages found - Create some pages first', 'wp-bottom-navigation-pro'); ?></option>
             <?php else: ?>
                 <?php foreach ($pages as $page): ?>
                     <option value="<?php echo esc_attr($page->ID); ?>" <?php selected(in_array($page->ID, $selected_pages)); ?>>
