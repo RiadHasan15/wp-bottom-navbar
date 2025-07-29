@@ -1843,8 +1843,12 @@ jQuery(document).ready(function($) {
                             <div class="wpbnp-navigation-config">
                                 <h4>Navigation Configuration</h4>
                                 <div class="wpbnp-field">
-                                    <label>Navigation Items</label>
-                                    <p class="description">This configuration will use the items defined in the main Items tab with the conditions above.</p>
+                                    <label>Preset to Display</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][preset_id]" class="wpbnp-preset-selector">
+                                        <option value="default">Default Navigation (Items Tab)</option>
+                                        <!-- Custom presets will be populated by JavaScript -->
+                                    </select>
+                                    <p class="description">Choose which navigation preset to display when the conditions above are met.</p>
                                 </div>
                             </div>
                         </div>
@@ -1864,7 +1868,8 @@ jQuery(document).ready(function($) {
                 console.log('Configuration added successfully');
                 console.log('Total configs now:', $('.wpbnp-config-item').length);
                 
-                // Icons are now using Unicode, no need to check dashicons
+                // Populate custom presets in the new configuration
+                this.populatePresetSelector($('.wpbnp-config-item').last().find('.wpbnp-preset-selector'));
                 
                 this.showNotification('New configuration added!', 'success');
             } catch (error) {
@@ -1930,6 +1935,7 @@ jQuery(document).ready(function($) {
             };
             
             this.addPresetToDOM(newPreset);
+            this.updateAllPresetSelectors();
             this.showNotification(`Custom preset "${presetName}" created successfully!`, 'success');
         },
         
@@ -2038,6 +2044,7 @@ jQuery(document).ready(function($) {
                 presetItem.find('input[name*="[description]"]').val('');
             }
             
+            this.updateAllPresetSelectors();
             this.showNotification(`Preset "${newName}" updated successfully!`, 'success');
         },
         
@@ -2057,6 +2064,7 @@ jQuery(document).ready(function($) {
             };
             
             this.addPresetToDOM(newPreset);
+            this.updateAllPresetSelectors();
             this.showNotification(`Preset "${newPreset.name}" created successfully!`, 'success');
         },
         
@@ -2081,9 +2089,73 @@ jQuery(document).ready(function($) {
                 if ($('.wpbnp-preset-item').length === 0) {
                     $('#wpbnp-custom-presets-list').html('<p class="wpbnp-no-presets">No custom presets created yet. Click "Create New Preset" to get started.</p>');
                 }
+                
+                // Update all preset selectors
+                WPBottomNavAdmin.updateAllPresetSelectors();
             });
             
             this.showNotification(`Preset "${presetName}" deleted successfully!`, 'success');
+        },
+        
+        // Populate preset selector with available custom presets
+        populatePresetSelector: function($selector) {
+            if (!$selector || $selector.length === 0) return;
+            
+            // Get custom presets from the page (if any)
+            const customPresets = this.getAvailableCustomPresets();
+            
+            // Clear existing options except default
+            $selector.find('option:not([value="default"])').remove();
+            
+            if (customPresets.length > 0) {
+                // Add optgroup for custom presets
+                let optgroupHtml = '<optgroup label="Custom Presets">';
+                customPresets.forEach(preset => {
+                    const itemCount = preset.items ? preset.items.length : 0;
+                    optgroupHtml += `<option value="${preset.id}">${preset.name} (${itemCount} items)</option>`;
+                });
+                optgroupHtml += '</optgroup>';
+                
+                $selector.append(optgroupHtml);
+            } else {
+                // Add disabled option when no presets available
+                $selector.append('<option value="" disabled>No custom presets available - Create some in the Items tab</option>');
+            }
+        },
+        
+        // Get available custom presets from the DOM
+        getAvailableCustomPresets: function() {
+            const presets = [];
+            
+            $('.wpbnp-preset-item').each(function() {
+                const $item = $(this);
+                const preset = {
+                    id: $item.data('preset-id'),
+                    name: $item.find('.wpbnp-preset-name').text(),
+                    items: []
+                };
+                
+                // Try to get items from hidden input
+                const itemsJson = $item.find('input[name*="[items]"]').val();
+                if (itemsJson) {
+                    try {
+                        preset.items = JSON.parse(itemsJson);
+                    } catch (e) {
+                        console.warn('Failed to parse preset items:', e);
+                    }
+                }
+                
+                presets.push(preset);
+            });
+            
+            return presets;
+        },
+        
+        // Update all preset selectors when presets change
+        updateAllPresetSelectors: function() {
+            $('.wpbnp-preset-selector').each((index, element) => {
+                this.populatePresetSelector($(element));
+            });
         },
 
         
@@ -2113,6 +2185,9 @@ jQuery(document).ready(function($) {
         
         // Initialize custom presets
         WPBottomNavAdmin.initCustomPresets();
+        
+        // Populate existing preset selectors
+        WPBottomNavAdmin.updateAllPresetSelectors();
         
         // Icons are now using Unicode, no need to check dashicons
     
