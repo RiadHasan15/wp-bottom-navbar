@@ -999,7 +999,6 @@ class WPBNP_Admin_UI {
         }
         
         ?>
-        <!-- DEBUG: Found <?php echo count($pages); ?> pages/posts -->
         <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
             <?php if (empty($pages)): ?>
                 <option value="" disabled><?php esc_html_e('No pages found - Create some pages first', 'wp-bottom-navigation-pro'); ?></option>

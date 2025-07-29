@@ -1846,10 +1846,6 @@ jQuery(document).ready(function ($) {
             // Page targeting configuration management
             $(document).on('click', '#wpbnp-add-config', function (e) {
                 e.preventDefault();
-                console.log('Add configuration button clicked');
-                console.log('Button element:', this);
-                console.log('Configurations list exists:', $('#wpbnp-configurations-list').length > 0);
-                // alert('Add Configuration button clicked!'); // Temporary debug
                 WPBottomNavAdmin.addPageTargetingConfig();
             });
 
@@ -1880,13 +1876,10 @@ jQuery(document).ready(function ($) {
 
         // Add new page targeting configuration
         addPageTargetingConfig: function () {
-            console.log('addPageTargetingConfig function called');
-
             try {
                 const existingConfigs = $('.wpbnp-config-item').length;
-                const configIndex = existingConfigs; // This will be the correct index for the new config
+                const configIndex = existingConfigs;
                 const configId = 'config_' + Date.now();
-                console.log('Existing configs:', existingConfigs, 'New config index:', configIndex, 'Config ID:', configId);
 
                 const configHtml = `
                 <div class="wpbnp-config-item" data-config-id="${configId}">
@@ -1982,71 +1975,27 @@ jQuery(document).ready(function ($) {
                     $('.wpbnp-no-configs').remove();
                 }
 
-                console.log('Appending config HTML to:', $('#wpbnp-configurations-list'));
-                console.log('Config HTML:', configHtml);
                 $('#wpbnp-configurations-list').append(configHtml);
-                console.log('Configuration added successfully');
-                console.log('Total configs now:', $('.wpbnp-config-item').length);
 
-                // Add a small delay to ensure DOM is fully rendered
-                setTimeout(() => {
-                    // Populate all selectors in the new configuration
-                    const $newConfig = $('.wpbnp-config-item').last();
+                // Populate all selectors in the new configuration
+                const $newConfig = $('.wpbnp-config-item').last();
 
                 // Populate custom presets
                 const newPresetSelector = $newConfig.find('.wpbnp-preset-selector');
-                console.log('New preset selector found:', newPresetSelector.length);
                 this.populatePresetSelector(newPresetSelector);
 
-                // Debug: Log the entire new config HTML
-                console.log('New config HTML:', $newConfig.html());
-                console.log('All selects in new config:', $newConfig.find('select').length);
-                $newConfig.find('select').each(function(i, el) {
-                    console.log('Select', i, 'name:', $(el).attr('name'));
-                });
-                
-                // Populate pages selector - try multiple selector approaches
-                let pagesSelector = $newConfig.find('select[name*="pages"]');
-                console.log('Direct pages selector found:', pagesSelector.length);
-                if (!pagesSelector.length) {
-                    pagesSelector = $newConfig.find('select').filter(function() {
-                        return $(this).attr('name') && $(this).attr('name').includes('pages');
-                    });
-                    console.log('Filtered pages selector found:', pagesSelector.length);
-                }
-                if (!pagesSelector.length) {
-                    pagesSelector = $newConfig.find('select').filter(function() {
-                        return $(this).attr('name') && $(this).attr('name').indexOf('pages') !== -1;
-                    });
-                    console.log('IndexOf pages selector found:', pagesSelector.length);
-                }
-                console.log('Final pages selector found:', pagesSelector.length, pagesSelector.attr('name'));
+                // Populate pages selector
+                const pagesSelector = $newConfig.find('select[name*="pages"]');
                 this.populatePagesSelector(pagesSelector, configIndex);
 
-                // Populate categories selector - try multiple selector approaches
-                let categoriesSelector = $newConfig.find('select[name*="categories"]');
-                console.log('Direct categories selector found:', categoriesSelector.length);
-                if (!categoriesSelector.length) {
-                    categoriesSelector = $newConfig.find('select').filter(function() {
-                        return $(this).attr('name') && $(this).attr('name').includes('categories');
-                    });
-                    console.log('Filtered categories selector found:', categoriesSelector.length);
-                }
-                if (!categoriesSelector.length) {
-                    categoriesSelector = $newConfig.find('select').filter(function() {
-                        return $(this).attr('name') && $(this).attr('name').indexOf('categories') !== -1;
-                    });
-                    console.log('IndexOf categories selector found:', categoriesSelector.length);
-                }
-                console.log('Final categories selector found:', categoriesSelector.length, categoriesSelector.attr('name'));
+                // Populate categories selector  
+                const categoriesSelector = $newConfig.find('select[name*="categories"]');
                 this.populateCategoriesSelector(categoriesSelector, configIndex);
-                console.log('Selector population completed');
 
                 // Save form state to preserve the new configuration
                 this.saveFormState();
 
                 this.showNotification('New configuration added!', 'success');
-                }, 100); // 100ms delay
             } catch (error) {
                 console.error('Error adding configuration:', error);
                 this.showNotification('Error adding configuration: ' + error.message, 'error');
@@ -3121,12 +3070,8 @@ jQuery(document).ready(function ($) {
         // Populate pages selector for new configurations
         populatePagesSelector: function ($selector, configIndex) {
             if (!$selector || !$selector.length) {
-                console.error('Pages selector not found for config', configIndex);
                 return;
             }
-
-            console.log('Populating pages selector for config', configIndex);
-            console.log('Selector found:', $selector.length);
 
             // Make AJAX call to get pages
             $.ajax({
@@ -3137,7 +3082,6 @@ jQuery(document).ready(function ($) {
                     nonce: wpbnp_admin.nonce
                 },
                 success: function (response) {
-                    console.log('Pages AJAX response:', response);
                     if (response.success && response.data.pages) {
                         $selector.empty();
                         $selector.append('<option value="">Select pages...</option>');
@@ -3145,16 +3089,11 @@ jQuery(document).ready(function ($) {
                         response.data.pages.forEach(function (page) {
                             $selector.append(`<option value="${page.ID}">${page.post_title}</option>`);
                         });
-
-                        console.log('Pages populated:', response.data.pages.length);
                     } else {
-                        console.log('No pages found in response');
                         $selector.html('<option value="" disabled>No pages found - Create some pages first</option>');
                     }
                 },
-                error: function (xhr, status, error) {
-                    console.error('Pages AJAX error:', status, error);
-                    console.error('Response:', xhr.responseText);
+                error: function () {
                     $selector.html('<option value="" disabled>Error loading pages</option>');
                 }
             });
@@ -3163,12 +3102,8 @@ jQuery(document).ready(function ($) {
         // Populate categories selector for new configurations
         populateCategoriesSelector: function ($selector, configIndex) {
             if (!$selector || !$selector.length) {
-                console.error('Categories selector not found for config', configIndex);
                 return;
             }
-
-            console.log('Populating categories selector for config', configIndex);
-            console.log('Selector found:', $selector.length);
 
             // Make AJAX call to get categories
             $.ajax({
@@ -3179,7 +3114,6 @@ jQuery(document).ready(function ($) {
                     nonce: wpbnp_admin.nonce
                 },
                 success: function (response) {
-                    console.log('Categories AJAX response:', response);
                     if (response.success && response.data.categories) {
                         $selector.empty();
                         $selector.append('<option value="">Select categories...</option>');
@@ -3187,16 +3121,11 @@ jQuery(document).ready(function ($) {
                         response.data.categories.forEach(function (category) {
                             $selector.append(`<option value="${category.term_id}">${category.name}</option>`);
                         });
-
-                        console.log('Categories populated:', response.data.categories.length);
                     } else {
-                        console.log('No categories found in response');
                         $selector.html('<option value="" disabled>No categories found</option>');
                     }
                 },
-                error: function (xhr, status, error) {
-                    console.error('Categories AJAX error:', status, error);
-                    console.error('Response:', xhr.responseText);
+                error: function () {
                     $selector.html('<option value="" disabled>Error loading categories</option>');
                 }
             });
