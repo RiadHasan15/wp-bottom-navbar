@@ -1986,15 +1986,25 @@ jQuery(document).ready(function ($) {
                     this.populatePresetSelector(newPresetSelector);
                 }
 
-                // Populate pages selector
-                const pagesSelector = $newConfig.find('select[name*="pages"]');
+                // Populate pages selector - try multiple selector approaches
+                let pagesSelector = $newConfig.find('select[name*="pages"]');
+                if (!pagesSelector.length) {
+                    pagesSelector = $newConfig.find('select').filter(function() {
+                        return $(this).attr('name') && $(this).attr('name').includes('pages');
+                    });
+                }
                 console.log('Pages selector found:', pagesSelector.length, 'Name:', pagesSelector.attr('name'));
                 if (pagesSelector.length > 0) {
                     this.populatePagesSelector(pagesSelector, configIndex);
                 }
 
-                // Populate categories selector  
-                const categoriesSelector = $newConfig.find('select[name*="categories"]');
+                // Populate categories selector - try multiple selector approaches
+                let categoriesSelector = $newConfig.find('select[name*="categories"]');
+                if (!categoriesSelector.length) {
+                    categoriesSelector = $newConfig.find('select').filter(function() {
+                        return $(this).attr('name') && $(this).attr('name').includes('categories');
+                    });
+                }
                 console.log('Categories selector found:', categoriesSelector.length, 'Name:', categoriesSelector.attr('name'));
                 if (categoriesSelector.length > 0) {
                     this.populateCategoriesSelector(categoriesSelector, configIndex);
