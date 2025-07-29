@@ -320,14 +320,18 @@ jQuery(document).ready(function($) {
         bindEvents: function() {
             // Tab switching
             $(document).on('click', '.wpbnp-tab', function(e) {
-                e.preventDefault();
-                
-                // CRITICAL: Save form state before switching tabs to preserve custom presets
+                // Save form state before switching tabs to preserve custom presets
                 WPBottomNavAdmin.saveFormState();
                 console.log('Form state saved before tab switch');
                 
-                const targetTab = $(this).attr('href').split('=')[1];
-                WPBottomNavAdmin.switchTab(targetTab);
+                // Small delay to ensure state is saved before navigation
+                setTimeout(() => {
+                    console.log('Navigating to:', this.href);
+                    window.location.href = this.href;
+                }, 50);
+                
+                // Prevent immediate navigation to allow state saving
+                e.preventDefault();
             });
             
             // Form submission
@@ -371,8 +375,7 @@ jQuery(document).ready(function($) {
             $(document).on('click', '.wpbnp-import-settings', this.importSettings.bind(this));
             $(document).on('click', '.wpbnp-reset-settings', this.resetSettings.bind(this));
             
-            // Handle tab switching with state preservation
-            $(document).on('click', '.wpbnp-tab', this.handleTabSwitch.bind(this));
+
             
             // Auto-save form state when any field changes (CRITICAL for Enable Bottom Navigation)
             $(document).on('change input', '#wpbnp-settings-form input, #wpbnp-settings-form select, #wpbnp-settings-form textarea', this.debounce(() => {
@@ -417,35 +420,7 @@ jQuery(document).ready(function($) {
             };
         },
         
-        // Handle tab switching while preserving form state
-        handleTabSwitch: function(e) {
-            console.log('Tab switch triggered:', e.target, e.currentTarget);
-            
-            // Get the actual tab link (might be e.target or its parent)
-            const tabLink = $(e.target).closest('.wpbnp-tab')[0];
-            const targetHref = tabLink ? tabLink.href : null;
-            
-            console.log('Tab link found:', tabLink, 'href:', targetHref);
-            
-            // Only proceed if we have a valid href
-            if (!targetHref) {
-                console.warn('Tab click without valid href, ignoring');
-                return;
-            }
-            
-            // Save current form state before switching tabs
-            this.saveFormState();
-            
-            // Small delay to ensure state is saved before navigation
-            setTimeout(() => {
-                console.log('Navigating to:', targetHref);
-                // Let the navigation proceed
-                window.location.href = targetHref;
-            }, 50);
-            
-            // Prevent immediate navigation to allow state saving
-            e.preventDefault();
-        },
+
         
         // Save current form state to localStorage
         saveFormState: function() {
