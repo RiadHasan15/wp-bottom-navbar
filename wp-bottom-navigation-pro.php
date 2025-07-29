@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WPBNP_VERSION', '1.1.1');
+define('WPBNP_VERSION', '1.1.2');
 define('WPBNP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPBNP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WPBNP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -1140,21 +1140,28 @@ class WP_Bottom_Navigation_Pro {
      * Activate pro license
      */
     public function activate_license() {
+        // Log that the function is being called
+        error_log('WPBNP: License activation function called');
+        
         // Verify nonce
         if (!check_ajax_referer('wpbnp_admin_nonce', 'nonce', false)) {
+            error_log('WPBNP: Nonce verification failed');
             wp_send_json_error(array('message' => 'Security check failed'));
             return;
         }
         
         // Check user capabilities
         if (!current_user_can('manage_options')) {
+            error_log('WPBNP: User capabilities check failed');
             wp_send_json_error(array('message' => 'Insufficient permissions'));
             return;
         }
         
         $license_key = sanitize_text_field(wp_unslash($_POST['license_key'] ?? ''));
+        error_log('WPBNP: License key received: ' . $license_key);
         
         if (empty($license_key)) {
+            error_log('WPBNP: Empty license key');
             wp_send_json_error(array('message' => 'License key is required'));
             return;
         }
@@ -1162,6 +1169,7 @@ class WP_Bottom_Navigation_Pro {
         // For demo purposes, we'll accept any non-empty license key
         // In a real implementation, you would validate against your license server
         $is_valid = $this->validate_license_key($license_key);
+        error_log('WPBNP: License validation result: ' . ($is_valid ? 'valid' : 'invalid'));
         
         if ($is_valid) {
             update_option('wpbnp_pro_license_key', $license_key);
@@ -1173,11 +1181,14 @@ class WP_Bottom_Navigation_Pro {
             $settings['page_targeting']['enabled'] = true;
             update_option('wpbnp_settings', $settings);
             
+            error_log('WPBNP: License activated successfully');
             wp_send_json_success(array(
                 'message' => 'License activated successfully!',
-                'license_key' => $license_key
+                'license_key' => $license_key,
+                'debug' => 'License activation completed'
             ));
         } else {
+            error_log('WPBNP: License validation failed');
             wp_send_json_error(array('message' => 'Invalid license key. Please use a key with at least 10 characters containing both letters and numbers.'));
         }
     }
