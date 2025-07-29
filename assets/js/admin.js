@@ -331,16 +331,16 @@ jQuery(document).ready(function($) {
             });
             
             // Form submission
-            $('#wpbnp-settings-form').on('submit', this.handleFormSubmit);
+            $('#wpbnp-settings-form').on('submit', this.handleFormSubmit.bind(this));
             
             // Reset button
-            $('#wpbnp-reset-settings').on('click', this.handleReset);
+            $('#wpbnp-reset-settings').on('click', this.resetSettings.bind(this));
             
             // Export button
-            $('#wpbnp-export-settings').on('click', this.handleExport);
+            $('#wpbnp-export-settings').on('click', this.exportSettings.bind(this));
             
             // Import button
-            $('#wpbnp-import-settings').on('click', this.handleImport);
+            $('#wpbnp-import-settings').on('click', this.importSettings.bind(this));
             
             // License activation from custom presets section
             $(document).on('click', '#wpbnp-activate-license-presets', function(e) {
@@ -675,78 +675,92 @@ jQuery(document).ready(function($) {
         
         // Handle form submission
         handleFormSubmit: function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            
-            // Critical fix: Ensure unchecked checkboxes are handled properly
-            // FormData doesn't include unchecked checkboxes, so we need to explicitly add them
-            $('#wpbnp-settings-form input[type="checkbox"]').each(function() {
-                const checkbox = $(this);
-                const name = checkbox.attr('name');
-                if (name && !checkbox.is(':checked')) {
-                    formData.append(name, '0');
-                }
-            });
-            
-            // CRITICAL: Ensure custom presets data is included in form submission
-            const customPresets = this.getCustomPresetsData();
-            if (customPresets.length > 0) {
-                formData.append('wpbnp_custom_presets_data', JSON.stringify(customPresets));
-                console.log('Including custom presets data in form submission:', customPresets);
-            }
-            
-            // Ensure action and nonce are included
-            formData.append('action', 'wpbnp_save_settings');
-            formData.append('nonce', this.nonce);
-            
-            const submitBtn = $('#wpbnp-save-settings');
-            const originalText = submitBtn.text();
-            
-            submitBtn.prop('disabled', true).text(wpbnp_admin.strings.saving || 'Saving...');
-            
-            $.ajax({
-                url: wpbnp_admin.ajax_url,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        WPBottomNavAdmin.showNotification(wpbnp_admin.strings.saved || 'Settings saved successfully!', 'success');
-                        
-                        // Update local settings from response
-                        if (response.data && response.data.settings) {
-                            WPBottomNavAdmin.settings = response.data.settings;
-                            
-                            // CRITICAL: Update wpbnp_admin.settings to ensure consistency
-                            if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
-                                wpbnp_admin.settings = response.data.settings;
-                                console.log('Updated wpbnp_admin.settings from response');
-                            }
-                            
-                            // CRITICAL: Restore custom presets from the database response
-                            if (response.data.settings.custom_presets && response.data.settings.custom_presets.presets) {
-                                console.log('Restoring custom presets from database response:', response.data.settings.custom_presets.presets);
-                                WPBottomNavAdmin.restoreCustomPresets(response.data.settings.custom_presets.presets);
-                            }
-                        }
-                        
-                        // Only clear localStorage after successful restoration
-                        localStorage.removeItem('wpbnp_form_state');
-                        console.log('Form state cleared after successful save and restoration');
-                    } else {
-                        WPBottomNavAdmin.showNotification(response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings', 'error');
+            try {
+                console.log('handleFormSubmit called');
+                console.log('Event target:', e.target);
+                console.log('WPBottomNavAdmin object:', typeof WPBottomNavAdmin);
+                console.log('wpbnp_admin object:', typeof wpbnp_admin);
+                
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                
+                // Critical fix: Ensure unchecked checkboxes are handled properly
+                // FormData doesn't include unchecked checkboxes, so we need to explicitly add them
+                $('#wpbnp-settings-form input[type="checkbox"]').each(function() {
+                    const checkbox = $(this);
+                    const name = checkbox.attr('name');
+                    if (name && !checkbox.is(':checked')) {
+                        formData.append(name, '0');
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX error:', xhr, status, error);
-                    WPBottomNavAdmin.showNotification('Ajax error occurred: ' + error, 'error');
-                },
-                complete: function() {
-                    submitBtn.prop('disabled', false).text(originalText);
+                });
+                
+                // CRITICAL: Ensure custom presets data is included in form submission
+                const customPresets = this.getCustomPresetsData();
+                if (customPresets.length > 0) {
+                    formData.append('wpbnp_custom_presets_data', JSON.stringify(customPresets));
+                    console.log('Including custom presets data in form submission:', customPresets);
                 }
-            });
+                
+                // Ensure action and nonce are included
+                formData.append('action', 'wpbnp_save_settings');
+                formData.append('nonce', wpbnp_admin.nonce);
+                
+                console.log('Form data prepared, submitting...');
+                
+                const submitBtn = $('#wpbnp-save-settings');
+                const originalText = submitBtn.text();
+                
+                submitBtn.prop('disabled', true).text(wpbnp_admin.strings.saving || 'Saving...');
+                
+                $.ajax({
+                    url: wpbnp_admin.ajax_url,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log('AJAX success response:', response);
+                        if (response.success) {
+                            WPBottomNavAdmin.showNotification(wpbnp_admin.strings.saved || 'Settings saved successfully!', 'success');
+                            
+                            // Update local settings from response
+                            if (response.data && response.data.settings) {
+                                WPBottomNavAdmin.settings = response.data.settings;
+                                
+                                // CRITICAL: Update wpbnp_admin.settings to ensure consistency
+                                if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
+                                    wpbnp_admin.settings = response.data.settings;
+                                    console.log('Updated wpbnp_admin.settings from response');
+                                }
+                                
+                                // CRITICAL: Restore custom presets from the database response
+                                if (response.data.settings.custom_presets && response.data.settings.custom_presets.presets) {
+                                    console.log('Restoring custom presets from database response:', response.data.settings.custom_presets.presets);
+                                    WPBottomNavAdmin.restoreCustomPresets(response.data.settings.custom_presets.presets);
+                                }
+                            }
+                            
+                            // Only clear localStorage after successful restoration
+                            localStorage.removeItem('wpbnp_form_state');
+                            console.log('Form state cleared after successful save and restoration');
+                        } else {
+                            WPBottomNavAdmin.showNotification(response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings', 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX error:', xhr, status, error);
+                        WPBottomNavAdmin.showNotification('Ajax error occurred: ' + error, 'error');
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).text(originalText);
+                    }
+                });
+            } catch (error) {
+                console.error('Error in handleFormSubmit:', error);
+                console.error('Error stack:', error.stack);
+                WPBottomNavAdmin.showNotification('Error processing form submission: ' + error.message, 'error');
+            }
         },
         
         // Reset settings
@@ -766,7 +780,7 @@ jQuery(document).ready(function($) {
                 type: 'POST',
                 data: {
                     action: 'wpbnp_reset_settings',
-                    nonce: this.nonce
+                    nonce: wpbnp_admin.nonce
                 },
                 success: (response) => {
                     if (response.success) {
@@ -1665,7 +1679,7 @@ jQuery(document).ready(function($) {
             });
             
             formData.append('action', 'wpbnp_save_settings');
-            formData.append('nonce', this.nonce);
+            formData.append('nonce', wpbnp_admin.nonce);
             
             $.ajax({
                 url: wpbnp_admin.ajax_url,
@@ -2188,7 +2202,7 @@ jQuery(document).ready(function($) {
             // Create a minimal form data with just the custom presets
             const formData = new FormData();
             formData.append('action', 'wpbnp_save_settings');
-            formData.append('nonce', this.nonce);
+            formData.append('nonce', wpbnp_admin.nonce);
             formData.append('wpbnp_custom_presets_data', JSON.stringify(customPresets));
             
             // Add minimal settings to ensure the save works
