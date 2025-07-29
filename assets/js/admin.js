@@ -1654,6 +1654,12 @@ jQuery(document).ready(function($) {
                 $('#wpbnp-license-modal').show();
             });
             
+            // License activation from custom presets section
+            $(document).on('click', '#wpbnp-activate-license-custom-presets', function(e) {
+                e.preventDefault();
+                $('#wpbnp-license-modal').show();
+            });
+            
             $(document).on('click', '#wpbnp-license-modal .wpbnp-modal-close', function() {
                 $('#wpbnp-license-modal').hide();
             });
@@ -1867,6 +1873,218 @@ jQuery(document).ready(function($) {
             }
         },
         
+        // Custom Preset Management
+        initCustomPresets: function() {
+            // Add new custom preset
+            $(document).on('click', '#wpbnp-add-custom-preset', function(e) {
+                e.preventDefault();
+                WPBottomNavAdmin.createCustomPreset();
+            });
+            
+            // Edit custom preset
+            $(document).on('click', '.wpbnp-preset-edit', function(e) {
+                e.preventDefault();
+                const presetItem = $(this).closest('.wpbnp-preset-item');
+                const presetId = presetItem.data('preset-id');
+                WPBottomNavAdmin.editCustomPreset(presetId);
+            });
+            
+            // Duplicate custom preset
+            $(document).on('click', '.wpbnp-preset-duplicate', function(e) {
+                e.preventDefault();
+                const presetItem = $(this).closest('.wpbnp-preset-item');
+                const presetId = presetItem.data('preset-id');
+                WPBottomNavAdmin.duplicateCustomPreset(presetId);
+            });
+            
+            // Delete custom preset
+            $(document).on('click', '.wpbnp-preset-delete', function(e) {
+                e.preventDefault();
+                const presetItem = $(this).closest('.wpbnp-preset-item');
+                const presetId = presetItem.data('preset-id');
+                const presetName = presetItem.find('.wpbnp-preset-name').text();
+                
+                if (confirm(`Are you sure you want to delete the preset "${presetName}"? This action cannot be undone.`)) {
+                    WPBottomNavAdmin.deleteCustomPreset(presetId);
+                }
+            });
+        },
+        
+        // Create new custom preset
+        createCustomPreset: function() {
+            const presetName = prompt('Enter preset name:', 'My Custom Preset');
+            if (!presetName) return;
+            
+            const presetDescription = prompt('Enter preset description (optional):', '');
+            const presetId = 'preset_' + Date.now();
+            
+            // Get current navigation items as the base for the new preset
+            const currentItems = this.getCurrentNavigationItems();
+            
+            const newPreset = {
+                id: presetId,
+                name: presetName,
+                description: presetDescription,
+                created_at: Math.floor(Date.now() / 1000),
+                items: currentItems
+            };
+            
+            this.addPresetToDOM(newPreset);
+            this.showNotification(`Custom preset "${presetName}" created successfully!`, 'success');
+        },
+        
+        // Get current navigation items
+        getCurrentNavigationItems: function() {
+            const items = [];
+            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function() {
+                const $row = $(this);
+                const item = {
+                    id: $row.find('input[name*="[id]"]').val() || 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    label: $row.find('input[name*="[label]"]').val() || '',
+                    icon: $row.find('input[name*="[icon]"]').val() || '',
+                    url: $row.find('input[name*="[url]"]').val() || '',
+                    enabled: $row.find('input[name*="[enabled]"]').is(':checked'),
+                    target: $row.find('select[name*="[target]"]').val() || '_self',
+                    show_badge: $row.find('input[name*="[show_badge]"]').is(':checked'),
+                    badge_type: $row.find('select[name*="[badge_type]"]').val() || 'count',
+                    custom_badge_text: $row.find('input[name*="[custom_badge_text]"]').val() || '',
+                    user_roles: []
+                };
+                
+                // Get user roles
+                $row.find('input[name*="[user_roles][]"]:checked').each(function() {
+                    item.user_roles.push($(this).val());
+                });
+                
+                items.push(item);
+            });
+            
+            return items;
+        },
+        
+        // Add preset to DOM
+        addPresetToDOM: function(preset) {
+            const presetsContainer = $('#wpbnp-custom-presets-list');
+            const noPresetsMessage = presetsContainer.find('.wpbnp-no-presets');
+            
+            if (noPresetsMessage.length) {
+                noPresetsMessage.remove();
+            }
+            
+            const index = $('.wpbnp-preset-item').length;
+            const itemsCount = preset.items ? preset.items.length : 0;
+            const createdDate = new Date(preset.created_at * 1000).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            
+            const presetHtml = `
+                <div class="wpbnp-preset-item" data-preset-id="${preset.id}">
+                    <div class="wpbnp-preset-header">
+                        <div class="wpbnp-preset-info">
+                            <h4 class="wpbnp-preset-name">${preset.name}</h4>
+                            <p class="wpbnp-preset-meta">${itemsCount} items • Created ${createdDate}</p>
+                            ${preset.description ? `<p class="wpbnp-preset-description">${preset.description}</p>` : ''}
+                        </div>
+                        <div class="wpbnp-preset-actions">
+                            <button type="button" class="wpbnp-preset-edit" title="Edit Preset">
+                                <span class="wpbnp-edit-icon">✏️</span>
+                            </button>
+                            <button type="button" class="wpbnp-preset-duplicate" title="Duplicate Preset">
+                                <span class="wpbnp-duplicate-icon">📋</span>
+                            </button>
+                            <button type="button" class="wpbnp-preset-delete" title="Delete Preset">
+                                <span class="wpbnp-delete-icon">×</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][id]" value="${preset.id}">
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][name]" value="${preset.name}">
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][description]" value="${preset.description || ''}">
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][created_at]" value="${preset.created_at}">
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][items]" value="${JSON.stringify(preset.items || []).replace(/"/g, '&quot;')}">
+                </div>
+            `;
+            
+            presetsContainer.append(presetHtml);
+        },
+        
+        // Edit custom preset
+        editCustomPreset: function(presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const currentName = presetItem.find('.wpbnp-preset-name').text();
+            const currentDescription = presetItem.find('.wpbnp-preset-description').text();
+            
+            const newName = prompt('Enter preset name:', currentName);
+            if (!newName) return;
+            
+            const newDescription = prompt('Enter preset description (optional):', currentDescription);
+            
+            // Update DOM
+            presetItem.find('.wpbnp-preset-name').text(newName);
+            presetItem.find('input[name*="[name]"]').val(newName);
+            
+            if (newDescription) {
+                if (presetItem.find('.wpbnp-preset-description').length) {
+                    presetItem.find('.wpbnp-preset-description').text(newDescription);
+                } else {
+                    presetItem.find('.wpbnp-preset-meta').after(`<p class="wpbnp-preset-description">${newDescription}</p>`);
+                }
+                presetItem.find('input[name*="[description]"]').val(newDescription);
+            } else {
+                presetItem.find('.wpbnp-preset-description').remove();
+                presetItem.find('input[name*="[description]"]').val('');
+            }
+            
+            this.showNotification(`Preset "${newName}" updated successfully!`, 'success');
+        },
+        
+        // Duplicate custom preset
+        duplicateCustomPreset: function(presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const originalName = presetItem.find('.wpbnp-preset-name').text();
+            const originalDescription = presetItem.find('.wpbnp-preset-description').text();
+            const originalItems = JSON.parse(presetItem.find('input[name*="[items]"]').val() || '[]');
+            
+            const newPreset = {
+                id: 'preset_' + Date.now(),
+                name: originalName + ' (Copy)',
+                description: originalDescription,
+                created_at: Math.floor(Date.now() / 1000),
+                items: originalItems
+            };
+            
+            this.addPresetToDOM(newPreset);
+            this.showNotification(`Preset "${newPreset.name}" created successfully!`, 'success');
+        },
+        
+        // Delete custom preset
+        deleteCustomPreset: function(presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const presetName = presetItem.find('.wpbnp-preset-name').text();
+            
+            presetItem.fadeOut(300, function() {
+                $(this).remove();
+                
+                // Reindex remaining presets
+                $('.wpbnp-preset-item').each(function(index) {
+                    $(this).find('input[name*="[presets]["]').each(function() {
+                        const name = $(this).attr('name');
+                        const newName = name.replace(/\[presets\]\[\d+\]/, `[presets][${index}]`);
+                        $(this).attr('name', newName);
+                    });
+                });
+                
+                // Show no presets message if empty
+                if ($('.wpbnp-preset-item').length === 0) {
+                    $('#wpbnp-custom-presets-list').html('<p class="wpbnp-no-presets">No custom presets created yet. Click "Create New Preset" to get started.</p>');
+                }
+            });
+            
+            this.showNotification(`Preset "${presetName}" deleted successfully!`, 'success');
+        },
 
         
         // Reindex configurations after deletion
@@ -1892,6 +2110,9 @@ jQuery(document).ready(function($) {
         
         // Initialize pro features
         WPBottomNavAdmin.initProFeatures();
+        
+        // Initialize custom presets
+        WPBottomNavAdmin.initCustomPresets();
         
         // Icons are now using Unicode, no need to check dashicons
     

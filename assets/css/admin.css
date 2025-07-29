@@ -1377,6 +1377,132 @@ input:checked + .wpbnp-toggle-slider:before {
     transform: rotate(180deg) !important;
 }
 
+/* Custom Presets Styles */
+.wpbnp-custom-presets-section {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.wpbnp-custom-presets-section h3 {
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wpbnp-presets-header {
+    margin: 20px 0;
+    text-align: right;
+}
+
+.wpbnp-add-preset-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.wpbnp-add-preset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+}
+
+.wpbnp-presets-list {
+    display: grid;
+    gap: 15px;
+}
+
+.wpbnp-preset-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.wpbnp-preset-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.wpbnp-preset-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.wpbnp-preset-info {
+    flex: 1;
+}
+
+.wpbnp-preset-name {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.wpbnp-preset-meta {
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+.wpbnp-preset-description {
+    margin: 0;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+}
+
+.wpbnp-preset-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.wpbnp-preset-edit,
+.wpbnp-preset-duplicate,
+.wpbnp-preset-delete {
+    background: none;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.wpbnp-preset-edit:hover {
+    background: #e3f2fd;
+    border-color: #2196f3;
+}
+
+.wpbnp-preset-duplicate:hover {
+    background: #f3e5f5;
+    border-color: #9c27b0;
+}
+
+.wpbnp-preset-delete:hover {
+    background: #ffebee;
+    border-color: #f44336;
+}
+
+.wpbnp-no-presets {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    padding: 40px 20px;
+    background: white;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+}
+
 .wpbnp-config-toggle:hover {
     background: #e2e8f0;
     color: #2d3748;

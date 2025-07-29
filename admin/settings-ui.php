@@ -267,6 +267,125 @@ class WPBNP_Admin_UI {
             <button type="button" id="wpbnp-add-item" class="button button-secondary">
                 <?php esc_html_e('Add Item', 'wp-bottom-navigation-pro'); ?>
             </button>
+            
+            <!-- Custom Presets Pro Feature -->
+            <?php $this->render_custom_presets_section($settings); ?>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render custom presets section
+     */
+    private function render_custom_presets_section($settings) {
+        $is_pro_active = $this->is_pro_license_active();
+        $custom_presets = isset($settings['custom_presets']) ? $settings['custom_presets'] : array();
+        $presets = isset($custom_presets['presets']) ? $custom_presets['presets'] : array();
+        
+        ?>
+        <div class="wpbnp-section wpbnp-custom-presets-section" style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
+            <h3>
+                <?php esc_html_e('Custom Presets', 'wp-bottom-navigation-pro'); ?>
+                <span class="wpbnp-pro-badge">PRO</span>
+            </h3>
+            <p><?php esc_html_e('Create custom navigation presets that can be displayed based on specific conditions using Page Targeting.', 'wp-bottom-navigation-pro'); ?></p>
+            
+            <?php if (!$is_pro_active): ?>
+                <!-- Pro License Required -->
+                <div class="wpbnp-pro-notice">
+                    <div class="wpbnp-pro-notice-content">
+                        <h4><?php esc_html_e('🚀 Pro Feature: Custom Presets', 'wp-bottom-navigation-pro'); ?></h4>
+                        <p><?php esc_html_e('Create unlimited custom navigation presets and display them based on specific pages, post types, categories, or user roles.', 'wp-bottom-navigation-pro'); ?></p>
+                        
+                        <div class="wpbnp-pro-features">
+                            <ul>
+                                <li>✅ <?php esc_html_e('Create unlimited custom presets', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('Save different navigation configurations', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('Target presets by page conditions', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('Perfect for different sections of your site', 'wp-bottom-navigation-pro'); ?></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="wpbnp-pro-actions">
+                            <a href="#" class="wpbnp-pro-button" id="wpbnp-activate-license-custom-presets">
+                                <?php esc_html_e('Enter License Key', 'wp-bottom-navigation-pro'); ?>
+                            </a>
+                            <a href="#" class="wpbnp-pro-button wpbnp-pro-button-secondary" target="_blank">
+                                <?php esc_html_e('Get Pro License', 'wp-bottom-navigation-pro'); ?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <!-- Pro Features Active -->
+                <div class="wpbnp-custom-presets-interface">
+                    <div class="wpbnp-presets-header">
+                        <button type="button" class="wpbnp-add-preset-btn" id="wpbnp-add-custom-preset">
+                            <?php esc_html_e('+ Create New Preset', 'wp-bottom-navigation-pro'); ?>
+                        </button>
+                    </div>
+                    
+                    <div class="wpbnp-presets-list" id="wpbnp-custom-presets-list">
+                        <?php if (empty($presets)): ?>
+                            <p class="wpbnp-no-presets"><?php esc_html_e('No custom presets created yet. Click "Create New Preset" to get started.', 'wp-bottom-navigation-pro'); ?></p>
+                        <?php else: ?>
+                            <?php foreach ($presets as $index => $preset): ?>
+                                <?php $this->render_custom_preset_item($preset, $index); ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                
+                <!-- Hidden field to enable custom presets -->
+                <input type="hidden" name="settings[custom_presets][enabled]" value="<?php echo $is_pro_active ? '1' : '0'; ?>">
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render individual custom preset item
+     */
+    private function render_custom_preset_item($preset, $index) {
+        $preset_id = $preset['id'] ?? '';
+        $preset_name = $preset['name'] ?? 'Unnamed Preset';
+        $preset_description = $preset['description'] ?? '';
+        $items_count = count($preset['items'] ?? array());
+        $created_at = isset($preset['created_at']) ? date('M j, Y', $preset['created_at']) : 'Unknown';
+        
+        ?>
+        <div class="wpbnp-preset-item" data-preset-id="<?php echo esc_attr($preset_id); ?>">
+            <div class="wpbnp-preset-header">
+                <div class="wpbnp-preset-info">
+                    <h4 class="wpbnp-preset-name"><?php echo esc_html($preset_name); ?></h4>
+                    <p class="wpbnp-preset-meta">
+                        <?php printf(esc_html__('%d items • Created %s', 'wp-bottom-navigation-pro'), $items_count, $created_at); ?>
+                    </p>
+                    <?php if ($preset_description): ?>
+                        <p class="wpbnp-preset-description"><?php echo esc_html($preset_description); ?></p>
+                    <?php endif; ?>
+                </div>
+                <div class="wpbnp-preset-actions">
+                    <button type="button" class="wpbnp-preset-edit" title="Edit Preset">
+                        <span class="wpbnp-edit-icon">✏️</span>
+                    </button>
+                    <button type="button" class="wpbnp-preset-duplicate" title="Duplicate Preset">
+                        <span class="wpbnp-duplicate-icon">📋</span>
+                    </button>
+                    <button type="button" class="wpbnp-preset-delete" title="Delete Preset">
+                        <span class="wpbnp-delete-icon">×</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Hidden inputs to store preset data -->
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][id]" value="<?php echo esc_attr($preset_id); ?>">
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][name]" value="<?php echo esc_attr($preset_name); ?>">
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][description]" value="<?php echo esc_attr($preset_description); ?>">
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][created_at]" value="<?php echo esc_attr($preset['created_at'] ?? time()); ?>">
+            
+            <!-- Store items as JSON -->
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][items]" value="<?php echo esc_attr(json_encode($preset['items'] ?? array())); ?>">
         </div>
         <?php
     }
@@ -808,9 +927,11 @@ class WPBNP_Admin_UI {
                     
                     <div class="wpbnp-navigation-config">
                         <h4><?php esc_html_e('Navigation Configuration', 'wp-bottom-navigation-pro'); ?></h4>
+                        
                         <div class="wpbnp-field">
-                            <label><?php esc_html_e('Navigation Items', 'wp-bottom-navigation-pro'); ?></label>
-                            <p class="description"><?php esc_html_e('This configuration will use the items defined in the main Items tab with the conditions above.', 'wp-bottom-navigation-pro'); ?></p>
+                            <label><?php esc_html_e('Preset to Display', 'wp-bottom-navigation-pro'); ?></label>
+                            <?php $this->render_custom_preset_selector($config, $index); ?>
+                            <p class="description"><?php esc_html_e('Choose which navigation preset to display when the conditions above are met.', 'wp-bottom-navigation-pro'); ?></p>
                         </div>
                     </div>
                 </div>
@@ -967,6 +1088,40 @@ class WPBNP_Admin_UI {
                     <?php echo esc_html($role_name); ?>
                 </option>
             <?php endforeach; ?>
+        </select>
+        <?php
+    }
+    
+    /**
+     * Render custom preset selector
+     */
+    private function render_custom_preset_selector($config, $index) {
+        $selected_preset = isset($config['preset_id']) ? $config['preset_id'] : 'default';
+        $settings = wpbnp_get_settings();
+        $custom_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
+        
+        ?>
+        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][preset_id]" class="wpbnp-preset-selector">
+            <option value="default" <?php selected($selected_preset, 'default'); ?>>
+                <?php esc_html_e('Default Navigation (Items Tab)', 'wp-bottom-navigation-pro'); ?>
+            </option>
+            
+            <?php if (!empty($custom_presets)): ?>
+                <optgroup label="<?php esc_attr_e('Custom Presets', 'wp-bottom-navigation-pro'); ?>">
+                    <?php foreach ($custom_presets as $preset): ?>
+                        <option value="<?php echo esc_attr($preset['id']); ?>" <?php selected($selected_preset, $preset['id']); ?>>
+                            <?php echo esc_html($preset['name']); ?>
+                            <?php if (isset($preset['items'])): ?>
+                                (<?php echo count($preset['items']); ?> items)
+                            <?php endif; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </optgroup>
+            <?php else: ?>
+                <option value="" disabled>
+                    <?php esc_html_e('No custom presets available - Create some in the Items tab', 'wp-bottom-navigation-pro'); ?>
+                </option>
+            <?php endif; ?>
         </select>
         <?php
     }
