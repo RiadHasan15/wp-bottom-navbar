@@ -1883,9 +1883,10 @@ jQuery(document).ready(function ($) {
             console.log('addPageTargetingConfig function called');
 
             try {
-                const configIndex = $('.wpbnp-config-item').length;
+                const existingConfigs = $('.wpbnp-config-item').length;
+                const configIndex = existingConfigs; // This will be the correct index for the new config
                 const configId = 'config_' + Date.now();
-                console.log('Config index:', configIndex, 'Config ID:', configId);
+                console.log('Existing configs:', existingConfigs, 'New config index:', configIndex, 'Config ID:', configId);
 
                 const configHtml = `
                 <div class="wpbnp-config-item" data-config-id="${configId}">
@@ -1999,35 +2000,45 @@ jQuery(document).ready(function ($) {
 
                 // Debug: Log the entire new config HTML
                 console.log('New config HTML:', $newConfig.html());
+                console.log('All selects in new config:', $newConfig.find('select').length);
+                $newConfig.find('select').each(function(i, el) {
+                    console.log('Select', i, 'name:', $(el).attr('name'));
+                });
                 
                 // Populate pages selector - try multiple selector approaches
                 let pagesSelector = $newConfig.find('select[name*="pages"]');
+                console.log('Direct pages selector found:', pagesSelector.length);
                 if (!pagesSelector.length) {
                     pagesSelector = $newConfig.find('select').filter(function() {
                         return $(this).attr('name') && $(this).attr('name').includes('pages');
                     });
+                    console.log('Filtered pages selector found:', pagesSelector.length);
                 }
                 if (!pagesSelector.length) {
                     pagesSelector = $newConfig.find('select').filter(function() {
                         return $(this).attr('name') && $(this).attr('name').indexOf('pages') !== -1;
                     });
+                    console.log('IndexOf pages selector found:', pagesSelector.length);
                 }
-                console.log('Pages selector found:', pagesSelector.length, pagesSelector.attr('name'));
+                console.log('Final pages selector found:', pagesSelector.length, pagesSelector.attr('name'));
                 this.populatePagesSelector(pagesSelector, configIndex);
 
                 // Populate categories selector - try multiple selector approaches
                 let categoriesSelector = $newConfig.find('select[name*="categories"]');
+                console.log('Direct categories selector found:', categoriesSelector.length);
                 if (!categoriesSelector.length) {
                     categoriesSelector = $newConfig.find('select').filter(function() {
                         return $(this).attr('name') && $(this).attr('name').includes('categories');
                     });
+                    console.log('Filtered categories selector found:', categoriesSelector.length);
                 }
                 if (!categoriesSelector.length) {
                     categoriesSelector = $newConfig.find('select').filter(function() {
                         return $(this).attr('name') && $(this).attr('name').indexOf('categories') !== -1;
                     });
+                    console.log('IndexOf categories selector found:', categoriesSelector.length);
                 }
-                console.log('Categories selector found:', categoriesSelector.length, categoriesSelector.attr('name'));
+                console.log('Final categories selector found:', categoriesSelector.length, categoriesSelector.attr('name'));
                 this.populateCategoriesSelector(categoriesSelector, configIndex);
                 console.log('Selector population completed');
 
