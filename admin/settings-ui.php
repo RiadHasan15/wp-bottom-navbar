@@ -615,6 +615,9 @@ class WPBNP_Admin_UI {
         $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
         $is_pro_active = $this->is_pro_license_active();
         
+        // Debug information
+        error_log('WPBNP: Rendering page targeting tab. Pro active: ' . ($is_pro_active ? 'Yes' : 'No'));
+        
         ?>
         <div class="wpbnp-tab-content" id="wpbnp-page-targeting">
             <h2><?php esc_html_e('Page Targeting', 'wp-bottom-navigation-pro'); ?> <span class="wpbnp-pro-badge">PRO</span></h2>
@@ -725,6 +728,9 @@ class WPBNP_Admin_UI {
     private function render_page_targeting_configurations($page_targeting) {
         $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
         
+        // Debug information
+        error_log('WPBNP: Rendering configurations. Count: ' . count($configurations));
+        
         if (empty($configurations)) {
             echo '<p class="wpbnp-no-configs">' . esc_html__('No configurations created yet. Click "Add Configuration" to get started.', 'wp-bottom-navigation-pro') . '</p>';
             return;
@@ -826,11 +832,15 @@ class WPBNP_Admin_UI {
         ?>
         <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
             <option value=""><?php esc_html_e('Select pages...', 'wp-bottom-navigation-pro'); ?></option>
-            <?php foreach ($pages as $page): ?>
-                <option value="<?php echo esc_attr($page->ID); ?>" <?php selected(in_array($page->ID, $selected_pages)); ?>>
-                    <?php echo esc_html($page->post_title); ?>
-                </option>
-            <?php endforeach; ?>
+            <?php if (empty($pages)): ?>
+                <option value="" disabled><?php esc_html_e('No pages found', 'wp-bottom-navigation-pro'); ?></option>
+            <?php else: ?>
+                <?php foreach ($pages as $page): ?>
+                    <option value="<?php echo esc_attr($page->ID); ?>" <?php selected(in_array($page->ID, $selected_pages)); ?>>
+                        <?php echo esc_html($page->post_title); ?>
+                    </option>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </select>
         <?php
     }
@@ -864,11 +874,15 @@ class WPBNP_Admin_UI {
         ?>
         <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][categories][]" multiple class="wpbnp-multiselect">
             <option value=""><?php esc_html_e('Select categories...', 'wp-bottom-navigation-pro'); ?></option>
-            <?php foreach ($categories as $category): ?>
-                <option value="<?php echo esc_attr($category->term_id); ?>" <?php selected(in_array($category->term_id, $selected_categories)); ?>>
-                    <?php echo esc_html($category->name); ?>
-                </option>
-            <?php endforeach; ?>
+            <?php if (empty($categories)): ?>
+                <option value="" disabled><?php esc_html_e('No categories found', 'wp-bottom-navigation-pro'); ?></option>
+            <?php else: ?>
+                <?php foreach ($categories as $category): ?>
+                    <option value="<?php echo esc_attr($category->term_id); ?>" <?php selected(in_array($category->term_id, $selected_categories)); ?>>
+                        <?php echo esc_html($category->name); ?>
+                    </option>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </select>
         <?php
     }
@@ -889,6 +903,34 @@ class WPBNP_Admin_UI {
                 </option>
             <?php endforeach; ?>
         </select>
+        <?php
+    }
+    
+    /**
+     * Render configuration template for JavaScript
+     */
+    private function render_configuration_template() {
+        ?>
+        <div class="wpbnp-config-item" data-config-id="__CONFIG_ID__">
+            <div class="wpbnp-config-header">
+                <div class="wpbnp-config-title">
+                    <span class="wpbnp-config-name"><?php esc_html_e('New Configuration', 'wp-bottom-navigation-pro'); ?></span>
+                    <span class="wpbnp-config-priority">Priority: 1</span>
+                </div>
+                <div class="wpbnp-config-actions">
+                    <button type="button" class="wpbnp-config-toggle">
+                        <span class="dashicons dashicons-arrow-down"></span>
+                    </button>
+                    <button type="button" class="wpbnp-config-delete">
+                        <span class="dashicons dashicons-trash"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="wpbnp-config-content">
+                <!-- Template content will be populated by JavaScript -->
+                <p><?php esc_html_e('Configuration template for JavaScript', 'wp-bottom-navigation-pro'); ?></p>
+            </div>
+        </div>
         <?php
     }
 }
