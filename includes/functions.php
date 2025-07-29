@@ -15,13 +15,7 @@ function wpbnp_get_settings() {
     $defaults = wpbnp_get_default_settings();
     $settings = get_option('wpbnp_settings', $defaults);
     
-    error_log('WPBNP: Retrieved settings from database: ' . print_r($settings, true));
-    
-    $merged_settings = wp_parse_args($settings, $defaults);
-    
-    error_log('WPBNP: Final merged settings: ' . print_r($merged_settings, true));
-    
-    return $merged_settings;
+    return wp_parse_args($settings, $defaults);
 }
 
 /**
