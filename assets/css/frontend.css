@@ -1,5 +1,16 @@
 /* WP Bottom Navigation Pro - Frontend Styles */
 
+/* Ensure body has proper spacing for fixed navigation */
+body.wpbnp-active {
+    padding-bottom: 70px !important;
+    margin-bottom: 0 !important;
+}
+
+/* Prevent content from being hidden behind navigation */
+.wpbnp-body-padding {
+    padding-bottom: 70px;
+}
+
 /* Base Navigation Styles */
 .wpbnp-bottom-nav {
     position: fixed;
@@ -17,11 +28,28 @@
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     user-select: none;
+    /* Ensure proper positioning on all devices */
+    bottom: env(safe-area-inset-bottom, 0);
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0));
+    /* Force to bottom edge */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 /* Hide navigation state */
 .wpbnp-bottom-nav.wpbnp-hidden {
     transform: translateY(100%);
+}
+
+/* Viewport height fix for mobile/tablet browsers */
+@supports (-webkit-touch-callout: none) {
+    .wpbnp-bottom-nav {
+        /* iOS Safari specific fixes */
+        bottom: constant(safe-area-inset-bottom);
+        bottom: env(safe-area-inset-bottom);
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
 }
 
 /* Navigation Items */
@@ -540,6 +568,15 @@
 @media (max-width: 768px) {
     .wpbnp-bottom-nav {
         padding: 8px 5px;
+        /* Enhanced positioning for tablets */
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin: 0 !important;
+        /* Prevent viewport issues */
+        min-height: 70px;
+        box-sizing: border-box;
     }
     
     .wpbnp-nav-item {

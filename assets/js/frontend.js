@@ -23,6 +23,9 @@
                 return;
             }
             
+            // Add body class for proper spacing
+            $('body').addClass('wpbnp-active');
+            
             this.bindEvents();
             this.updateBadges();
             this.addRippleEffect();
@@ -38,6 +41,9 @@
             
             // Initialize visibility based on device settings
             this.handleDeviceVisibility();
+            
+            // Fix positioning on mobile/tablet devices
+            this.fixBottomPositioning();
         },
         
         /**
@@ -111,6 +117,50 @@
             // Check on load and resize
             updateVisibility();
             $(window).on('resize', updateVisibility);
+        },
+        
+        /**
+         * Fix bottom positioning for mobile/tablet devices
+         */
+        fixBottomPositioning: function() {
+            const $nav = $('.wpbnp-bottom-nav');
+            
+            if ($nav.length === 0) {
+                return;
+            }
+            
+            // Force repositioning
+            const repositionNav = () => {
+                $nav.css({
+                    'position': 'fixed',
+                    'bottom': '0',
+                    'left': '0',
+                    'right': '0',
+                    'z-index': '9999'
+                });
+                
+                // Add viewport meta if not present
+                if (!$('meta[name="viewport"]').length) {
+                    $('head').append('<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">');
+                }
+            };
+            
+            // Apply on load
+            repositionNav();
+            
+            // Reapply on resize and orientation change
+            $(window).on('resize orientationchange', function() {
+                setTimeout(repositionNav, 100);
+            });
+            
+            // Handle iOS Safari viewport changes
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                $(window).on('scroll', function() {
+                    if (window.pageYOffset === 0) {
+                        setTimeout(repositionNav, 50);
+                    }
+                });
+            }
         },
         
         /**
