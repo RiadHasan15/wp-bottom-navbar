@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WPBNP_VERSION', '1.0.5');
+define('WPBNP_VERSION', '1.1.0');
 define('WPBNP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPBNP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WPBNP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -111,6 +111,10 @@ class WP_Bottom_Navigation_Pro {
         add_action('wp_ajax_wpbnp_import_settings', array($this, 'import_settings'));
         add_action('wp_ajax_wpbnp_get_cart_count', array($this, 'get_cart_count'));
         add_action('wp_ajax_nopriv_wpbnp_get_cart_count', array($this, 'get_cart_count'));
+        
+        // Pro feature AJAX handlers
+        add_action('wp_ajax_wpbnp_activate_license', array($this, 'activate_license'));
+        add_action('wp_ajax_wpbnp_deactivate_license', array($this, 'deactivate_license'));
         
         // Footer hook for navigation display
         add_action('wp_footer', array($this, 'display_navigation'), 999);
@@ -1130,6 +1134,114 @@ class WP_Bottom_Navigation_Pro {
     public function deactivate() {
         // Clean up if needed
         do_action('wpbnp_deactivate');
+    }
+    
+    /**
+     * Activate pro license
+     */
+    public function activate_license() {
+        // Verify nonce
+        if (!check_ajax_referer('wpbnp_admin_nonce', 'nonce', false)) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        // Check user capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Insufficient permissions'));
+            return;
+        }
+        
+        $license_key = sanitize_text_field(wp_unslash($_POST['license_key'] ?? ''));
+        
+        if (empty($license_key)) {
+            wp_send_json_error(array('message' => 'License key is required'));
+            return;
+        }
+        
+        // For demo purposes, we'll accept any non-empty license key
+        // In a real implementation, you would validate against your license server
+        $is_valid = $this->validate_license_key($license_key);
+        
+        if ($is_valid) {
+            update_option('wpbnp_pro_license_key', $license_key);
+            update_option('wpbnp_pro_license_status', 'active');
+            update_option('wpbnp_pro_license_activated_at', current_time('timestamp'));
+            
+            wp_send_json_success(array(
+                'message' => 'License activated successfully!',
+                'license_key' => $license_key
+            ));
+        } else {
+            wp_send_json_error(array('message' => 'Invalid license key'));
+        }
+    }
+    
+    /**
+     * Deactivate pro license
+     */
+    public function deactivate_license() {
+        // Verify nonce
+        if (!check_ajax_referer('wpbnp_admin_nonce', 'nonce', false)) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        // Check user capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Insufficient permissions'));
+            return;
+        }
+        
+        delete_option('wpbnp_pro_license_key');
+        delete_option('wpbnp_pro_license_status');
+        delete_option('wpbnp_pro_license_activated_at');
+        
+        wp_send_json_success(array('message' => 'License deactivated successfully!'));
+    }
+    
+    /**
+     * Validate license key (demo implementation)
+     */
+    private function validate_license_key($license_key) {
+        // Demo validation - accept any key that:
+        // 1. Is at least 10 characters long
+        // 2. Contains both letters and numbers
+        // 3. Doesn't contain spaces
+        
+        if (strlen($license_key) < 10) {
+            return false;
+        }
+        
+        if (strpos($license_key, ' ') !== false) {
+            return false;
+        }
+        
+        $has_letter = preg_match('/[a-zA-Z]/', $license_key);
+        $has_number = preg_match('/[0-9]/', $license_key);
+        
+        return $has_letter && $has_number;
+        
+        // In a real implementation, you would make an API call to your license server:
+        /*
+        $response = wp_remote_post('https://your-license-server.com/api/validate', array(
+            'body' => array(
+                'license_key' => $license_key,
+                'domain' => home_url(),
+                'product' => 'wp-bottom-navigation-pro'
+            ),
+            'timeout' => 15
+        ));
+        
+        if (is_wp_error($response)) {
+            return false;
+        }
+        
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        
+        return isset($data['valid']) && $data['valid'] === true;
+        */
     }
 }
 

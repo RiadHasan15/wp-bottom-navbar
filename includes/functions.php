@@ -103,6 +103,12 @@ function wpbnp_get_default_settings() {
             'z_index' => '9999',
             'fixed_position' => 'bottom',
             'custom_css' => ''
+        ),
+        
+        // Pro feature: Page targeting
+        'page_targeting' => array(
+            'enabled' => false,
+            'configurations' => array()
         )
     ));
 }
@@ -3571,4 +3577,133 @@ function wpbnp_can_user_see_item($item) {
     
     // Item is visible
     return true;
+}
+
+/**
+ * Check if pro license is active
+ */
+function wpbnp_is_pro_license_active() {
+    $license_key = get_option('wpbnp_pro_license_key', '');
+    $license_status = get_option('wpbnp_pro_license_status', 'inactive');
+    
+    return !empty($license_key) && $license_status === 'active';
+}
+
+/**
+ * Check if page targeting is enabled and get active configuration
+ */
+function wpbnp_get_active_page_targeting_config() {
+    // Check if pro license is active
+    if (!wpbnp_is_pro_license_active()) {
+        return null;
+    }
+    
+    $settings = wpbnp_get_settings();
+    $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
+    
+    if (!isset($page_targeting['enabled']) || !$page_targeting['enabled']) {
+        return null;
+    }
+    
+    $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
+    
+    if (empty($configurations)) {
+        return null;
+    }
+    
+    // Sort configurations by priority (higher first)
+    usort($configurations, function($a, $b) {
+        $priority_a = isset($a['priority']) ? intval($a['priority']) : 1;
+        $priority_b = isset($b['priority']) ? intval($b['priority']) : 1;
+        return $priority_b - $priority_a;
+    });
+    
+    // Check each configuration's conditions
+    foreach ($configurations as $config) {
+        if (wpbnp_check_page_targeting_conditions($config)) {
+            return $config;
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Check if current page matches targeting conditions
+ */
+function wpbnp_check_page_targeting_conditions($config) {
+    if (!isset($config['conditions'])) {
+        return false;
+    }
+    
+    $conditions = $config['conditions'];
+    
+    // If all conditions are empty, this is a fallback configuration
+    $has_conditions = false;
+    
+    // Check specific pages
+    if (!empty($conditions['pages'])) {
+        $has_conditions = true;
+        if (is_page() && in_array(get_the_ID(), $conditions['pages'])) {
+            return true;
+        }
+    }
+    
+    // Check post types
+    if (!empty($conditions['post_types'])) {
+        $has_conditions = true;
+        $current_post_type = get_post_type();
+        if ($current_post_type && in_array($current_post_type, $conditions['post_types'])) {
+            return true;
+        }
+    }
+    
+    // Check categories
+    if (!empty($conditions['categories'])) {
+        $has_conditions = true;
+        if (is_single() || is_category()) {
+            $post_categories = wp_get_post_categories(get_the_ID());
+            if (array_intersect($post_categories, $conditions['categories'])) {
+                return true;
+            }
+        }
+        if (is_category() && in_array(get_queried_object_id(), $conditions['categories'])) {
+            return true;
+        }
+    }
+    
+    // Check user roles
+    if (!empty($conditions['user_roles'])) {
+        $has_conditions = true;
+        if (is_user_logged_in()) {
+            $user = wp_get_current_user();
+            if (array_intersect($user->roles, $conditions['user_roles'])) {
+                return true;
+            }
+        }
+    }
+    
+    // If no conditions were set, this is a fallback configuration
+    if (!$has_conditions) {
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Get navigation items based on page targeting
+ */
+function wpbnp_get_targeted_navigation_items() {
+    $active_config = wpbnp_get_active_page_targeting_config();
+    
+    if ($active_config) {
+        // Use items from the main settings (page targeting uses the same items with different conditions)
+        $settings = wpbnp_get_settings();
+        return isset($settings['items']) ? $settings['items'] : array();
+    }
+    
+    // Return default items
+    $settings = wpbnp_get_settings();
+    return isset($settings['items']) ? $settings['items'] : array();
 }
