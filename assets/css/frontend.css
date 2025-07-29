@@ -628,3 +628,34 @@
         color: #4a9eff;
     }
 }
+
+/* Keyboard Navigation Focus Styles */
+.wpbnp-nav-item.wpbnp-focused {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px !important;
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+    transform: scale(1.05) !important;
+}
+
+/* Remove default focus outline */
+.wpbnp-nav-item:focus {
+    outline: none !important;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .wpbnp-nav-item.wpbnp-focused {
+        transform: none !important;
+        transition: none !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .wpbnp-nav-item.wpbnp-focused {
+        outline: 3px solid currentColor !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+}
