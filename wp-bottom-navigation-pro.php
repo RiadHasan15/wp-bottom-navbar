@@ -1015,6 +1015,13 @@ class WP_Bottom_Navigation_Pro {
         // Get the complete updated settings
         $updated_settings = wpbnp_get_settings();
         
+        // Debug: Log the custom presets in the response
+        if (isset($updated_settings['custom_presets'])) {
+            error_log('WPBNP: Response includes custom_presets: ' . count($updated_settings['custom_presets']['presets']) . ' presets');
+        } else {
+            error_log('WPBNP: Response does not include custom_presets');
+        }
+        
         wp_send_json_success(array(
             'message' => __('Settings saved successfully!', 'wp-bottom-navigation-pro'),
             'settings' => $updated_settings

@@ -574,10 +574,12 @@ jQuery(document).ready(function ($) {
             if (presetsData && presetsData.length > 0) {
                 // Add each preset back to DOM
                 presetsData.forEach(preset => {
+                    console.log('Adding preset to DOM:', preset.name);
                     this.addPresetToDOM(preset);
                 });
 
                 // Update preset selectors
+                console.log('Updating preset selectors after restoration...');
                 this.updateAllPresetSelectors();
 
                 console.log(`${presetsData.length} custom presets restored successfully`);
@@ -605,6 +607,13 @@ jQuery(document).ready(function ($) {
                 }
             });
 
+            // CRITICAL: Add custom presets data to form submission
+            const customPresets = this.getCustomPresetsData();
+            if (customPresets.length > 0) {
+                formData.append('wpbnp_custom_presets_data', JSON.stringify(customPresets));
+                console.log('Added custom presets data to form submission:', customPresets);
+            }
+
             formData.append('action', 'wpbnp_save_settings');
             formData.append('nonce', this.nonce);
 
@@ -626,6 +635,22 @@ jQuery(document).ready(function ($) {
                         if (response.data && response.data.settings) {
                             this.settings = response.data.settings;
                             console.log('Updated local settings:', this.settings);
+                            console.log('Custom presets in response:', this.settings.custom_presets);
+                            
+                            // CRITICAL: Update global wpbnp_admin.settings object as well
+                            if (typeof wpbnp_admin !== 'undefined') {
+                                wpbnp_admin.settings = response.data.settings;
+                                console.log('Updated global wpbnp_admin.settings:', wpbnp_admin.settings);
+                            }
+                            
+                            // CRITICAL: Restore custom presets from server response
+                            if (this.settings.custom_presets && this.settings.custom_presets.presets) {
+                                console.log('Restoring custom presets from server response:', this.settings.custom_presets.presets);
+                                // Add a small delay to ensure DOM is ready
+                                setTimeout(() => {
+                                    this.restoreCustomPresets(this.settings.custom_presets.presets);
+                                }, 100);
+                            }
                         } else {
                             // If no settings in response, merge current form data with existing settings
                             const currentFormData = this.getFormData();
@@ -2110,6 +2135,8 @@ jQuery(document).ready(function ($) {
 
         // Add preset to DOM
         addPresetToDOM: function (preset) {
+            console.log('addPresetToDOM called for preset:', preset.name);
+            
             const presetsContainer = $('#wpbnp-custom-presets-list');
             const noPresetsMessage = presetsContainer.find('.wpbnp-no-presets');
 
@@ -2158,6 +2185,7 @@ jQuery(document).ready(function ($) {
             `;
 
             presetsContainer.append(presetHtml);
+            console.log('Preset added to DOM successfully:', preset.name);
         },
 
         // Edit custom preset items
@@ -2562,6 +2590,55 @@ jQuery(document).ready(function ($) {
             console.log('=== END DEBUG ===');
         },
 
+        // Check custom preset save state
+        checkCustomPresetState: function () {
+            console.log('=== CUSTOM PRESET STATE CHECK ===');
+            
+            // Check DOM state
+            const domPresets = $('.wpbnp-preset-item');
+            console.log('DOM presets count:', domPresets.length);
+            
+            domPresets.each(function(index) {
+                const $item = $(this);
+                const presetId = $item.data('preset-id');
+                const presetName = $item.find('.wpbnp-preset-name').text();
+                const hasItemsInput = $item.find('input[name*="[items]"]').length > 0;
+                const itemsValue = $item.find('input[name*="[items]"]').val();
+                
+                console.log(`DOM Preset ${index + 1}:`, {
+                    id: presetId,
+                    name: presetName,
+                    hasItemsInput: hasItemsInput,
+                    itemsValueLength: itemsValue ? itemsValue.length : 0
+                });
+            });
+            
+            // Check settings state
+            if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
+                console.log('Settings custom_presets:', wpbnp_admin.settings.custom_presets);
+            } else {
+                console.log('No wpbnp_admin.settings available');
+            }
+            
+            // Check localStorage state
+            const savedState = localStorage.getItem('wpbnp_form_state');
+            if (savedState) {
+                try {
+                    const parsedState = JSON.parse(savedState);
+                    console.log('localStorage form state:', parsedState);
+                    if (parsedState.wpbnp_custom_presets_data) {
+                        console.log('localStorage custom presets data:', parsedState.wpbnp_custom_presets_data);
+                    }
+                } catch (e) {
+                    console.log('Error parsing localStorage state:', e);
+                }
+            } else {
+                console.log('No saved form state in localStorage');
+            }
+            
+            console.log('=== END STATE CHECK ===');
+        },
+
         // Test function to save form and check if presets persist
         testPresetSave: function () {
             console.log('=== TESTING PRESET SAVE ===');
@@ -2575,6 +2652,33 @@ jQuery(document).ready(function ($) {
                 // This won't work because page doesn't reload, but it's a test
                 console.log('3. You should now go to another tab and back to see if presets persist');
             }, 2000);
+        },
+
+        // Manual test function for custom preset save
+        testCustomPresetSave: function () {
+            console.log('=== MANUAL CUSTOM PRESET SAVE TEST ===');
+            
+            // Get current custom presets from DOM
+            const currentPresets = this.getCustomPresetsData();
+            console.log('Current presets in DOM:', currentPresets);
+            
+            // Create a test preset if none exist
+            if (currentPresets.length === 0) {
+                console.log('No presets found, creating a test preset...');
+                this.createCustomPreset();
+                
+                setTimeout(() => {
+                    const newPresets = this.getCustomPresetsData();
+                    console.log('After creating test preset:', newPresets);
+                    
+                    // Now test the save
+                    console.log('Testing save with new preset...');
+                    $('#wpbnp-settings-form').trigger('submit');
+                }, 1000);
+            } else {
+                console.log('Found existing presets, testing save...');
+                $('#wpbnp-settings-form').trigger('submit');
+            }
         },
 
 
