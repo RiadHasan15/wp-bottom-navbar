@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 // Define plugin constants
 // NOTE: When merging with pro branch, use semantic versioning (e.g., 1.2.0)
-define('WPBNP_VERSION', '1.2.4'); // Fixed Tab Navigation Error (wp-admin/undefined)
+define('WPBNP_VERSION', '1.2.5'); // Fixed Custom Presets Not Showing in Dropdowns
 define('WPBNP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPBNP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WPBNP_PLUGIN_BASENAME', plugin_basename(__FILE__));

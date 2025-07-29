@@ -809,24 +809,7 @@ class WPBNP_Admin_UI {
                 <!-- PRO Features - Page Targeting Interface -->
                 <div class="wpbnp-page-targeting-interface">
                     
-                    <!-- Debug Info (can be removed in production) -->
-                    <?php if (defined('WP_DEBUG') && WP_DEBUG): ?>
-                    <div style="background: #f0f0f0; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 12px;">
-                        <strong>🔍 Debug Info:</strong> 
-                        <?php 
-                        $debug_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
-                        echo count($debug_presets) . ' custom presets found';
-                        if (!empty($debug_presets)) {
-                            echo ' (';
-                            foreach ($debug_presets as $i => $preset) {
-                                if ($i > 0) echo ', ';
-                                echo '"' . esc_html($preset['name'] ?? 'Unnamed') . '"';
-                            }
-                            echo ')';
-                        }
-                        ?>
-                    </div>
-                    <?php endif; ?>
+
                     
                     <div class="wpbnp-targeting-header">
                         <h3><?php esc_html_e('Navigation Configurations', 'wp-bottom-navigation-pro'); ?></h3>
