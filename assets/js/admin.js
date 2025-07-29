@@ -1,18 +1,18 @@
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     'use strict';
-    
+
     // CRITICAL: Immediate checkbox state preservation - runs before everything else
-    (function() {
+    (function () {
         const savedState = localStorage.getItem('wpbnp_form_state');
         if (savedState) {
             try {
                 const formData = JSON.parse(savedState);
                 if (formData['settings[enabled]'] !== undefined) {
                     // Use MutationObserver to watch for the checkbox and restore it immediately
-                    const observer = new MutationObserver(function(mutations) {
+                    const observer = new MutationObserver(function (mutations) {
                         const checkbox = document.querySelector('input[name="settings[enabled]"][type="checkbox"]');
                         const hiddenField = document.querySelector('input[name="settings[enabled]"][type="hidden"]');
-                        
+
                         if (checkbox) {
                             checkbox.checked = Boolean(formData['settings[enabled]']);
                             console.log('MutationObserver: Restored enabled checkbox (visible) to:', checkbox.checked);
@@ -23,18 +23,18 @@ jQuery(document).ready(function($) {
                             observer.disconnect();
                         }
                     });
-                    
+
                     // Start observing
                     observer.observe(document.body, {
                         childList: true,
                         subtree: true
                     });
-                    
+
                     // Fallback: try to set it immediately if it already exists
                     setTimeout(() => {
                         const checkbox = document.querySelector('input[name="settings[enabled]"][type="checkbox"]');
                         const hiddenField = document.querySelector('input[name="settings[enabled]"][type="hidden"]');
-                        
+
                         if (checkbox) {
                             checkbox.checked = Boolean(formData['settings[enabled]']);
                             console.log('Immediate fallback: Restored enabled checkbox (visible) to:', checkbox.checked);
@@ -50,13 +50,13 @@ jQuery(document).ready(function($) {
             }
         }
     })();
-    
+
     // Check if we have admin data available
     if (typeof wpbnp_admin === 'undefined') {
         console.warn('WP Bottom Navigation Pro: Admin data not available');
         return;
     }
-    
+
     // Main admin object
     const WPBottomNavAdmin = {
         settings: wpbnp_admin.settings || {},
@@ -64,30 +64,25 @@ jQuery(document).ready(function($) {
         dashicons: wpbnp_admin.dashicons || {},
         nonce: wpbnp_admin.nonce || '',
         currentTab: 'items',
-        
-        init: function() {
-            console.log('Initializing WP Bottom Navigation Pro Admin...');
-            
+
+        init: function () {
             this.currentTab = this.getCurrentTab();
-            
+
             // CRITICAL: Immediately save current form state on load to capture any existing values
             setTimeout(() => {
                 this.saveFormState();
                 console.log('Initial form state saved on page load');
             }, 100);
-            
+
             this.bindEvents();
             this.initializeColorPickers();
             this.setupSortable();
-            
+
             // Initialize form data after DOM is ready
             setTimeout(() => {
                 this.loadFormData();
                 this.initializeItems();
-                
-                // CRITICAL: Initialize custom presets from database
-                this.initCustomPresetsFromDatabase();
-                
+
                 // Restore form state if switching tabs (delay to ensure elements are ready)
                 if (localStorage.getItem('wpbnp_form_state')) {
                     setTimeout(() => {
@@ -95,61 +90,30 @@ jQuery(document).ready(function($) {
                     }, 100);
                 }
             }, 200);
-            
-            console.log('Admin initialization complete');
         },
-        
-        // Initialize custom presets from database
-        initCustomPresetsFromDatabase: function() {
-            console.log('Initializing custom presets from database...');
-            
-            // Check if we have custom presets in the database settings
-            if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings && wpbnp_admin.settings.custom_presets) {
-                const dbPresets = wpbnp_admin.settings.custom_presets.presets;
-                if (dbPresets && dbPresets.length > 0) {
-                    console.log(`Found ${dbPresets.length} custom presets in database`);
-                    
-                    // Check if we already have presets in DOM
-                    const domPresets = $('.wpbnp-preset-item').length;
-                    console.log(`Found ${domPresets} presets in DOM`);
-                    
-                    // If no presets in DOM, restore from database
-                    if (domPresets === 0) {
-                        console.log('No presets in DOM, restoring from database...');
-                        this.restoreCustomPresets(dbPresets);
-                    } else {
-                        console.log('Presets already in DOM, skipping database restoration');
-                    }
-                } else {
-                    console.log('No custom presets found in database');
-                }
-            } else {
-                console.log('No custom presets settings found in database');
-            }
-        },
-        
+
         // Get current tab from URL or default
-        getCurrentTab: function() {
+        getCurrentTab: function () {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('tab') || 'items';
         },
-        
+
         // Load form data from settings
-        loadFormData: function() {
+        loadFormData: function () {
             this.populateFormFields();
         },
-        
+
         // Populate form fields with current settings
-        populateFormFields: function() {
+        populateFormFields: function () {
             const settings = this.settings;
-            
+
             // First, populate the main enabled checkbox - this is critical
             const enabledCheckbox = $('input[name="settings[enabled]"]');
             if (enabledCheckbox.length) {
                 enabledCheckbox.prop('checked', Boolean(settings.enabled));
                 console.log('Set enabled checkbox to:', Boolean(settings.enabled));
             }
-            
+
             // Populate style fields
             if (settings.style) {
                 Object.keys(settings.style).forEach(key => {
@@ -162,7 +126,7 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
-            
+
             // Populate animation fields
             if (settings.animations) {
                 Object.keys(settings.animations).forEach(key => {
@@ -176,7 +140,7 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
-            
+
             // Populate device fields
             if (settings.devices) {
                 Object.keys(settings.devices).forEach(device => {
@@ -192,7 +156,7 @@ jQuery(document).ready(function($) {
                     });
                 });
             }
-            
+
             // Populate display rules
             if (settings.display_rules) {
                 Object.keys(settings.display_rules).forEach(key => {
@@ -215,7 +179,7 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
-            
+
             // Populate badge fields
             if (settings.badges) {
                 Object.keys(settings.badges).forEach(key => {
@@ -232,7 +196,7 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
-            
+
             // Populate advanced fields
             if (settings.advanced) {
                 Object.keys(settings.advanced).forEach(key => {
@@ -242,12 +206,12 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
-            
+
             console.log('Form fields populated with settings:', settings);
         },
-        
+
         // Initialize navigation items
-        initializeItems: function() {
+        initializeItems: function () {
             const itemsList = $('#wpbnp-items-list');
             if (itemsList.length && this.settings.items) {
                 itemsList.empty();
@@ -256,13 +220,13 @@ jQuery(document).ready(function($) {
                 });
             }
         },
-        
+
         // Add new item row
-        addItemRow: function(item = null, index = null) {
+        addItemRow: function (item = null, index = null) {
             if (index === null) {
                 index = this.settings.items ? this.settings.items.length : 0;
             }
-            
+
             const defaultItem = {
                 id: `item_${index}`,
                 label: 'New Item',
@@ -270,9 +234,9 @@ jQuery(document).ready(function($) {
                 url: '#',
                 enabled: true
             };
-            
+
             const itemData = item || defaultItem;
-            
+
             const rowHtml = `
                 <div class="wpbnp-nav-item-row" data-index="${index}">
                     <span class="wpbnp-drag-handle dashicons dashicons-sort"></span>
@@ -311,106 +275,62 @@ jQuery(document).ready(function($) {
                     </div>
                 </div>
             `;
-            
+
             $('#wpbnp-items-list').append(rowHtml);
             this.updateItemsData();
         },
-        
+
         // Bind all events
-        bindEvents: function() {
-            // Tab switching
-            $(document).on('click', '.wpbnp-tab', function(e) {
-                // Save form state before switching tabs to preserve custom presets
-                WPBottomNavAdmin.saveFormState();
-                console.log('Form state saved before tab switch');
-                
-                // Small delay to ensure state is saved before navigation
-                setTimeout(() => {
-                    console.log('Navigating to:', this.href);
-                    window.location.href = this.href;
-                }, 50);
-                
-                // Prevent immediate navigation to allow state saving
-                e.preventDefault();
-            });
-            
+        bindEvents: function () {
             // Form submission
-            $('#wpbnp-settings-form').on('submit', this.handleFormSubmit.bind(this));
-            
-            // Also add a direct click handler for the save button as a backup
-            $(document).on('click', '#wpbnp-save-settings', function(e) {
-                console.log('Save button clicked directly');
-                console.log('Button element:', this);
-                console.log('Form element:', $('#wpbnp-settings-form').length);
-                
-                // Prevent default to handle manually
-                e.preventDefault();
-                
-                // Trigger form submission manually
-                console.log('Triggering form submission...');
-                $('#wpbnp-settings-form').trigger('submit');
-            });
-            
-            // Reset button
-            $('#wpbnp-reset-settings').on('click', this.resetSettings.bind(this));
-            
-            // Export button
-            $('#wpbnp-export-settings').on('click', this.exportSettings.bind(this));
-            
-            // Import button
-            $('#wpbnp-import-settings').on('click', this.importSettings.bind(this));
-            
-            // License activation from custom presets section
-            $(document).on('click', '#wpbnp-activate-license-presets', function(e) {
-                e.preventDefault();
-                WPBottomNavAdmin.activateLicense();
-            });
-            
+            $(document).on('submit', '#wpbnp-settings-form', this.handleFormSubmit.bind(this));
+
             // Add item button
             $(document).on('click', '#wpbnp-add-item', this.handleAddItem.bind(this));
-            
+
             // Toggle item
             $(document).on('click', '.wpbnp-toggle-item', this.handleToggleItem.bind(this));
-            
+
             // Remove item
             $(document).on('click', '.wpbnp-remove-item', this.handleRemoveItem.bind(this));
-            
+
             // Icon picker
             $(document).on('click', '.wpbnp-pick-icon', this.openIconPicker.bind(this));
-            
+
             // Preset application
             $(document).on('click', '.wpbnp-preset-card, .wpbnp-apply-preset', this.applyPreset.bind(this));
-            
+
             // Update items data when inputs change
             $(document).on('input change', '.wpbnp-nav-item-row input', this.updateItemsData.bind(this));
-            
+
             // Export/Import/Reset settings
             $(document).on('click', '.wpbnp-export-settings', this.exportSettings.bind(this));
             $(document).on('click', '.wpbnp-import-settings', this.importSettings.bind(this));
             $(document).on('click', '.wpbnp-reset-settings', this.resetSettings.bind(this));
-            
 
-            
+            // Handle tab switching with state preservation
+            $(document).on('click', '.wpbnp-tab', this.handleTabSwitch.bind(this));
+
             // Auto-save form state when any field changes (CRITICAL for Enable Bottom Navigation)
             $(document).on('change input', '#wpbnp-settings-form input, #wpbnp-settings-form select, #wpbnp-settings-form textarea', this.debounce(() => {
                 this.saveFormState();
                 console.log('Auto-saved form state due to field change');
             }, 500));
-            
+
             // Specific handler for the Enable Bottom Navigation checkbox
             $(document).on('change', 'input[name="settings[enabled]"]', (e) => {
                 const isChecked = $(e.target).is(':checked') || $(e.target).val() === '1';
-                
+
                 // Update local settings immediately
                 this.settings.enabled = isChecked;
-                
+
                 // Save form state immediately
                 this.saveFormState();
-                
+
                 console.log('Enable Bottom Navigation changed to:', isChecked);
                 console.log('Saved state immediately');
             });
-            
+
             // Handle hidden field updates for non-Items tabs
             $(document).on('wpbnp_update_enabled_state', (e, newState) => {
                 const hiddenField = $('#wpbnp-enabled-hidden');
@@ -420,9 +340,9 @@ jQuery(document).ready(function($) {
                 }
             });
         },
-        
+
         // Debounce function to prevent excessive saves
-        debounce: function(func, wait) {
+        debounce: function (func, wait) {
             let timeout;
             return function executedFunction(...args) {
                 const later = () => {
@@ -433,19 +353,48 @@ jQuery(document).ready(function($) {
                 timeout = setTimeout(later, wait);
             };
         },
-        
 
-        
+        // Handle tab switching while preserving form state
+        handleTabSwitch: function (e) {
+            console.log('Tab switch triggered:', e.target, e.currentTarget);
+
+            // Get the actual tab link (might be e.target or its parent)
+            const tabLink = $(e.target).closest('.wpbnp-tab')[0];
+            const targetHref = tabLink ? tabLink.href : null;
+
+            console.log('Tab link found:', tabLink, 'href:', targetHref);
+
+            // Only proceed if we have a valid href
+            if (!targetHref) {
+                console.warn('Tab click without valid href, ignoring');
+                return;
+            }
+
+            // Save current form state before switching tabs
+            this.saveFormState();
+
+            // Small delay to ensure state is saved before navigation
+            setTimeout(() => {
+                console.log('Navigating to:', targetHref);
+                // Let the navigation proceed
+                window.location.href = targetHref;
+            }, 50);
+
+            // Prevent immediate navigation to allow state saving
+            e.preventDefault();
+        },
+
         // Save current form state to localStorage
-        saveFormState: function() {
+        saveFormState: function () {
             const formData = this.getFormData();
-            
-            // CRITICAL: Handle enabled checkbox state properly
+
+            // CRITICAL: Always ensure the enabled checkbox state is captured
+            // Check for both visible checkbox and hidden field
             const enabledCheckbox = $('input[name="settings[enabled]"][type="checkbox"]');
             const enabledHidden = $('input[name="settings[enabled]"][type="hidden"]');
-            
+
             if (enabledCheckbox.length) {
-                // We're on the Items tab with visible checkbox
+                // We're on Items tab with visible checkbox
                 formData['settings[enabled]'] = enabledCheckbox.is(':checked');
                 console.log('Saved enabled checkbox state (visible):', formData['settings[enabled]']);
             } else if (enabledHidden.length) {
@@ -453,34 +402,25 @@ jQuery(document).ready(function($) {
                 formData['settings[enabled]'] = enabledHidden.val() === '1';
                 console.log('Saved enabled checkbox state (hidden):', formData['settings[enabled]']);
             }
-            
-            // CRITICAL: Save custom presets data separately with improved structure
+
+            // CRITICAL: Save custom presets data separately
             const customPresets = this.getCustomPresetsData();
             if (customPresets.length > 0) {
                 formData['wpbnp_custom_presets_data'] = JSON.stringify(customPresets);
                 console.log('Saved custom presets data:', customPresets);
-                
-                // Also update the settings object to ensure it's available immediately
-                if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
-                    if (!wpbnp_admin.settings.custom_presets) {
-                        wpbnp_admin.settings.custom_presets = {};
-                    }
-                    wpbnp_admin.settings.custom_presets.presets = customPresets;
-                    console.log('Updated wpbnp_admin.settings with custom presets');
-                }
             }
-            
+
             localStorage.setItem('wpbnp_form_state', JSON.stringify(formData));
             console.log('Form state saved to localStorage:', formData);
         },
-        
+
         // Get form data
-        getFormData: function() {
+        getFormData: function () {
             const formData = {};
             const form = $('#wpbnp-settings-form');
-            
+
             // Get all form inputs
-            form.find('input, select, textarea').each(function() {
+            form.find('input, select, textarea').each(function () {
                 const $input = $(this);
                 const name = $input.attr('name');
                 if (name) {
@@ -496,24 +436,18 @@ jQuery(document).ready(function($) {
                     }
                 }
             });
-            
+
             // Also store the items data specifically
             formData['wpbnp_items_data'] = JSON.stringify(this.settings.items || []);
-            
+
             return formData;
         },
 
         // Get custom presets data from DOM
-        getCustomPresetsData: function() {
-            console.log('=== GETTING CUSTOM PRESETS DATA ===');
+        getCustomPresetsData: function () {
             const presets = [];
-            const presetItems = $('.wpbnp-preset-item');
-            console.log('Found preset items in DOM:', presetItems.length);
-            
-            presetItems.each(function(index) {
+            $('.wpbnp-preset-item').each(function () {
                 const $item = $(this);
-                console.log(`Processing preset item ${index + 1}:`, $item);
-                
                 const preset = {
                     id: $item.data('preset-id'),
                     name: $item.find('.wpbnp-preset-name').text().trim(),
@@ -521,66 +455,55 @@ jQuery(document).ready(function($) {
                     created_at: parseInt($item.find('input[name*="[created_at]"]').val()) || Math.floor(Date.now() / 1000),
                     items: []
                 };
-                
-                console.log('Preset data extracted:', preset);
-                
+
                 // Get items from hidden input
                 const itemsJson = $item.find('input[name*="[items]"]').val();
-                console.log('Items JSON found:', itemsJson);
-                
                 if (itemsJson) {
                     try {
                         preset.items = JSON.parse(itemsJson.replace(/&quot;/g, '"'));
-                        console.log('Successfully parsed items:', preset.items);
                     } catch (e) {
                         console.warn('Failed to parse preset items:', e);
                         preset.items = [];
                     }
-                } else {
-                    console.log('No items JSON found for this preset');
                 }
-                
+
                 if (preset.id && preset.name) {
                     presets.push(preset);
-                    console.log('Added preset to collection:', preset.name);
-                } else {
-                    console.log('Skipping preset due to missing id or name');
                 }
             });
-            
-            console.log('Final presets collection:', presets);
+
             return presets;
         },
-        
+
         // Restore form state from localStorage
-        restoreFormState: function() {
+        restoreFormState: function () {
             const savedState = localStorage.getItem('wpbnp_form_state');
             if (savedState) {
                 try {
                     const formData = JSON.parse(savedState);
-                    
+
                     // CRITICAL: Handle the enabled checkbox FIRST and more aggressively
                     if (formData['settings[enabled]'] !== undefined) {
                         const shouldBeChecked = Boolean(formData['settings[enabled]']);
-                        
+
                         // Handle visible checkbox (Items tab)
                         const enabledCheckbox = $('input[name="settings[enabled]"][type="checkbox"]');
                         if (enabledCheckbox.length) {
                             enabledCheckbox.prop('checked', shouldBeChecked);
                             console.log('Restored enabled checkbox (visible) to:', shouldBeChecked);
                         }
-                        
+
                         // Handle hidden field (other tabs)
                         const enabledHidden = $('input[name="settings[enabled]"][type="hidden"]');
                         if (enabledHidden.length) {
                             enabledHidden.val(shouldBeChecked ? '1' : '0');
                             console.log('Restored enabled checkbox (hidden) to:', shouldBeChecked);
                         }
-                        
+
                         // Also update the local settings object
                         this.settings.enabled = shouldBeChecked;
                     }
-                    
+
                     // Restore regular form fields
                     Object.keys(formData).forEach(name => {
                         if (name === 'wpbnp_items_data') {
@@ -596,7 +519,7 @@ jQuery(document).ready(function($) {
                             }
                             return;
                         }
-                        
+
                         if (name === 'wpbnp_custom_presets_data') {
                             // Handle custom presets data separately
                             try {
@@ -609,12 +532,12 @@ jQuery(document).ready(function($) {
                             }
                             return;
                         }
-                        
+
                         // Skip enabled checkbox as we handled it above
                         if (name === 'settings[enabled]') {
                             return;
                         }
-                        
+
                         const $input = $(`[name="${name}"]`);
                         if ($input.length) {
                             if ($input.attr('type') === 'checkbox') {
@@ -628,49 +551,35 @@ jQuery(document).ready(function($) {
                             }
                         }
                     });
-                    
-                    console.log('Form state restored successfully from localStorage');
+
+                    console.log('Form state restored successfully');
                 } catch (e) {
                     console.error('Error restoring form state:', e);
                     // Clear corrupted state
                     localStorage.removeItem('wpbnp_form_state');
                 }
-            } else {
-                // No localStorage data, check if we need to restore custom presets from database
-                console.log('No localStorage data found, checking database for custom presets...');
-                this.initCustomPresetsFromDatabase();
             }
         },
 
         // Restore custom presets from saved data
-        restoreCustomPresets: function(presetsData) {
+        restoreCustomPresets: function (presetsData) {
             console.log('Restoring custom presets:', presetsData);
-            
+
             // Clear existing presets in DOM first
             $('#wpbnp-custom-presets-list .wpbnp-preset-item').remove();
-            
+
             // Remove any existing "no presets" message
             $('#wpbnp-custom-presets-list .wpbnp-no-presets').remove();
-            
+
             if (presetsData && presetsData.length > 0) {
                 // Add each preset back to DOM
                 presetsData.forEach(preset => {
-                    console.log('Restoring preset:', preset.name, 'with', preset.items ? preset.items.length : 0, 'items');
                     this.addPresetToDOM(preset);
                 });
-                
+
                 // Update preset selectors
                 this.updateAllPresetSelectors();
-                
-                // Also update the settings object to ensure consistency
-                if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
-                    if (!wpbnp_admin.settings.custom_presets) {
-                        wpbnp_admin.settings.custom_presets = {};
-                    }
-                    wpbnp_admin.settings.custom_presets.presets = presetsData;
-                    console.log('Updated wpbnp_admin.settings with restored presets');
-                }
-                
+
                 console.log(`${presetsData.length} custom presets restored successfully`);
             } else {
                 // Show "no presets" message
@@ -678,136 +587,87 @@ jQuery(document).ready(function($) {
                 console.log('No custom presets to restore');
             }
         },
-        
+
         // Handle form submission
-        handleFormSubmit: function(e) {
-            try {
-                console.log('=== FORM SUBMISSION DEBUG ===');
-                console.log('handleFormSubmit called');
-                console.log('Event target:', e.target);
-                console.log('Event type:', e.type);
-                console.log('WPBottomNavAdmin object:', typeof WPBottomNavAdmin);
-                console.log('wpbnp_admin object:', typeof wpbnp_admin);
-                console.log('Form element:', $('#wpbnp-settings-form').length);
-                console.log('Save button:', $('#wpbnp-save-settings').length);
-                
-                e.preventDefault();
-                
-                const formData = new FormData(e.target);
-                console.log('FormData created, entries:', formData.entries ? 'available' : 'not available');
-                
-                // Critical fix: Ensure unchecked checkboxes are handled properly
-                // FormData doesn't include unchecked checkboxes, so we need to explicitly add them
-                $('#wpbnp-settings-form input[type="checkbox"]').each(function() {
-                    const checkbox = $(this);
-                    const name = checkbox.attr('name');
-                    if (name && !checkbox.is(':checked')) {
-                        formData.append(name, '0');
-                        console.log('Added unchecked checkbox:', name);
-                    }
-                });
-                
-                // CRITICAL: Ensure custom presets data is included in form submission
-                const customPresets = this.getCustomPresetsData();
-                console.log('Custom presets data:', customPresets);
-                
-                if (customPresets.length > 0) {
-                    formData.append('wpbnp_custom_presets_data', JSON.stringify(customPresets));
-                    console.log('Including custom presets data in form submission:', customPresets);
-                } else {
-                    console.log('No custom presets to include');
-                }
-                
-                // Ensure action and nonce are included
-                formData.append('action', 'wpbnp_save_settings');
-                formData.append('nonce', wpbnp_admin.nonce);
-                
-                // Debug: Log all form data being sent
-                console.log('=== FORM DATA BEING SENT ===');
-                for (let [key, value] of formData.entries()) {
-                    console.log(key + ':', value);
-                }
-                
-                console.log('Form data prepared, submitting...');
-                console.log('AJAX URL:', wpbnp_admin.ajax_url);
-                console.log('Nonce:', wpbnp_admin.nonce);
-                
-                const submitBtn = $('#wpbnp-save-settings');
-                const originalText = submitBtn.text();
-                
-                submitBtn.prop('disabled', true).text(wpbnp_admin.strings.saving || 'Saving...');
-                
-                $.ajax({
-                    url: wpbnp_admin.ajax_url,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        console.log('AJAX success response:', response);
-                        if (response.success) {
-                            WPBottomNavAdmin.showNotification(wpbnp_admin.strings.saved || 'Settings saved successfully!', 'success');
-                            
-                            // Update local settings from response
-                            if (response.data && response.data.settings) {
-                                WPBottomNavAdmin.settings = response.data.settings;
-                                
-                                // CRITICAL: Update wpbnp_admin.settings to ensure consistency
-                                if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
-                                    wpbnp_admin.settings = response.data.settings;
-                                    console.log('Updated wpbnp_admin.settings from response');
-                                }
-                                
-                                // CRITICAL: Restore custom presets from the database response
-                                if (response.data.settings.custom_presets && response.data.settings.custom_presets.presets) {
-                                    console.log('Restoring custom presets from database response:', response.data.settings.custom_presets.presets);
-                                    WPBottomNavAdmin.restoreCustomPresets(response.data.settings.custom_presets.presets);
-                                }
-                            }
-                            
-                            // Only clear localStorage after successful restoration
-                            localStorage.removeItem('wpbnp_form_state');
-                            console.log('Form state cleared after successful save and restoration');
-                        } else {
-                            WPBottomNavAdmin.showNotification(response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings', 'error');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('AJAX error:', xhr, status, error);
-                        console.error('Response text:', xhr.responseText);
-                        console.error('Status:', xhr.status);
-                        console.error('Status text:', xhr.statusText);
-                        WPBottomNavAdmin.showNotification('Ajax error occurred: ' + error, 'error');
-                    },
-                    complete: function() {
-                        submitBtn.prop('disabled', false).text(originalText);
-                    }
-                });
-            } catch (error) {
-                console.error('Error in handleFormSubmit:', error);
-                console.error('Error stack:', error.stack);
-                WPBottomNavAdmin.showNotification('Error processing form submission: ' + error.message, 'error');
-            }
-        },
-        
-        // Reset settings
-        resetSettings: function(e) {
+        handleFormSubmit: function (e) {
             e.preventDefault();
-            
+
+            const formData = new FormData(e.target);
+
+            // Critical fix: Ensure unchecked checkboxes are handled properly
+            // FormData doesn't include unchecked checkboxes, so we need to explicitly add them
+            $('#wpbnp-settings-form input[type="checkbox"]').each(function () {
+                const checkbox = $(this);
+                const name = checkbox.attr('name');
+                if (name && !formData.has(name)) {
+                    // If checkbox is not in FormData (meaning it's unchecked), add it as '0'
+                    formData.append(name, '0');
+                }
+            });
+
+            formData.append('action', 'wpbnp_save_settings');
+            formData.append('nonce', this.nonce);
+
+            // Disable submit button
+            const submitBtn = $('.wpbnp-save-settings');
+            const originalText = submitBtn.text();
+            submitBtn.prop('disabled', true).text(wpbnp_admin.strings.saving || 'Saving...');
+
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: (response) => {
+                    if (response.success) {
+                        this.showNotification(wpbnp_admin.strings.saved || 'Settings saved successfully!', 'success');
+                        // Update local settings from response
+                        if (response.data && response.data.settings) {
+                            this.settings = response.data.settings;
+                            console.log('Updated local settings:', this.settings);
+                        } else {
+                            // If no settings in response, merge current form data with existing settings
+                            const currentFormData = this.getFormData();
+                            // Update enabled state specifically
+                            if (currentFormData['settings[enabled]'] !== undefined) {
+                                this.settings.enabled = currentFormData['settings[enabled]'];
+                            }
+                        }
+                        // Clear saved form state after successful save
+                        localStorage.removeItem('wpbnp_form_state');
+                        console.log('Settings saved and form state cleared');
+                    } else {
+                        this.showNotification(response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings', 'error');
+                    }
+                },
+                error: () => {
+                    this.showNotification('Ajax error occurred', 'error');
+                },
+                complete: () => {
+                    submitBtn.prop('disabled', false).text(originalText);
+                }
+            });
+        },
+
+        // Reset settings
+        resetSettings: function (e) {
+            e.preventDefault();
+
             if (!confirm(wpbnp_admin.strings.confirm_reset || 'Are you sure you want to reset all settings to defaults?')) {
                 return;
             }
-            
+
             const button = $(e.target);
             const originalText = button.text();
             button.prop('disabled', true).text('Resetting...');
-            
+
             $.ajax({
                 url: wpbnp_admin.ajax_url,
                 type: 'POST',
                 data: {
                     action: 'wpbnp_reset_settings',
-                    nonce: wpbnp_admin.nonce
+                    nonce: this.nonce
                 },
                 success: (response) => {
                     if (response.success) {
@@ -833,29 +693,29 @@ jQuery(document).ready(function($) {
                 }
             });
         },
-        
+
         // Handle add item
-        handleAddItem: function(e) {
+        handleAddItem: function (e) {
             e.preventDefault();
             this.addItemRow();
         },
-        
+
         // Handle toggle item
-        handleToggleItem: function(e) {
+        handleToggleItem: function (e) {
             e.preventDefault();
             const button = $(e.target);
             const hiddenInput = button.siblings('.wpbnp-item-enabled');
             const isEnabled = hiddenInput.val() === '1';
-            
+
             hiddenInput.val(isEnabled ? '0' : '1');
             button.toggleClass('enabled disabled');
             button.text(isEnabled ? 'Disabled' : 'Enabled');
-            
+
             this.updateItemsData();
         },
-        
+
         // Handle remove item
-        handleRemoveItem: function(e) {
+        handleRemoveItem: function (e) {
             e.preventDefault();
             if (confirm('Are you sure you want to remove this item?')) {
                 $(e.target).closest('.wpbnp-nav-item-row').remove();
@@ -863,23 +723,23 @@ jQuery(document).ready(function($) {
                 this.updateItemsData();
             }
         },
-        
+
         // Open icon picker modal
-        openIconPicker: function(e) {
+        openIconPicker: function (e) {
             e.preventDefault();
             const button = $(e.target);
             const input = button.siblings('.wpbnp-icon-input');
-            
+
             // Create modal if it doesn't exist
             if (!$('#wpbnp-icon-modal').length) {
                 this.createIconModal();
             }
-            
+
             // Get current preset and determine recommended icon library
             const currentPreset = $('input[name="settings[preset]"]').val() || 'minimal';
             const presetIconMapping = {
                 'minimal': 'dashicons',
-                'dark': 'fontawesome', 
+                'dark': 'fontawesome',
                 'material': 'material',
                 'ios': 'apple',
                 'glassmorphism': 'bootstrap',
@@ -889,35 +749,35 @@ jQuery(document).ready(function($) {
                 'gradient': 'bootstrap',
                 'floating': 'fontawesome'
             };
-            
+
             const recommendedLibrary = presetIconMapping[currentPreset] || 'dashicons';
-            
+
             // Show modal and store reference to input
             $('#wpbnp-icon-modal').show().data('target-input', input);
-            
+
             // Automatically switch to recommended icon library tab
             $('.wpbnp-icon-tab').removeClass('active');
             $('.wpbnp-icon-library-content').removeClass('active');
             $(`.wpbnp-icon-tab[data-library="${recommendedLibrary}"]`).addClass('active');
             $(`.wpbnp-icon-library-content[data-library="${recommendedLibrary}"]`).addClass('active');
-            
+
             // Update library indicator (Bootstrap for all presets)
             const libraryName = $(`.wpbnp-icon-tab[data-library="${recommendedLibrary}"]`).text();
             $('#wpbnp-current-library').text(`${libraryName}`);
             this.updateIconCount();
-            
+
             // Highlight current selection
             $('.wpbnp-icon-option').removeClass('selected');
             $(`.wpbnp-icon-option[data-icon="${input.val()}"]`).addClass('selected');
-            
+
             // Focus search
             $('#wpbnp-icon-search').focus();
-            
+
             // Icon library notifications disabled (using Bootstrap for all presets)
         },
-        
+
         // Create enhanced icon picker modal with multiple libraries
-        createIconModal: function() {
+        createIconModal: function () {
             const iconLibraries = {
                 'dashicons': {
                     name: 'WordPress Icons',
@@ -962,7 +822,7 @@ jQuery(document).ready(function($) {
                     badge: 'FE'
                 }
             };
-            
+
             // Generate organized tabs HTML with badges and descriptions
             let tabsHtml = '<div class="wpbnp-icon-tabs-container">';
             tabsHtml += '<div class="wpbnp-icon-tabs">';
@@ -980,19 +840,19 @@ jQuery(document).ready(function($) {
             tabsHtml += '</div>';
             tabsHtml += '<div class="wpbnp-library-info"><span id="wpbnp-current-library-desc">Select an icon library</span></div>';
             tabsHtml += '</div>';
-            
+
             // Generate organized content HTML for each library
             let contentHtml = '<div class="wpbnp-icon-content-wrapper">';
             Object.keys(iconLibraries).forEach(libKey => {
                 const lib = iconLibraries[libKey];
                 contentHtml += `<div class="wpbnp-icon-library-content" data-library="${libKey}">`;
                 contentHtml += `<div class="wpbnp-icons-grid">`;
-                
+
                 Object.keys(lib.icons).forEach(iconKey => {
                     const iconName = lib.icons[iconKey];
                     let iconElement = '';
                     let saveValue = '';
-                    
+
                     // Generate proper icon markup and save value based on library type
                     if (libKey === 'dashicons') {
                         iconElement = `<span class="dashicons ${iconKey}"></span>`;
@@ -1013,7 +873,7 @@ jQuery(document).ready(function($) {
                         iconElement = `<i class="feather-${iconKey}"></i>`;
                         saveValue = `feather-${iconKey}`;
                     }
-                    
+
                     contentHtml += `
                         <div class="wpbnp-icon-option" data-icon="${saveValue}" data-library="${libKey}" title="${iconName}">
                             <div class="wpbnp-icon-preview">${iconElement}</div>
@@ -1021,11 +881,11 @@ jQuery(document).ready(function($) {
                         </div>
                     `;
                 });
-                
+
                 contentHtml += '</div></div>';
             });
             contentHtml += '</div>';
-            
+
             // Complete organized modal HTML
             const modalHtml = `
                 <div id="wpbnp-icon-modal" class="wpbnp-modal" style="display: none;">
@@ -1053,52 +913,52 @@ jQuery(document).ready(function($) {
                     </div>
                 </div>
             `;
-            
+
             // Remove existing modal and add new one
             $('#wpbnp-icon-modal').remove();
             $('body').append(modalHtml);
-            
+
             // Initialize with first tab active
             $('.wpbnp-icon-tab').first().addClass('active');
             $('.wpbnp-icon-library-content').first().addClass('active');
             this.updateIconCount();
             this.updateLibraryInfo();
-            
+
             // Bind events
             this.bindIconModalEvents();
         },
-        
+
         // Apply preset with debouncing and performance optimization
-        applyPreset: function(e) {
+        applyPreset: function (e) {
             e.preventDefault();
             const $target = $(e.currentTarget);
-            
+
             // Prevent double-clicks and rapid clicking
             if ($target.hasClass('wpbnp-applying')) {
                 return;
             }
-            
+
             $target.addClass('wpbnp-applying');
-            
+
             const presetKey = $target.data('preset');
             const preset = this.presets[presetKey];
-            
+
             if (!preset) {
                 $target.removeClass('wpbnp-applying');
                 return;
             }
-            
+
             // Show immediate feedback
             $target.find('.wpbnp-preset-name').text('Applying...');
-            
+
             // Use setTimeout to allow UI to update and prevent blocking
             setTimeout(() => {
                 this.doApplyPreset(preset, presetKey, $target, e);
             }, 50);
         },
-        
+
         // Actual preset application logic (separated for performance)
-        doApplyPreset: function(preset, presetKey, $target, originalEvent) {
+        doApplyPreset: function (preset, presetKey, $target, originalEvent) {
             // Define icon library mapping for each preset (Bootstrap Icons for all)
             const presetIconMapping = {
                 'minimal': 'bootstrap',      // Bootstrap Icons
@@ -1112,10 +972,10 @@ jQuery(document).ready(function($) {
                 'gradient': 'bootstrap',     // Bootstrap Icons
                 'floating': 'bootstrap'      // Bootstrap Icons (simplified)
             };
-            
+
             // Get recommended icon library for this preset
             const recommendedIconLibrary = presetIconMapping[presetKey] || 'bootstrap';
-            
+
             // Icon conversion mapping between libraries
             const iconConversion = {
                 // Common icon mappings (Bootstrap outline icons as preferred default)
@@ -1216,7 +1076,7 @@ jQuery(document).ready(function($) {
                     'feather': 'info'
                 }
             };
-            
+
             // Apply style settings
             if (preset.style) {
                 Object.keys(preset.style).forEach(key => {
@@ -1229,7 +1089,7 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
-            
+
             // Apply animation settings
             if (preset.animations) {
                 Object.keys(preset.animations).forEach(key => {
@@ -1243,15 +1103,15 @@ jQuery(document).ready(function($) {
                     }
                 });
             }
-            
+
             // DISABLED: Auto-conversion (keeping Bootstrap Icons for all presets for simplicity)
             if (false && this.settings.items && this.settings.items.length > 0) {
                 // Conversion disabled - using Bootstrap Icons universally
                 const shouldConvertIcons = false; // Disabled
-                
+
                 if (shouldConvertIcons) {
                     let iconsChanged = 0;
-                    
+
                     // Simplified conversion - only convert obvious mismatches
                     this.settings.items.forEach((item, index) => {
                         if (item.icon && this.needsIconConversion(item.icon, recommendedIconLibrary)) {
@@ -1259,80 +1119,80 @@ jQuery(document).ready(function($) {
                             if (convertedIcon && convertedIcon !== item.icon) {
                                 item.icon = convertedIcon;
                                 iconsChanged++;
-                                
+
                                 // Icon updated in memory, UI will be refreshed after loop
                             }
                         }
                     });
-                    
-                                                              // Icon conversion disabled - using Bootstrap Icons for all presets
+
+                    // Icon conversion disabled - using Bootstrap Icons for all presets
                 }
             }
-            
+
             // If no items exist, create default preset-appropriate items
             if (!this.settings.items || this.settings.items.length === 0) {
                 // Same 3 default items (Home, Shop, Account) with Bootstrap outline icons for all presets
                 const defaultPresetItems = {
                     'minimal': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'dark': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'material': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'ios': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'glassmorphism': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'neumorphism': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'cyberpunk': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'vintage': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'gradient': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ],
                     'floating': [
-                        {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                        {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                        {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                        { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                        { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                        { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                     ]
                 };
-                
+
                 // Use preset default items, fallback to Bootstrap outline icons
                 const defaultItems = defaultPresetItems[presetKey] || [
-                    {id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true},
-                    {id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true},
-                    {id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true}
+                    { id: 'home', label: 'Home', icon: 'bi bi-house-door', url: wpbnp_admin.home_url, enabled: true },
+                    { id: 'shop', label: 'Shop', icon: 'bi bi-cart', url: '#', enabled: true },
+                    { id: 'account', label: 'Account', icon: 'bi bi-person', url: '#', enabled: true }
                 ];
                 this.settings.items = [...defaultItems];
-                
+
                 // Re-render items list (batched)
                 setTimeout(() => {
                     this.refreshItemsList();
@@ -1344,30 +1204,30 @@ jQuery(document).ready(function($) {
             $('input[name="settings[preset]"]').val(presetKey);
             $('.wpbnp-preset-card').removeClass('active');
             $(`.wpbnp-preset-card[data-preset="${presetKey}"]`).addClass('active');
-            
+
             // Show success notification
             this.showNotification(`✨ ${preset.name} preset applied successfully!`, 'success');
-            
+
             // Auto-save the form after preset application (debounced)
             setTimeout(() => {
                 this.saveFormState();
             }, 100);
-            
+
             // Reset button state and restore text
             $target.removeClass('wpbnp-applying');
             $target.find('.wpbnp-preset-name').text(preset.name);
         },
-        
+
         // Check if icon needs conversion (simplified)
-        needsIconConversion: function(iconClass, targetLibrary) {
+        needsIconConversion: function (iconClass, targetLibrary) {
             if (!iconClass || !targetLibrary) return false;
-            
+
             const iconType = this.getIconType(iconClass);
             return iconType !== targetLibrary;
         },
-        
+
         // Get icon type (simplified detection)
-        getIconType: function(iconClass) {
+        getIconType: function (iconClass) {
             if (iconClass.startsWith('bi bi-')) return 'bootstrap';
             if (iconClass.startsWith('dashicons-')) return 'dashicons';
             if (iconClass.startsWith('fas fa-') || iconClass.startsWith('far fa-') || iconClass.startsWith('fab fa-')) return 'fontawesome';
@@ -1376,9 +1236,9 @@ jQuery(document).ready(function($) {
             if (!iconClass.includes('-') && !iconClass.includes(' ') && !iconClass.includes('<')) return 'material';
             return 'bootstrap'; // default changed to bootstrap
         },
-        
+
         // Simple icon conversion (basic mapping only)
-        getSimpleIconConversion: function(iconClass, targetLibrary, index) {
+        getSimpleIconConversion: function (iconClass, targetLibrary, index) {
             // Basic conversion map for common icons only (Bootstrap outline icons as default)
             const basicConversions = {
                 'home': {
@@ -1446,24 +1306,24 @@ jQuery(document).ready(function($) {
                     'feather': 'feather-settings'
                 }
             };
-            
+
             // Try to find conversion by checking if current icon exists in any mapping
             for (const [key, mapping] of Object.entries(basicConversions)) {
                 if (Object.values(mapping).includes(iconClass)) {
                     return mapping[targetLibrary] || iconClass;
                 }
             }
-            
+
             // Special handling for common Bootstrap to Apple conversions
             const bootstrapToAppleMap = {
                 'bi bi-house-door': 'house-fill',
-                'bi bi-cart': 'cart-fill', 
+                'bi bi-cart': 'cart-fill',
                 'bi bi-person': 'person-fill',
                 'bi bi-search': 'magnifyingglass',
                 'bi bi-heart': 'heart-fill',
                 'bi bi-gear': 'gearshape-fill'
             };
-            
+
             // Special handling for common Dashicons to Apple conversions  
             const dashiconsToAppleMap = {
                 'dashicons-admin-home': 'house-fill',
@@ -1473,7 +1333,7 @@ jQuery(document).ready(function($) {
                 'dashicons-heart': 'heart-fill',
                 'dashicons-admin-settings': 'gearshape-fill'
             };
-            
+
             // Apply direct mappings based on target library
             if (targetLibrary === 'apple') {
                 if (bootstrapToAppleMap[iconClass]) {
@@ -1512,14 +1372,14 @@ jQuery(document).ready(function($) {
                     return toMaterialMap[iconClass];
                 }
             }
-            
+
             return iconClass; // Return original if no conversion found
         },
-        
+
         // Generate HTML for icon preview
-        generateIconHTML: function(iconClass) {
+        generateIconHTML: function (iconClass) {
             if (!iconClass) return '';
-            
+
             // Handle different icon types (Bootstrap first as default)
             if (iconClass.startsWith('bi bi-')) {
                 return `<i class="${iconClass}"></i>`;
@@ -1540,9 +1400,9 @@ jQuery(document).ready(function($) {
                 return `<span class="wpbnp-custom-icon">${iconClass}</span>`;
             }
         },
-        
+
         // Helper function to identify Apple SF Symbols (only ones with CSS definitions)
-        isAppleIcon: function(iconClass) {
+        isAppleIcon: function (iconClass) {
             // List of Apple icon patterns that have proper CSS definitions
             const validAppleIcons = [
                 'house', 'house-fill', 'house-circle', 'house-circle-fill',
@@ -1614,19 +1474,19 @@ jQuery(document).ready(function($) {
                 'clock', 'clock-fill', 'clock-circle', 'clock-circle-fill',
                 'alarm', 'alarm-fill', 'stopwatch', 'stopwatch-fill', 'timer', 'calendar', 'hourglass'
             ];
-            
+
             return validAppleIcons.includes(iconClass);
         },
-        
+
         // Initialize color pickers
-        initializeColorPickers: function() {
+        initializeColorPickers: function () {
             if ($.fn.wpColorPicker) {
                 $('.wpbnp-color-picker').wpColorPicker();
             }
         },
-        
+
         // Setup sortable
-        setupSortable: function() {
+        setupSortable: function () {
             if ($.fn.sortable) {
                 $('#wpbnp-items-list').sortable({
                     handle: '.wpbnp-drag-handle',
@@ -1638,12 +1498,12 @@ jQuery(document).ready(function($) {
                 });
             }
         },
-        
+
         // Reindex items after sorting/removal
-        reindexItems: function() {
-            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function(index) {
+        reindexItems: function () {
+            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function (index) {
                 $(this).attr('data-index', index);
-                $(this).find('input').each(function() {
+                $(this).find('input').each(function () {
                     const name = $(this).attr('name');
                     if (name && name.includes('[items][')) {
                         const newName = name.replace(/\[items\]\[\d+\]/, `[items][${index}]`);
@@ -1652,11 +1512,11 @@ jQuery(document).ready(function($) {
                 });
             });
         },
-        
+
         // Update items data in memory
-        updateItemsData: function() {
+        updateItemsData: function () {
             const items = [];
-            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function() {
+            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function () {
                 const row = $(this);
                 items.push({
                     id: row.find('.wpbnp-item-id').val(),
@@ -1668,46 +1528,46 @@ jQuery(document).ready(function($) {
             });
             this.settings.items = items;
         },
-        
+
         // Refresh the items list display
-        refreshItemsList: function() {
+        refreshItemsList: function () {
             // Clear existing items
             $('#wpbnp-items-list').empty();
-            
+
             // Re-render all items from current settings
             if (this.settings.items && this.settings.items.length > 0) {
                 this.settings.items.forEach((item, index) => {
                     this.addItemRow(item, index);
                 });
             }
-            
+
             // Re-setup sortable after refresh
             this.setupSortable();
         },
-        
+
         // Save settings programmatically (for auto-save after conversions)
-        saveSettings: function() {
+        saveSettings: function () {
             // Get current form data
             const form = document.getElementById('wpbnp-settings-form');
             if (!form) {
                 console.error('Settings form not found');
                 return;
             }
-            
+
             const formData = new FormData(form);
-            
+
             // Handle unchecked checkboxes
-            $('#wpbnp-settings-form input[type="checkbox"]').each(function() {
+            $('#wpbnp-settings-form input[type="checkbox"]').each(function () {
                 const checkbox = $(this);
                 const name = checkbox.attr('name');
                 if (name && !formData.has(name)) {
                     formData.append(name, '0');
                 }
             });
-            
+
             formData.append('action', 'wpbnp_save_settings');
-            formData.append('nonce', wpbnp_admin.nonce);
-            
+            formData.append('nonce', this.nonce);
+
             $.ajax({
                 url: wpbnp_admin.ajax_url,
                 type: 'POST',
@@ -1727,15 +1587,15 @@ jQuery(document).ready(function($) {
                 }
             });
         },
-        
+
         // Export settings
-        exportSettings: function(e) {
+        exportSettings: function (e) {
             e.preventDefault();
-            
+
             const button = $(e.target);
             const originalText = button.text();
             button.prop('disabled', true).text('Exporting...');
-            
+
             $.ajax({
                 url: wpbnp_admin.ajax_url,
                 type: 'POST',
@@ -1747,12 +1607,12 @@ jQuery(document).ready(function($) {
                     if (response.success) {
                         // Create and trigger download
                         const dataStr = response.data.data;
-                        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
                         const linkElement = document.createElement('a');
                         linkElement.setAttribute('href', dataUri);
                         linkElement.setAttribute('download', response.data.filename);
                         linkElement.click();
-                        
+
                         this.showNotification('Settings exported successfully!', 'success');
                     } else {
                         this.showNotification(response.data ? response.data.message : 'Error exporting settings', 'error');
@@ -1766,33 +1626,33 @@ jQuery(document).ready(function($) {
                 }
             });
         },
-        
+
         // Import settings
-        importSettings: function(e) {
+        importSettings: function (e) {
             e.preventDefault();
             $('#wpbnp-import-file').click();
         },
-        
+
         // Show notification
-        showNotification: function(message, type = 'success') {
+        showNotification: function (message, type = 'success') {
             const notification = $(`
                 <div class="wpbnp-notification ${type}">
                     <span class="wpbnp-notification-message">${message}</span>
                     <button type="button" class="wpbnp-notification-close">&times;</button>
                 </div>
             `);
-            
+
             $('#wpbnp-notifications').append(notification);
-            
+
             // Auto-remove after 5 seconds
             setTimeout(() => {
                 notification.fadeOut(() => {
                     notification.remove();
                 });
             }, 5000);
-            
+
             // Manual close
-            notification.find('.wpbnp-notification-close').on('click', function() {
+            notification.find('.wpbnp-notification-close').on('click', function () {
                 notification.fadeOut(() => {
                     notification.remove();
                 });
@@ -1800,13 +1660,13 @@ jQuery(document).ready(function($) {
         },
 
         // Update icon count in the modal
-        updateIconCount: function() {
+        updateIconCount: function () {
             const totalIcons = $('.wpbnp-icon-option').length;
             $('#wpbnp-icon-count').text(`${totalIcons} icons`);
         },
 
         // Update library info in the modal
-        updateLibraryInfo: function() {
+        updateLibraryInfo: function () {
             const currentLibrary = $('.wpbnp-icon-tab.active').data('library');
             const currentLibraryName = $('.wpbnp-icon-tab.active .wpbnp-tab-name').text();
             const currentLibraryDescription = $('.wpbnp-icon-tab.active').attr('title');
@@ -1814,13 +1674,13 @@ jQuery(document).ready(function($) {
             const currentLibraryCount = $('.wpbnp-icon-tab.active .wpbnp-tab-count').text();
 
             $('#wpbnp-current-library-desc').text(`${currentLibraryName} - ${currentLibraryDescription}`);
-            
+
             // Update icon counts
             this.updateIconCount();
         },
 
         // Update icon count display
-        updateIconCount: function() {
+        updateIconCount: function () {
             const totalIcons = $('.wpbnp-icon-library-content.active .wpbnp-icon-option').length;
             const visibleIcons = $('.wpbnp-icon-library-content.active .wpbnp-icon-option:visible').length;
             $('#wpbnp-icon-count').text(`${totalIcons} icons`);
@@ -1828,14 +1688,14 @@ jQuery(document).ready(function($) {
         },
 
         // Bind events for the icon picker modal
-        bindIconModalEvents: function() {
-            $(document).on('click', '.wpbnp-modal-close, .wpbnp-modal', function(e) {
+        bindIconModalEvents: function () {
+            $(document).on('click', '.wpbnp-modal-close, .wpbnp-modal', function (e) {
                 if (e.target === this) {
                     $('#wpbnp-icon-modal').hide();
                 }
             });
 
-            $(document).on('click', '.wpbnp-icon-option', function() {
+            $(document).on('click', '.wpbnp-icon-option', function () {
                 const icon = $(this).data('icon');
                 const targetInput = $('#wpbnp-icon-modal').data('target-input');
                 targetInput.val(icon);
@@ -1843,6 +1703,1069 @@ jQuery(document).ready(function($) {
                 $('.wpbnp-icon-option').removeClass('selected');
                 $(this).addClass('selected');
                 $('#wpbnp-icon-modal').hide();
-                
+
                 // Show success feedback
-                WPBottomNavAdmin.showNotification(`
+                WPBottomNavAdmin.showNotification(`Icon "${icon}" selected!`, 'success');
+            });
+
+            $(document).on('click', '.wpbnp-icon-tab', function () {
+                const library = $(this).data('library');
+                $('.wpbnp-icon-tab').removeClass('active');
+                $('.wpbnp-icon-library-content').removeClass('active');
+                $(this).addClass('active');
+                $(`.wpbnp-icon-library-content[data-library="${library}"]`).addClass('active');
+                WPBottomNavAdmin.updateLibraryInfo();
+                $('#wpbnp-icon-search').val('').trigger('input');
+            });
+
+            $(document).on('input', '#wpbnp-icon-search', function () {
+                const searchTerm = $(this).val().toLowerCase();
+                let visibleCount = 0;
+
+                $('.wpbnp-icon-library-content.active .wpbnp-icon-option').each(function () {
+                    const iconName = $(this).find('.wpbnp-icon-label').text().toLowerCase();
+                    const iconClass = $(this).data('icon').toLowerCase();
+                    if (iconName.includes(searchTerm) || iconClass.includes(searchTerm)) {
+                        $(this).show();
+                        visibleCount++;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                // Update visible count
+                const totalIcons = $('.wpbnp-icon-library-content.active .wpbnp-icon-option').length;
+                $('#wpbnp-icon-count').text(`${totalIcons} icons`);
+                $('#wpbnp-visible-count').text(`${visibleCount} visible`);
+            });
+        },
+
+        // Initialize pro features
+        initProFeatures: function () {
+            // License activation modal
+            $(document).on('click', '#wpbnp-activate-license', function (e) {
+                e.preventDefault();
+                $('#wpbnp-license-modal').show();
+            });
+
+            // License activation from custom presets section
+            $(document).on('click', '#wpbnp-activate-license-custom-presets', function (e) {
+                e.preventDefault();
+                $('#wpbnp-license-modal').show();
+            });
+
+            $(document).on('click', '#wpbnp-license-modal .wpbnp-modal-close', function () {
+                $('#wpbnp-license-modal').hide();
+            });
+
+            $(document).on('click', '#wpbnp-license-modal', function (e) {
+                if (e.target === this) {
+                    $('#wpbnp-license-modal').hide();
+                }
+            });
+
+            // License activation button click
+            $(document).on('click', '#wpbnp-activate-license-btn', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('License activation button clicked');
+
+                const licenseKey = $('#wpbnp-license-key').val().trim();
+                console.log('License key:', licenseKey);
+                if (!licenseKey) {
+                    WPBottomNavAdmin.showNotification('Please enter a license key', 'error');
+                    return;
+                }
+
+                const submitBtn = $(this);
+                const originalText = submitBtn.text();
+                submitBtn.prop('disabled', true).text('Activating...');
+
+                console.log('Making AJAX call to wpbnp_activate_license');
+                console.log('AJAX URL:', wpbnp_admin.ajax_url);
+                console.log('Nonce:', WPBottomNavAdmin.nonce);
+
+                $.ajax({
+                    url: wpbnp_admin.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'wpbnp_activate_license',
+                        license_key: licenseKey,
+                        nonce: WPBottomNavAdmin.nonce
+                    },
+                    success: function (response) {
+                        console.log('License activation response:', response);
+                        if (response.success) {
+                            WPBottomNavAdmin.showNotification('License activated successfully!', 'success');
+                            $('#wpbnp-license-modal').hide();
+                            console.log('Reloading page in 1 second...');
+                            setTimeout(() => {
+                                console.log('Reloading page now');
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            console.log('License activation failed:', response);
+                            WPBottomNavAdmin.showNotification(response.data ? response.data.message : 'Error activating license', 'error');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('AJAX error:', xhr, status, error);
+                        WPBottomNavAdmin.showNotification('Ajax error occurred: ' + error, 'error');
+                    },
+                    complete: function () {
+                        submitBtn.prop('disabled', false).text(originalText);
+                    }
+                });
+            });
+
+            // Page targeting configuration management
+            $(document).on('click', '#wpbnp-add-config', function (e) {
+                e.preventDefault();
+                console.log('Add configuration button clicked');
+                console.log('Button element:', this);
+                console.log('Configurations list exists:', $('#wpbnp-configurations-list').length > 0);
+                // alert('Add Configuration button clicked!'); // Temporary debug
+                WPBottomNavAdmin.addPageTargetingConfig();
+            });
+
+            $(document).on('click', '.wpbnp-config-toggle', function (e) {
+                e.preventDefault();
+                const configItem = $(this).closest('.wpbnp-config-item');
+                const content = configItem.find('.wpbnp-config-content');
+
+                if (content.is(':visible')) {
+                    content.slideUp();
+                    configItem.removeClass('expanded');
+                } else {
+                    content.slideDown();
+                    configItem.addClass('expanded');
+                }
+            });
+
+            $(document).on('click', '.wpbnp-config-delete', function (e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to delete this configuration?')) {
+                    $(this).closest('.wpbnp-config-item').fadeOut(() => {
+                        $(this).closest('.wpbnp-config-item').remove();
+                        WPBottomNavAdmin.reindexConfigurations();
+                    });
+                }
+            });
+        },
+
+        // Add new page targeting configuration
+        addPageTargetingConfig: function () {
+            console.log('addPageTargetingConfig function called');
+
+            try {
+                const configIndex = $('.wpbnp-config-item').length;
+                const configId = 'config_' + Date.now();
+                console.log('Config index:', configIndex, 'Config ID:', configId);
+
+                const configHtml = `
+                <div class="wpbnp-config-item" data-config-id="${configId}">
+                    <div class="wpbnp-config-header">
+                        <div class="wpbnp-config-title">
+                            <span class="wpbnp-config-name">New Configuration</span>
+                            <span class="wpbnp-config-priority">Priority: 1</span>
+                        </div>
+                        <div class="wpbnp-config-actions">
+                            <button type="button" class="wpbnp-config-toggle" title="Toggle Configuration">
+                                <span class="wpbnp-arrow-icon">▼</span>
+                            </button>
+                            <button type="button" class="wpbnp-config-delete" title="Delete Configuration">
+                                <span class="wpbnp-delete-icon">×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="wpbnp-config-content" style="display: block;">
+                        <div class="wpbnp-config-settings">
+                            <div class="wpbnp-field">
+                                <label>Configuration Name</label>
+                                <input type="text" name="settings[page_targeting][configurations][${configIndex}][name]" 
+                                       value="New Configuration" placeholder="Enter configuration name...">
+                            </div>
+                            
+                            <div class="wpbnp-field">
+                                <label>Priority</label>
+                                <input type="number" name="settings[page_targeting][configurations][${configIndex}][priority]" 
+                                       value="1" min="1" max="100">
+                                <p class="description">Higher priority configurations will override lower ones when conditions match.</p>
+                            </div>
+                            
+                            <div class="wpbnp-targeting-conditions">
+                                <h4>Display Conditions</h4>
+                                <p class="description">Leave all conditions empty to use as default fallback.</p>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Specific Pages</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][pages][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select pages...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Post Types</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][post_types][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select post types...</option>
+                                        <option value="post">Posts</option>
+                                        <option value="page">Pages</option>
+                                        <option value="product">Products (WooCommerce)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Categories</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][categories][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select categories...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>User Roles</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][user_roles][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select user roles...</option>
+                                        <option value="administrator">Administrator</option>
+                                        <option value="editor">Editor</option>
+                                        <option value="author">Author</option>
+                                        <option value="contributor">Contributor</option>
+                                        <option value="subscriber">Subscriber</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="wpbnp-navigation-config">
+                                <h4>Navigation Configuration</h4>
+                                <div class="wpbnp-field">
+                                    <label>Preset to Display</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][preset_id]" class="wpbnp-preset-selector">
+                                        <option value="default">Default Navigation (Items Tab)</option>
+                                        <!-- Custom presets will be populated by JavaScript -->
+                                    </select>
+                                    <p class="description">Choose which navigation preset to display when the conditions above are met.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="settings[page_targeting][configurations][${configIndex}][id]" value="${configId}">
+                </div>
+                `;
+
+                if ($('.wpbnp-no-configs').length) {
+                    $('.wpbnp-no-configs').remove();
+                }
+
+                console.log('Appending config HTML to:', $('#wpbnp-configurations-list'));
+                console.log('Config HTML:', configHtml);
+                $('#wpbnp-configurations-list').append(configHtml);
+                console.log('Configuration added successfully');
+                console.log('Total configs now:', $('.wpbnp-config-item').length);
+
+                // Populate all selectors in the new configuration
+                const $newConfig = $('.wpbnp-config-item').last();
+
+                // Populate custom presets
+                const newPresetSelector = $newConfig.find('.wpbnp-preset-selector');
+                console.log('New preset selector found:', newPresetSelector.length);
+                this.populatePresetSelector(newPresetSelector);
+
+                // Populate pages selector
+                this.populatePagesSelector($newConfig.find('select[name*="[pages]"]'), configIndex);
+
+                // Populate categories selector  
+                this.populateCategoriesSelector($newConfig.find('select[name*="[categories]"]'), configIndex);
+                console.log('Selector population completed');
+
+                // Save form state to preserve the new configuration
+                this.saveFormState();
+
+                this.showNotification('New configuration added!', 'success');
+            } catch (error) {
+                console.error('Error adding configuration:', error);
+                this.showNotification('Error adding configuration: ' + error.message, 'error');
+            }
+        },
+
+        // Custom Preset Management
+        initCustomPresets: function () {
+            // Add new custom preset
+            $(document).on('click', '#wpbnp-add-custom-preset', function (e) {
+                e.preventDefault();
+                WPBottomNavAdmin.createCustomPreset();
+            });
+
+            // Edit custom preset items
+            $(document).on('click', '.wpbnp-preset-edit-items', function (e) {
+                e.preventDefault();
+                const presetItem = $(this).closest('.wpbnp-preset-item');
+                const presetId = presetItem.data('preset-id');
+                WPBottomNavAdmin.editCustomPresetItems(presetId);
+            });
+
+            // Edit custom preset name/description
+            $(document).on('click', '.wpbnp-preset-edit', function (e) {
+                e.preventDefault();
+                const presetItem = $(this).closest('.wpbnp-preset-item');
+                const presetId = presetItem.data('preset-id');
+                WPBottomNavAdmin.editCustomPreset(presetId);
+            });
+
+            // Duplicate custom preset
+            $(document).on('click', '.wpbnp-preset-duplicate', function (e) {
+                e.preventDefault();
+                const presetItem = $(this).closest('.wpbnp-preset-item');
+                const presetId = presetItem.data('preset-id');
+                WPBottomNavAdmin.duplicateCustomPreset(presetId);
+            });
+
+            // Delete custom preset
+            $(document).on('click', '.wpbnp-preset-delete', function (e) {
+                e.preventDefault();
+                const presetItem = $(this).closest('.wpbnp-preset-item');
+                const presetId = presetItem.data('preset-id');
+                const presetName = presetItem.find('.wpbnp-preset-name').text();
+
+                if (confirm(`Are you sure you want to delete the preset "${presetName}"? This action cannot be undone.`)) {
+                    WPBottomNavAdmin.deleteCustomPreset(presetId);
+                }
+            });
+
+            // Update preset items
+            $(document).on('click', '.wpbnp-update-preset-btn', function (e) {
+                e.preventDefault();
+                const presetId = $(this).data('preset-id');
+                WPBottomNavAdmin.updatePresetItems(presetId);
+            });
+
+            // Cancel preset editing
+            $(document).on('click', '.wpbnp-cancel-preset-edit', function (e) {
+                e.preventDefault();
+                const presetId = $(this).data('preset-id');
+                WPBottomNavAdmin.cancelPresetEdit(presetId);
+            });
+        },
+
+        // Create new custom preset
+        createCustomPreset: function () {
+            const presetName = prompt('Enter preset name:', 'My Custom Preset');
+            if (!presetName) return;
+
+            const presetDescription = prompt('Enter preset description (optional):', '');
+            const presetId = 'preset_' + Date.now();
+
+            // Get current navigation items as the base for the new preset
+            const currentItems = this.getCurrentNavigationItems();
+
+            const newPreset = {
+                id: presetId,
+                name: presetName,
+                description: presetDescription,
+                created_at: Math.floor(Date.now() / 1000),
+                items: currentItems
+            };
+
+            this.addPresetToDOM(newPreset);
+            this.updateAllPresetSelectors();
+
+            // Save form state to preserve the new preset
+            this.saveFormState();
+
+            this.showNotification(`Custom preset "${presetName}" created successfully!`, 'success');
+
+            // Important reminder to save
+            setTimeout(() => {
+                this.showNotification(`⚠️ Remember to click "Save Changes" to permanently save your custom preset!`, 'warning', 5000);
+            }, 2000);
+        },
+
+        // Get current navigation items
+        getCurrentNavigationItems: function () {
+            const items = [];
+            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function () {
+                const $row = $(this);
+                const item = {
+                    id: $row.find('input[name*="[id]"]').val() || 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    label: $row.find('input[name*="[label]"]').val() || '',
+                    icon: $row.find('input[name*="[icon]"]').val() || '',
+                    url: $row.find('input[name*="[url]"]').val() || '',
+                    enabled: $row.find('input[name*="[enabled]"]').is(':checked'),
+                    target: $row.find('select[name*="[target]"]').val() || '_self',
+                    show_badge: $row.find('input[name*="[show_badge]"]').is(':checked'),
+                    badge_type: $row.find('select[name*="[badge_type]"]').val() || 'count',
+                    custom_badge_text: $row.find('input[name*="[custom_badge_text]"]').val() || '',
+                    user_roles: []
+                };
+
+                // Get user roles
+                $row.find('input[name*="[user_roles][]"]:checked').each(function () {
+                    item.user_roles.push($(this).val());
+                });
+
+                items.push(item);
+            });
+
+            return items;
+        },
+
+        // Add preset to DOM
+        addPresetToDOM: function (preset) {
+            const presetsContainer = $('#wpbnp-custom-presets-list');
+            const noPresetsMessage = presetsContainer.find('.wpbnp-no-presets');
+
+            if (noPresetsMessage.length) {
+                noPresetsMessage.remove();
+            }
+
+            const index = $('.wpbnp-preset-item').length;
+            const itemsCount = preset.items ? preset.items.length : 0;
+            const createdDate = new Date(preset.created_at * 1000).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            const presetHtml = `
+                <div class="wpbnp-preset-item" data-preset-id="${preset.id}">
+                    <div class="wpbnp-preset-header">
+                        <div class="wpbnp-preset-info">
+                            <h4 class="wpbnp-preset-name">${preset.name}</h4>
+                            <p class="wpbnp-preset-meta">${itemsCount} items • Created ${createdDate}</p>
+                            ${preset.description ? `<p class="wpbnp-preset-description">${preset.description}</p>` : ''}
+                        </div>
+                        <div class="wpbnp-preset-actions">
+                            <button type="button" class="wpbnp-preset-edit-items" title="Edit Items">
+                                <span class="wpbnp-edit-items-icon">⚙️</span>
+                            </button>
+                            <button type="button" class="wpbnp-preset-edit" title="Edit Name & Description">
+                                <span class="wpbnp-edit-icon">✏️</span>
+                            </button>
+                            <button type="button" class="wpbnp-preset-duplicate" title="Duplicate Preset">
+                                <span class="wpbnp-duplicate-icon">📋</span>
+                            </button>
+                            <button type="button" class="wpbnp-preset-delete" title="Delete Preset">
+                                <span class="wpbnp-delete-icon">×</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][id]" value="${preset.id}">
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][name]" value="${preset.name}">
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][description]" value="${preset.description || ''}">
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][created_at]" value="${preset.created_at}">
+                    <input type="hidden" name="settings[custom_presets][presets][${index}][items]" value="${JSON.stringify(preset.items || []).replace(/"/g, '&quot;')}">
+                </div>
+            `;
+
+            presetsContainer.append(presetHtml);
+        },
+
+        // Edit custom preset items
+        editCustomPresetItems: function (presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const currentItems = JSON.parse(presetItem.find('input[name*="[items]"]').val() || '[]');
+            const presetName = presetItem.find('.wpbnp-preset-name').text();
+
+            // Show modal or interface to edit items
+            if (confirm(`Edit navigation items for "${presetName}"?\n\nThis will temporarily load the current preset items into the main Items tab for editing. After making changes, come back and click "Update Preset Items" to save them.`)) {
+                // Load items into the main navigation items interface
+                this.loadItemsIntoMainInterface(currentItems);
+
+                // Switch to Items tab
+                const itemsTab = $('.wpbnp-tab').filter(function () {
+                    return $(this).attr('href') && $(this).attr('href').includes('tab=items');
+                });
+
+                if (itemsTab.length > 0) {
+                    // Use direct navigation instead of click to avoid potential issues
+                    const itemsHref = itemsTab.attr('href');
+                    console.log('Switching to Items tab:', itemsHref);
+                    window.location.href = itemsHref;
+                } else {
+                    // Fallback: try to find by text content and get its href
+                    const fallbackTab = $('.wpbnp-tab:contains("Items")').first();
+                    if (fallbackTab.length > 0 && fallbackTab.attr('href')) {
+                        console.log('Using fallback Items tab:', fallbackTab.attr('href'));
+                        window.location.href = fallbackTab.attr('href');
+                    } else {
+                        console.error('Could not find Items tab');
+                        this.showNotification('Could not switch to Items tab. Please click the Items tab manually.', 'error');
+                    }
+                }
+
+                // Show notification with instructions
+                this.showNotification(`✅ Preset items loaded into Items tab. Edit them, then return here and click "Update Preset Items".`, 'info', 8000);
+
+                // Add update button to preset
+                this.addUpdatePresetButton(presetId, presetName);
+            }
+        },
+
+        // Load items into main interface for editing
+        loadItemsIntoMainInterface: function (items) {
+            // Clear existing items
+            $('#wpbnp-items-list').empty();
+
+            // Add each item to the main interface
+            items.forEach((item, index) => {
+                this.addNavigationItem(item, index);
+            });
+
+            // Update the items counter if it exists
+            this.updateItemsDisplay();
+        },
+
+        // Add update button to preset
+        addUpdatePresetButton: function (presetId, presetName) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+
+            // Remove existing update button if any
+            presetItem.find('.wpbnp-update-preset-items').remove();
+
+            // Add update button
+            const updateButton = `
+                <div class="wpbnp-update-preset-items" style="margin-top: 10px; padding: 10px; background: #e8f4fd; border: 1px solid #0073aa; border-radius: 4px;">
+                    <p style="margin: 0 0 8px 0; font-weight: 600; color: #0073aa;">📝 Items loaded for editing</p>
+                    <button type="button" class="wpbnp-update-preset-btn" data-preset-id="${presetId}" 
+                            style="background: #0073aa; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">
+                        Update "${presetName}" Items
+                    </button>
+                    <button type="button" class="wpbnp-cancel-preset-edit" data-preset-id="${presetId}" 
+                            style="background: #666; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; margin-left: 8px;">
+                        Cancel
+                    </button>
+                </div>
+            `;
+
+            presetItem.append(updateButton);
+        },
+
+        // Edit custom preset name/description
+        editCustomPreset: function (presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const currentName = presetItem.find('.wpbnp-preset-name').text();
+            const currentDescription = presetItem.find('.wpbnp-preset-description').text();
+
+            const newName = prompt('Enter preset name:', currentName);
+            if (!newName) return;
+
+            const newDescription = prompt('Enter preset description (optional):', currentDescription);
+
+            // Update DOM
+            presetItem.find('.wpbnp-preset-name').text(newName);
+            presetItem.find('input[name*="[name]"]').val(newName);
+
+            if (newDescription) {
+                if (presetItem.find('.wpbnp-preset-description').length) {
+                    presetItem.find('.wpbnp-preset-description').text(newDescription);
+                } else {
+                    presetItem.find('.wpbnp-preset-meta').after(`<p class="wpbnp-preset-description">${newDescription}</p>`);
+                }
+                presetItem.find('input[name*="[description]"]').val(newDescription);
+            } else {
+                presetItem.find('.wpbnp-preset-description').remove();
+                presetItem.find('input[name*="[description]"]').val('');
+            }
+
+            this.updateAllPresetSelectors();
+
+            // Save form state to preserve the changes
+            this.saveFormState();
+
+            this.showNotification(`Preset "${newName}" updated successfully!`, 'success');
+        },
+
+        // Duplicate custom preset
+        duplicateCustomPreset: function (presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const originalName = presetItem.find('.wpbnp-preset-name').text();
+            const originalDescription = presetItem.find('.wpbnp-preset-description').text();
+            const originalItems = JSON.parse(presetItem.find('input[name*="[items]"]').val() || '[]');
+
+            const newPreset = {
+                id: 'preset_' + Date.now(),
+                name: originalName + ' (Copy)',
+                description: originalDescription,
+                created_at: Math.floor(Date.now() / 1000),
+                items: originalItems
+            };
+
+            this.addPresetToDOM(newPreset);
+            this.updateAllPresetSelectors();
+
+            // Save form state to preserve the new preset
+            this.saveFormState();
+
+            this.showNotification(`Preset "${newPreset.name}" created successfully!`, 'success');
+        },
+
+        // Update preset items with current items from main interface
+        updatePresetItems: function (presetId) {
+            const currentItems = this.getCurrentNavigationItems();
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const presetName = presetItem.find('.wpbnp-preset-name').text();
+
+            // Update the hidden input with new items
+            presetItem.find('input[name*="[items]"]').val(JSON.stringify(currentItems));
+
+            // Update the items count in the display
+            const itemsCount = currentItems.length;
+            const metaText = presetItem.find('.wpbnp-preset-meta');
+            const currentMeta = metaText.text();
+            const newMeta = currentMeta.replace(/\d+ items/, `${itemsCount} items`);
+            metaText.text(newMeta);
+
+            // Remove the update button
+            presetItem.find('.wpbnp-update-preset-items').remove();
+
+            this.updateAllPresetSelectors();
+            this.showNotification(`✅ Preset "${presetName}" updated with ${itemsCount} items!`, 'success');
+        },
+
+        // Cancel preset editing
+        cancelPresetEdit: function (presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+
+            // Remove the update button
+            presetItem.find('.wpbnp-update-preset-items').remove();
+
+            this.showNotification('Preset editing cancelled.', 'info');
+        },
+
+        // Delete custom preset
+        deleteCustomPreset: function (presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const presetName = presetItem.find('.wpbnp-preset-name').text();
+
+            presetItem.fadeOut(300, function () {
+                $(this).remove();
+
+                // Reindex remaining presets
+                $('.wpbnp-preset-item').each(function (index) {
+                    $(this).find('input[name*="[presets]["]').each(function () {
+                        const name = $(this).attr('name');
+                        const newName = name.replace(/\[presets\]\[\d+\]/, `[presets][${index}]`);
+                        $(this).attr('name', newName);
+                    });
+                });
+
+                // Show no presets message if empty
+                if ($('.wpbnp-preset-item').length === 0) {
+                    $('#wpbnp-custom-presets-list').html('<p class="wpbnp-no-presets">No custom presets created yet. Click "Create New Preset" to get started.</p>');
+                }
+
+                // Update all preset selectors
+                WPBottomNavAdmin.updateAllPresetSelectors();
+
+                // Save form state to preserve the deletion
+                WPBottomNavAdmin.saveFormState();
+            });
+
+            this.showNotification(`Preset "${presetName}" deleted successfully!`, 'success');
+        },
+
+        // Populate preset selector with available custom presets
+        populatePresetSelector: function ($selector) {
+            if (!$selector || $selector.length === 0) {
+                console.warn('populatePresetSelector: No selector provided');
+                return;
+            }
+
+            console.log('Populating preset selector:', $selector[0]);
+
+            // Get custom presets from the page (if any)
+            const customPresets = this.getAvailableCustomPresets();
+            console.log('Available presets for selector:', customPresets);
+
+            // Clear existing options except default
+            $selector.find('option:not([value="default"])').remove();
+
+            if (customPresets.length > 0) {
+                // Add optgroup for custom presets
+                let optgroupHtml = '<optgroup label="Custom Presets">';
+                customPresets.forEach(preset => {
+                    const itemCount = preset.items ? preset.items.length : 0;
+                    optgroupHtml += `<option value="${preset.id}">${preset.name} (${itemCount} items)</option>`;
+                    console.log(`Added preset option: ${preset.name} (${itemCount} items)`);
+                });
+                optgroupHtml += '</optgroup>';
+
+                $selector.append(optgroupHtml);
+                console.log('Successfully populated selector with', customPresets.length, 'presets');
+            } else {
+                // Add disabled option when no presets available
+                $selector.append('<option value="" disabled>No custom presets available - Create some in the Items tab</option>');
+                console.log('No presets available, added placeholder option');
+            }
+        },
+
+        // Get available custom presets from settings data or DOM
+        getAvailableCustomPresets: function () {
+            const presets = [];
+
+            console.log('Getting available custom presets...');
+
+            // First try to get from settings data (more reliable)
+            console.log('Checking wpbnp_admin object:', typeof wpbnp_admin !== 'undefined' ? 'exists' : 'undefined');
+            if (typeof wpbnp_admin !== 'undefined') {
+                console.log('wpbnp_admin.settings exists:', !!wpbnp_admin.settings);
+                if (wpbnp_admin.settings) {
+                    console.log('custom_presets exists:', !!wpbnp_admin.settings.custom_presets);
+                    if (wpbnp_admin.settings.custom_presets) {
+                        console.log('custom_presets enabled:', wpbnp_admin.settings.custom_presets.enabled);
+                        console.log('presets array exists:', !!wpbnp_admin.settings.custom_presets.presets);
+                        console.log('presets array length:', wpbnp_admin.settings.custom_presets.presets ? wpbnp_admin.settings.custom_presets.presets.length : 'N/A');
+                        console.log('presets array content:', wpbnp_admin.settings.custom_presets.presets);
+                    }
+                }
+            }
+
+            if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings && wpbnp_admin.settings.custom_presets && wpbnp_admin.settings.custom_presets.presets) {
+                const settingsPresets = wpbnp_admin.settings.custom_presets.presets;
+                console.log(`Found ${settingsPresets.length} presets in settings data`);
+
+                settingsPresets.forEach(preset => {
+                    if (preset.id && preset.name) {
+                        const itemCount = preset.items ? preset.items.length : 0;
+                        console.log(`Settings preset "${preset.name}": ${itemCount} items`);
+                        presets.push({
+                            id: preset.id,
+                            name: preset.name,
+                            items: preset.items || []
+                        });
+                    }
+                });
+            } else {
+                console.log('Settings presets not available, reason:');
+                console.log('- wpbnp_admin undefined:', typeof wpbnp_admin === 'undefined');
+                console.log('- settings missing:', !wpbnp_admin?.settings);
+                console.log('- custom_presets missing:', !wpbnp_admin?.settings?.custom_presets);
+                console.log('- presets array missing:', !wpbnp_admin?.settings?.custom_presets?.presets);
+            }
+
+            // Always also check DOM for additional presets (might be newly created)
+            console.log('Checking DOM for additional presets...');
+            const settingsPresetIds = presets.map(p => p.id);
+            $('.wpbnp-preset-item').each(function () {
+                const $item = $(this);
+                const presetId = $item.data('preset-id');
+
+                // Skip if we already have this preset from settings
+                if (settingsPresetIds.includes(presetId)) {
+                    console.log(`Skipping DOM preset ${presetId} - already in settings`);
+                    return;
+                }
+
+                const preset = {
+                    id: presetId,
+                    name: $item.find('.wpbnp-preset-name').text(),
+                    items: []
+                };
+
+                // Try to get items from hidden input
+                const itemsJson = $item.find('input[name*="[items]"]').val();
+                if (itemsJson) {
+                    try {
+                        preset.items = JSON.parse(itemsJson);
+                        console.log(`DOM preset "${preset.name}": ${preset.items.length} items`);
+                    } catch (e) {
+                        console.warn('Failed to parse preset items:', e);
+                    }
+                } else {
+                    console.warn(`No items JSON found for preset "${preset.name}"`);
+                }
+
+                if (preset.id && preset.name) {
+                    presets.push(preset);
+                    console.log(`Added DOM preset "${preset.name}" to available presets`);
+                }
+            });
+
+            console.log(`Total found ${presets.length} custom presets`);
+            return presets;
+        },
+
+        // Update settings data with current presets from DOM
+        updateSettingsPresetData: function () {
+            if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
+                const domPresets = [];
+
+                $('.wpbnp-preset-item').each(function () {
+                    const $item = $(this);
+                    const preset = {
+                        id: $item.data('preset-id'),
+                        name: $item.find('.wpbnp-preset-name').text(),
+                        description: $item.find('.wpbnp-preset-description').text() || '',
+                        created_at: parseInt($item.find('input[name*="[created_at]"]').val()) || Math.floor(Date.now() / 1000),
+                        items: []
+                    };
+
+                    // Get items from hidden input
+                    const itemsJson = $item.find('input[name*="[items]"]').val();
+                    if (itemsJson) {
+                        try {
+                            preset.items = JSON.parse(itemsJson);
+                        } catch (e) {
+                            console.warn('Failed to parse preset items for settings update:', e);
+                        }
+                    }
+
+                    if (preset.id && preset.name) {
+                        domPresets.push(preset);
+                    }
+                });
+
+                // Update the settings data
+                if (!wpbnp_admin.settings.custom_presets) {
+                    wpbnp_admin.settings.custom_presets = {};
+                }
+                wpbnp_admin.settings.custom_presets.presets = domPresets;
+
+                console.log(`Updated settings data with ${domPresets.length} presets`);
+            }
+        },
+
+        // Update all preset selectors when presets change
+        updateAllPresetSelectors: function () {
+            console.log('Updating all preset selectors...');
+
+            // First update the settings data with current DOM state
+            this.updateSettingsPresetData();
+
+            const selectorCount = $('.wpbnp-preset-selector').length;
+            console.log(`Found ${selectorCount} preset selectors`);
+
+            if (selectorCount === 0) {
+                console.log('No preset selectors found on current page');
+                return;
+            }
+
+            $('.wpbnp-preset-selector').each((index, element) => {
+                console.log(`Updating selector ${index + 1}/${selectorCount}`);
+                this.populatePresetSelector($(element));
+            });
+        },
+
+        // Manual debug function - can be called from console
+        debugPresets: function () {
+            console.log('=== PRESET DEBUG INFORMATION ===');
+            console.log('1. wpbnp_admin object:', wpbnp_admin);
+            console.log('2. Settings presets:', wpbnp_admin?.settings?.custom_presets);
+            console.log('3. DOM preset items:', $('.wpbnp-preset-item').length);
+            console.log('4. Available presets:', this.getAvailableCustomPresets());
+            console.log('5. Preset selectors on page:', $('.wpbnp-preset-selector').length);
+
+            $('.wpbnp-preset-selector').each((index, element) => {
+                console.log(`Selector ${index + 1}:`, element, 'Options:', $(element).find('option').length);
+            });
+
+            console.log('=== END DEBUG ===');
+        },
+
+        // Test function to save form and check if presets persist
+        testPresetSave: function () {
+            console.log('=== TESTING PRESET SAVE ===');
+            console.log('1. DOM presets before save:', $('.wpbnp-preset-item').length);
+
+            // Trigger form save
+            $('#wpbnp-settings-form').trigger('submit');
+
+            setTimeout(() => {
+                console.log('2. Form should be saved now, checking...');
+                // This won't work because page doesn't reload, but it's a test
+                console.log('3. You should now go to another tab and back to see if presets persist');
+            }, 2000);
+        },
+
+
+        // Reindex configurations after deletion
+        reindexConfigurations: function () {
+            $('.wpbnp-config-item').each(function (index) {
+                $(this).find('input, select').each(function () {
+                    const name = $(this).attr('name');
+                    if (name && name.includes('[configurations][')) {
+                        const newName = name.replace(/\[configurations\]\[\d+\]/, `[configurations][${index}]`);
+                        $(this).attr('name', newName);
+                    }
+                });
+            });
+
+            if ($('.wpbnp-config-item').length === 0) {
+                $('#wpbnp-configurations-list').html('<p class="wpbnp-no-configs">No configurations created yet. Click "Add Configuration" to get started.</p>');
+            }
+        },
+
+        // Populate pages selector for new configurations
+        populatePagesSelector: function ($selector, configIndex) {
+            if (!$selector || !$selector.length) return;
+
+            console.log('Populating pages selector for config', configIndex);
+
+            // Make AJAX call to get pages
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_get_pages',
+                    nonce: wpbnp_admin.nonce
+                },
+                success: function (response) {
+                    if (response.success && response.data.pages) {
+                        $selector.empty();
+                        $selector.append('<option value="">Select pages...</option>');
+
+                        response.data.pages.forEach(function (page) {
+                            $selector.append(`<option value="${page.ID}">${page.post_title}</option>`);
+                        });
+
+                        console.log('Pages populated:', response.data.pages.length);
+                    } else {
+                        $selector.html('<option value="" disabled>No pages found - Create some pages first</option>');
+                    }
+                },
+                error: function () {
+                    $selector.html('<option value="" disabled>Error loading pages</option>');
+                }
+            });
+        },
+
+        // Populate categories selector for new configurations
+        populateCategoriesSelector: function ($selector, configIndex) {
+            if (!$selector || !$selector.length) return;
+
+            console.log('Populating categories selector for config', configIndex);
+
+            // Make AJAX call to get categories
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_get_categories',
+                    nonce: wpbnp_admin.nonce
+                },
+                success: function (response) {
+                    if (response.success && response.data.categories) {
+                        $selector.empty();
+                        $selector.append('<option value="">Select categories...</option>');
+
+                        response.data.categories.forEach(function (category) {
+                            $selector.append(`<option value="${category.term_id}">${category.name}</option>`);
+                        });
+
+                        console.log('Categories populated:', response.data.categories.length);
+                    } else {
+                        $selector.html('<option value="" disabled>No categories found</option>');
+                    }
+                },
+                error: function () {
+                    $selector.html('<option value="" disabled>Error loading categories</option>');
+                }
+            });
+        }
+    };
+
+    // Initialize admin
+    WPBottomNavAdmin.init();
+
+    // Initialize pro features
+    WPBottomNavAdmin.initProFeatures();
+
+    // Initialize custom presets
+    WPBottomNavAdmin.initCustomPresets();
+
+    // Debug: Check what's available in settings vs DOM
+    console.log('=== PRESET DETECTION DEBUG ===');
+    console.log('1. WPBNP Admin Settings:', wpbnp_admin);
+    if (wpbnp_admin && wpbnp_admin.settings && wpbnp_admin.settings.custom_presets) {
+        console.log('2. Custom Presets in Settings (from database):', wpbnp_admin.settings.custom_presets);
+        console.log('   - Enabled:', wpbnp_admin.settings.custom_presets.enabled);
+        console.log('   - Presets count:', wpbnp_admin.settings.custom_presets.presets ? wpbnp_admin.settings.custom_presets.presets.length : 0);
+    } else {
+        console.log('2. No custom presets in settings data!');
+    }
+
+    console.log('3. DOM Preset Elements:', $('.wpbnp-preset-item').length);
+    $('.wpbnp-preset-item').each(function (index) {
+        const $item = $(this);
+        console.log(`   DOM Preset ${index + 1}:`, {
+            id: $item.data('preset-id'),
+            name: $item.find('.wpbnp-preset-name').text(),
+            hasItemsInput: $item.find('input[name*="[items]"]').length > 0,
+            itemsValue: $item.find('input[name*="[items]"]').val()
+        });
+    });
+    console.log('=== END DEBUG ===');
+
+    // Populate existing preset selectors (with delay to ensure DOM is ready)
+    setTimeout(() => {
+        console.log('Initial preset selector population...');
+        WPBottomNavAdmin.updateAllPresetSelectors();
+    }, 100);
+
+    // Also populate when switching to page targeting tab
+    $(document).on('click', '.wpbnp-tab[href*="tab=page_targeting"]', function () {
+        setTimeout(() => {
+            console.log('Page targeting tab clicked, updating selectors...');
+            WPBottomNavAdmin.updateAllPresetSelectors();
+        }, 200);
+    });
+
+    // Icons are now using Unicode, no need to check dashicons
+
+    // Handle file import when file is selected
+    $('#wpbnp-import-file').on('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const importData = e.target.result;
+
+                    // Send import data via AJAX
+                    $.ajax({
+                        url: wpbnp_admin.ajax_url,
+                        type: 'POST',
+                        data: {
+                            action: 'wpbnp_import_settings',
+                            nonce: WPBottomNavAdmin.nonce,
+                            import_data: importData
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                WPBottomNavAdmin.showNotification('Settings imported successfully!', 'success');
+                                // Update settings and reload page
+                                if (response.data && response.data.settings) {
+                                    WPBottomNavAdmin.settings = response.data.settings;
+                                }
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000);
+                            } else {
+                                WPBottomNavAdmin.showNotification(response.data ? response.data.message : 'Error importing settings', 'error');
+                            }
+                        },
+                        error: function () {
+                            WPBottomNavAdmin.showNotification('Ajax error occurred', 'error');
+                        }
+                    });
+                } catch (error) {
+                    WPBottomNavAdmin.showNotification('Error reading file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        // Reset file input
+        $(this).val('');
+    });
+
+    // Restore form state on page load if switching tabs
+    if (localStorage.getItem('wpbnp_form_state')) {
+        setTimeout(() => {
+            WPBottomNavAdmin.restoreFormState();
+            console.log('Restored form state on page load');
+        }, 800); // Longer delay to ensure all elements are ready
+    }
+
+    // Make it globally available
+    window.WPBottomNavAdmin = WPBottomNavAdmin;
+});
