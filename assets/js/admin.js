@@ -1988,12 +1988,14 @@ jQuery(document).ready(function ($) {
 
                 // Populate pages selector
                 const pagesSelector = $newConfig.find('select[name*="pages"]');
+                console.log('Pages selector found:', pagesSelector.length, 'Name:', pagesSelector.attr('name'));
                 if (pagesSelector.length > 0) {
                     this.populatePagesSelector(pagesSelector, configIndex);
                 }
 
                 // Populate categories selector  
                 const categoriesSelector = $newConfig.find('select[name*="categories"]');
+                console.log('Categories selector found:', categoriesSelector.length, 'Name:', categoriesSelector.attr('name'));
                 if (categoriesSelector.length > 0) {
                     this.populateCategoriesSelector(categoriesSelector, configIndex);
                 }
