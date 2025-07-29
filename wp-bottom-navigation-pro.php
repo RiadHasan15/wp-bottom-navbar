@@ -115,10 +115,6 @@ class WP_Bottom_Navigation_Pro {
         add_action('wp_ajax_wpbnp_activate_license', array($this, 'activate_license'));
         add_action('wp_ajax_wpbnp_deactivate_license', array($this, 'deactivate_license'));
         
-        // AJAX handlers for dynamic content loading
-        add_action('wp_ajax_wpbnp_get_pages', array($this, 'ajax_get_pages'));
-        add_action('wp_ajax_wpbnp_get_categories', array($this, 'ajax_get_categories'));
-        
         // Footer hook for navigation display
         add_action('wp_footer', array($this, 'display_navigation'), 999);
         
@@ -1312,9 +1308,12 @@ class WP_Bottom_Navigation_Pro {
      * Get pages via AJAX
      */
     public function ajax_get_pages() {
+        error_log('WPBNP: ajax_get_pages called');
+        
         check_ajax_referer('wpbnp_admin_nonce', 'nonce');
         
         if (!current_user_can('manage_options')) {
+            error_log('WPBNP: ajax_get_pages - insufficient permissions');
             wp_die(__('Insufficient permissions', 'wp-bottom-navigation-pro'));
         }
         
@@ -1324,6 +1323,8 @@ class WP_Bottom_Navigation_Pro {
             'post_status' => 'publish'
         ));
         
+        error_log('WPBNP: Found ' . count($pages) . ' pages');
+        
         $formatted_pages = array();
         foreach ($pages as $page) {
             $formatted_pages[] = array(
@@ -1331,6 +1332,8 @@ class WP_Bottom_Navigation_Pro {
                 'post_title' => $page->post_title
             );
         }
+        
+        error_log('WPBNP: Sending ' . count($formatted_pages) . ' formatted pages');
         
         wp_send_json_success(array(
             'pages' => $formatted_pages
@@ -1341,9 +1344,12 @@ class WP_Bottom_Navigation_Pro {
      * Get categories via AJAX
      */
     public function ajax_get_categories() {
+        error_log('WPBNP: ajax_get_categories called');
+        
         check_ajax_referer('wpbnp_admin_nonce', 'nonce');
         
         if (!current_user_can('manage_options')) {
+            error_log('WPBNP: ajax_get_categories - insufficient permissions');
             wp_die(__('Insufficient permissions', 'wp-bottom-navigation-pro'));
         }
         
@@ -1353,6 +1359,8 @@ class WP_Bottom_Navigation_Pro {
             'hide_empty' => false
         ));
         
+        error_log('WPBNP: Found ' . count($categories) . ' categories');
+        
         $formatted_categories = array();
         foreach ($categories as $category) {
             $formatted_categories[] = array(
@@ -1360,6 +1368,8 @@ class WP_Bottom_Navigation_Pro {
                 'name' => $category->name
             );
         }
+        
+        error_log('WPBNP: Sending ' . count($formatted_categories) . ' formatted categories');
         
         wp_send_json_success(array(
             'categories' => $formatted_categories

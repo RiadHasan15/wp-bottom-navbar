@@ -1996,10 +1996,14 @@ jQuery(document).ready(function ($) {
                 this.populatePresetSelector(newPresetSelector);
 
                 // Populate pages selector
-                this.populatePagesSelector($newConfig.find('select[name*="[pages]"]'), configIndex);
+                const pagesSelector = $newConfig.find('select[name*="[pages]"]');
+                console.log('Pages selector found:', pagesSelector.length, pagesSelector.attr('name'));
+                this.populatePagesSelector(pagesSelector, configIndex);
 
                 // Populate categories selector  
-                this.populateCategoriesSelector($newConfig.find('select[name*="[categories]"]'), configIndex);
+                const categoriesSelector = $newConfig.find('select[name*="[categories]"]');
+                console.log('Categories selector found:', categoriesSelector.length, categoriesSelector.attr('name'));
+                this.populateCategoriesSelector(categoriesSelector, configIndex);
                 console.log('Selector population completed');
 
                 // Save form state to preserve the new configuration
