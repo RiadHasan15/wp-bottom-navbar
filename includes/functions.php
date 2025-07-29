@@ -106,6 +106,7 @@ function wpbnp_get_default_settings() {
         ),
         
         // Pro feature: Page targeting
+        // NOTE: When merging with pro branch, merge this array with existing pro settings
         'page_targeting' => array(
             'enabled' => false,
             'configurations' => array()
@@ -3631,6 +3632,7 @@ function wpbnp_can_user_see_item($item) {
 
 /**
  * Check if pro license is active
+ * NOTE: When merging with pro branch, ensure this doesn't conflict with existing license system
  */
 function wpbnp_is_pro_license_active() {
     $license_key = get_option('wpbnp_pro_license_key', '');
