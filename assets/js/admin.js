@@ -1721,6 +1721,10 @@ jQuery(document).ready(function($) {
             // Page targeting configuration management
             $(document).on('click', '#wpbnp-add-config', function(e) {
                 e.preventDefault();
+                console.log('Add configuration button clicked');
+                console.log('Button element:', this);
+                console.log('Configurations list exists:', $('#wpbnp-configurations-list').length > 0);
+                // alert('Add Configuration button clicked!'); // Temporary debug
                 WPBottomNavAdmin.addPageTargetingConfig();
             });
             
@@ -1747,10 +1751,14 @@ jQuery(document).ready(function($) {
         
         // Add new page targeting configuration
         addPageTargetingConfig: function() {
-            const configIndex = $('.wpbnp-config-item').length;
-            const configId = 'config_' + Date.now();
+            console.log('addPageTargetingConfig function called');
             
-            const configHtml = `
+            try {
+                const configIndex = $('.wpbnp-config-item').length;
+                const configId = 'config_' + Date.now();
+                console.log('Config index:', configIndex, 'Config ID:', configId);
+                
+                const configHtml = `
                 <div class="wpbnp-config-item" data-config-id="${configId}">
                     <div class="wpbnp-config-header">
                         <div class="wpbnp-config-title">
@@ -1834,14 +1842,20 @@ jQuery(document).ready(function($) {
                     
                     <input type="hidden" name="settings[page_targeting][configurations][${configIndex}][id]" value="${configId}">
                 </div>
-            `;
+                `;
+                
+                if ($('.wpbnp-no-configs').length) {
+                    $('.wpbnp-no-configs').remove();
+                }
             
-            if ($('.wpbnp-no-configs').length) {
-                $('.wpbnp-no-configs').remove();
+                console.log('Appending config HTML to:', $('#wpbnp-configurations-list'));
+                $('#wpbnp-configurations-list').append(configHtml);
+                console.log('Configuration added successfully');
+                this.showNotification('New configuration added!', 'success');
+            } catch (error) {
+                console.error('Error adding configuration:', error);
+                this.showNotification('Error adding configuration: ' + error.message, 'error');
             }
-            
-            $('#wpbnp-configurations-list').append(configHtml);
-            this.showNotification('New configuration added!', 'success');
         },
         
         // Reindex configurations after deletion
