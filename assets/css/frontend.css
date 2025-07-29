@@ -34,6 +34,11 @@ body.wpbnp-active {
     /* Force to bottom edge */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    /* iPad specific viewport fix */
+    bottom: max(0px, env(safe-area-inset-bottom, 0px));
+    position: -webkit-sticky;
+    position: sticky;
+    top: calc(100vh - 70px);
 }
 
 /* Hide navigation state */
@@ -49,6 +54,70 @@ body.wpbnp-active {
         bottom: env(safe-area-inset-bottom);
         padding-bottom: constant(safe-area-inset-bottom);
         padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* iPad specific fixes */
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px) 
+  and (-webkit-min-device-pixel-ratio: 1) {
+    .wpbnp-bottom-nav {
+        position: fixed !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        right: 0px !important;
+        z-index: 99999 !important;
+        transform: translate3d(0, 0, 0) !important;
+        -webkit-transform: translate3d(0, 0, 0) !important;
+        /* Use viewport height to force positioning */
+        top: calc(100vh - 70px) !important;
+        bottom: auto !important;
+        margin: 0 !important;
+        padding-bottom: 10px !important;
+        /* Ensure it's always visible */
+        position: absolute !important;
+        /* Alternative: use sticky positioning */
+        position: -webkit-sticky !important;
+        position: sticky !important;
+    }
+    
+    /* Ensure body has proper height for iPad */
+    body.wpbnp-active {
+        min-height: 100vh !important;
+        padding-bottom: 70px !important;
+    }
+}
+
+/* iPad Pro specific fixes */
+@media only screen 
+  and (min-device-width: 1024px) 
+  and (max-device-width: 1366px) 
+  and (-webkit-min-device-pixel-ratio: 2) {
+    .wpbnp-bottom-nav {
+        position: fixed !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        right: 0px !important;
+        z-index: 99999 !important;
+        transform: translate3d(0, 0, 0) !important;
+        -webkit-transform: translate3d(0, 0, 0) !important;
+        /* Use viewport height to force positioning */
+        top: calc(100vh - 70px) !important;
+        bottom: auto !important;
+        margin: 0 !important;
+        padding-bottom: 10px !important;
+        /* Ensure it's always visible */
+        position: absolute !important;
+        /* Alternative: use sticky positioning */
+        position: -webkit-sticky !important;
+        position: sticky !important;
+    }
+    
+    /* Ensure body has proper height for iPad Pro */
+    body.wpbnp-active {
+        min-height: 100vh !important;
+        padding-bottom: 70px !important;
     }
 }
 
