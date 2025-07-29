@@ -1921,7 +1921,7 @@ input:checked + .wpbnp-toggle-slider:before {
     opacity: 1 !important;
     position: relative !important;
     z-index: 1 !important;
-    border: 2px solid red !important; /* Debug border */
+
 }
 
 #wpbnp-create-preset-modal .wpbnp-form-group,
@@ -1936,7 +1936,7 @@ input:checked + .wpbnp-toggle-slider:before {
     opacity: 1 !important;
     position: relative !important;
     z-index: 2 !important;
-    border: 2px solid blue !important; /* Debug border */
+
 }
 
 #wpbnp-create-preset-modal .wpbnp-form-group label,
@@ -1958,7 +1958,7 @@ input:checked + .wpbnp-toggle-slider:before {
     position: relative !important;
     z-index: 3 !important;
     width: 100% !important;
-    border: 2px solid green !important; /* Debug border */
+
 }
 
 #wpbnp-create-preset-modal .wpbnp-form-group input[type="text"],

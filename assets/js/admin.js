@@ -2028,16 +2028,6 @@ jQuery(document).ready(function ($) {
                                         <div class="wpbnp-items-list"></div>
                                     </div>
                                 </div>
-                                
-                                <div class="wpbnp-form-group">
-                                    <div class="wpbnp-checkbox-group">
-                                        <label>
-                                            <input type="checkbox" id="preset-include-disabled" name="include-disabled">
-                                            Include disabled items
-                                        </label>
-                                        <small>Disabled items will be included but marked as disabled in the preset</small>
-                                    </div>
-                                </div>
                             </form>
                         </div>
                         <div class="wpbnp-modal-footer">
@@ -2085,10 +2075,7 @@ jQuery(document).ready(function ($) {
                 $createBtn.prop('disabled', !isValid);
             });
 
-            // Handle include disabled items checkbox
-            $('#preset-include-disabled').on('change', () => {
-                this.updateCreatePresetItemsPreview();
-            });
+
 
             // Handle form submission
             $createBtn.on('click', (e) => {
@@ -2125,10 +2112,9 @@ jQuery(document).ready(function ($) {
             const currentItems = this.getCurrentNavigationItems();
             const $itemsList = $('.wpbnp-items-list');
             const $countBadge = $('.wpbnp-count-badge');
-            const includeDisabled = $('#preset-include-disabled').is(':checked');
 
-            // Filter items based on include disabled setting
-            const itemsToShow = includeDisabled ? currentItems : currentItems.filter(item => item.enabled);
+            // Show all current items (no filtering)
+            const itemsToShow = currentItems;
 
             // Update count
             $countBadge.text(itemsToShow.length);
@@ -2150,6 +2136,37 @@ jQuery(document).ready(function ($) {
             if (itemsToShow.length === 0) {
                 $countBadge.addClass('wpbnp-count-empty');
             } else if (itemsToShow.length < 3) {
+                $countBadge.addClass('wpbnp-count-warning');
+            } else {
+                $countBadge.removeClass('wpbnp-count-empty wpbnp-count-warning');
+            }
+        },
+
+        // Update items preview in edit preset modal
+        updateEditPresetItemsPreview: function (savedItems) {
+            const $itemsList = $('#wpbnp-edit-preset-modal .wpbnp-items-list');
+            const $countBadge = $('#wpbnp-edit-preset-modal .wpbnp-count-badge');
+
+            // Update count
+            $countBadge.text(savedItems.length);
+
+            // Update items list
+            $itemsList.empty();
+            savedItems.forEach(item => {
+                const itemHtml = `
+                    <div class="wpbnp-preview-item ${!item.enabled ? 'wpbnp-disabled' : ''}">
+                        <span class="wpbnp-item-icon">${item.icon || '📱'}</span>
+                        <span class="wpbnp-item-label">${item.label || 'Unnamed Item'}</span>
+                        ${!item.enabled ? '<span class="wpbnp-disabled-badge">Disabled</span>' : ''}
+                    </div>
+                `;
+                $itemsList.append(itemHtml);
+            });
+
+            // Update count badge color based on item count
+            if (savedItems.length === 0) {
+                $countBadge.addClass('wpbnp-count-empty');
+            } else if (savedItems.length < 3) {
                 $countBadge.addClass('wpbnp-count-warning');
             } else {
                 $countBadge.removeClass('wpbnp-count-empty wpbnp-count-warning');
@@ -2181,7 +2198,7 @@ jQuery(document).ready(function ($) {
 
             // Get current navigation items
             const currentItems = this.getCurrentNavigationItems();
-            const itemsToInclude = includeDisabled ? currentItems : currentItems.filter(item => item.enabled);
+            const itemsToInclude = currentItems; // Include all items
 
             if (itemsToInclude.length === 0) {
                 this.showNotification('No items to include in the preset. Please add some navigation items first.', 'error');
@@ -2410,6 +2427,7 @@ jQuery(document).ready(function ($) {
             const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
             const currentName = presetItem.find('.wpbnp-preset-name').text();
             const currentDescription = presetItem.find('.wpbnp-preset-description').text();
+            const savedItems = JSON.parse(presetItem.find('input[name*="[items]"]').val() || '[]');
 
             // Remove existing modal if any
             $('#wpbnp-edit-preset-modal').remove();
@@ -2441,16 +2459,12 @@ jQuery(document).ready(function ($) {
                                 </div>
                                 
                                 <div class="wpbnp-form-group">
-                                    <label>Current Preset Info</label>
+                                    <label>Saved Navigation Items</label>
                                     <div class="wpbnp-current-items-preview">
                                         <div class="wpbnp-items-count">
-                                            <span class="wpbnp-count-badge">${presetItem.find('.wpbnp-preset-meta').text().match(/\d+/)[0]}</span> items in this preset
+                                            <span class="wpbnp-count-badge">${savedItems.length}</span> items in this preset
                                         </div>
-                                        <div class="wpbnp-preset-info-display">
-                                            <p><strong>Created:</strong> ${presetItem.find('.wpbnp-preset-meta').text().split('•')[1]}</p>
-                                            <p><strong>Current Name:</strong> ${currentName}</p>
-                                            ${currentDescription ? `<p><strong>Current Description:</strong> ${currentDescription}</p>` : ''}
-                                        </div>
+                                        <div class="wpbnp-items-list"></div>
                                     </div>
                                 </div>
                             </form>
@@ -2489,6 +2503,13 @@ jQuery(document).ready(function ($) {
             const $descriptionInput = $('#edit-preset-description');
             const $editBtn = $('.wpbnp-edit-preset-btn');
             const $cancelBtn = $('.wpbnp-modal-cancel, .wpbnp-modal-close');
+
+            // Get saved items from the preset
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const savedItems = JSON.parse(presetItem.find('input[name*="[items]"]').val() || '[]');
+
+            // Populate the items list with saved items
+            this.updateEditPresetItemsPreview(savedItems);
 
             // Handle name input validation
             $nameInput.on('input', function() {
