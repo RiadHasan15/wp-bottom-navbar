@@ -1883,12 +1883,23 @@ jQuery(document).ready(function($) {
                 console.log('Configuration added successfully');
                 console.log('Total configs now:', $('.wpbnp-config-item').length);
                 
-                // Populate custom presets in the new configuration
-                const newSelector = $('.wpbnp-config-item').last().find('.wpbnp-preset-selector');
-                console.log('New selector found:', newSelector.length, newSelector[0]);
-                console.log('About to populate selector...');
-                this.populatePresetSelector(newSelector);
+                // Populate all selectors in the new configuration
+                const $newConfig = $('.wpbnp-config-item').last();
+                
+                // Populate custom presets
+                const newPresetSelector = $newConfig.find('.wpbnp-preset-selector');
+                console.log('New preset selector found:', newPresetSelector.length);
+                this.populatePresetSelector(newPresetSelector);
+                
+                // Populate pages selector
+                this.populatePagesSelector($newConfig.find('select[name*="[pages]"]'), configIndex);
+                
+                // Populate categories selector  
+                this.populateCategoriesSelector($newConfig.find('select[name*="[categories]"]'), configIndex);
                 console.log('Selector population completed');
+                
+                // Save form state to preserve the new configuration
+                this.saveFormState();
                 
                 this.showNotification('New configuration added!', 'success');
             } catch (error) {
@@ -1977,6 +1988,10 @@ jQuery(document).ready(function($) {
             
             this.addPresetToDOM(newPreset);
             this.updateAllPresetSelectors();
+            
+            // Save form state to preserve the new preset
+            this.saveFormState();
+            
             this.showNotification(`Custom preset "${presetName}" created successfully!`, 'success');
             
             // Important reminder to save
@@ -2488,6 +2503,74 @@ jQuery(document).ready(function($) {
             if ($('.wpbnp-config-item').length === 0) {
                 $('#wpbnp-configurations-list').html('<p class="wpbnp-no-configs">No configurations created yet. Click "Add Configuration" to get started.</p>');
             }
+        },
+
+        // Populate pages selector for new configurations
+        populatePagesSelector: function($selector, configIndex) {
+            if (!$selector || !$selector.length) return;
+            
+            console.log('Populating pages selector for config', configIndex);
+            
+            // Make AJAX call to get pages
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_get_pages',
+                    nonce: wpbnp_admin.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data.pages) {
+                        $selector.empty();
+                        $selector.append('<option value="">Select pages...</option>');
+                        
+                        response.data.pages.forEach(function(page) {
+                            $selector.append(`<option value="${page.ID}">${page.post_title}</option>`);
+                        });
+                        
+                        console.log('Pages populated:', response.data.pages.length);
+                    } else {
+                        $selector.html('<option value="" disabled>No pages found - Create some pages first</option>');
+                    }
+                },
+                error: function() {
+                    $selector.html('<option value="" disabled>Error loading pages</option>');
+                }
+            });
+        },
+
+        // Populate categories selector for new configurations
+        populateCategoriesSelector: function($selector, configIndex) {
+            if (!$selector || !$selector.length) return;
+            
+            console.log('Populating categories selector for config', configIndex);
+            
+            // Make AJAX call to get categories
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_get_categories',
+                    nonce: wpbnp_admin.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data.categories) {
+                        $selector.empty();
+                        $selector.append('<option value="">Select categories...</option>');
+                        
+                        response.data.categories.forEach(function(category) {
+                            $selector.append(`<option value="${category.term_id}">${category.name}</option>`);
+                        });
+                        
+                        console.log('Categories populated:', response.data.categories.length);
+                    } else {
+                        $selector.html('<option value="" disabled>No categories found</option>');
+                    }
+                },
+                error: function() {
+                    $selector.html('<option value="" disabled>Error loading categories</option>');
+                }
+            });
         }
     };
     
