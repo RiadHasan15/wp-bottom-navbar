@@ -110,6 +110,24 @@
         },
         
         /**
+         * Handle keyboard navigation setup
+         */
+        handleKeyboardNavigation: function() {
+            // Make navigation items focusable
+            $('.wpbnp-nav-item').attr('tabindex', '0');
+            
+            // Add keyboard navigation styles
+            $('.wpbnp-nav-item').on('focus', function() {
+                $(this).addClass('wpbnp-focused');
+            }).on('blur', function() {
+                $(this).removeClass('wpbnp-focused');
+            });
+            
+            // Handle keyboard events
+            $('.wpbnp-nav-item').on('keydown', this.handleKeyDown);
+        },
+        
+        /**
          * Enhanced touch support
          */
         enhanceTouchSupport: function() {
@@ -152,9 +170,6 @@
             
             // Handle navigation item clicks
             $('.wpbnp-nav-item').on('click', this.handleItemClick.bind(this));
-            
-            // Handle keyboard navigation
-            $('.wpbnp-nav-item').on('keydown', this.handleKeyDown);
             
             // Update cart badge when WooCommerce fragments update
             $(document.body).on('wc_fragments_refreshed', function() {
