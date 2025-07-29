@@ -211,7 +211,7 @@
     font-size: 12px;
 }
 
-/* Modal Styles */
+/* Icon Picker Modal Styles */
 .wpbnp-modal {
     position: fixed;
     top: 0;
@@ -1071,7 +1071,7 @@ input:checked + .wpbnp-toggle-slider:before {
     }
 }
 
-/* Enhanced Modal Styling */
+/* Enhanced Icon Picker Modal Styling */
 .wpbnp-modal {
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
@@ -1797,8 +1797,9 @@ input:checked + .wpbnp-toggle-slider:before {
     }
 }
 
-/* Create Preset Modal Styles */
-.wpbnp-modal-overlay {
+/* Custom Preset Modal Styles - Fixed */
+#wpbnp-create-preset-modal,
+#wpbnp-edit-preset-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -1814,12 +1815,14 @@ input:checked + .wpbnp-toggle-slider:before {
     transition: all 0.3s ease;
 }
 
-.wpbnp-modal-overlay.wpbnp-modal-show {
+#wpbnp-create-preset-modal.wpbnp-modal-show,
+#wpbnp-edit-preset-modal.wpbnp-modal-show {
     opacity: 1;
     visibility: visible;
 }
 
-.wpbnp-modal {
+#wpbnp-create-preset-modal .wpbnp-modal,
+#wpbnp-edit-preset-modal .wpbnp-modal {
     background: white;
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -1831,11 +1834,13 @@ input:checked + .wpbnp-toggle-slider:before {
     transition: transform 0.3s ease;
 }
 
-.wpbnp-modal-overlay.wpbnp-modal-show .wpbnp-modal {
+#wpbnp-create-preset-modal.wpbnp-modal-show .wpbnp-modal,
+#wpbnp-edit-preset-modal.wpbnp-modal-show .wpbnp-modal {
     transform: scale(1);
 }
 
-.wpbnp-modal-header {
+#wpbnp-create-preset-modal .wpbnp-modal-header,
+#wpbnp-edit-preset-modal .wpbnp-modal-header {
     background: #667eea;
     color: white;
     padding: 20px 24px;
@@ -1844,13 +1849,15 @@ input:checked + .wpbnp-toggle-slider:before {
     align-items: center;
 }
 
-.wpbnp-modal-header h3 {
+#wpbnp-create-preset-modal .wpbnp-modal-header h3,
+#wpbnp-edit-preset-modal .wpbnp-modal-header h3 {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
 }
 
-.wpbnp-modal-close {
+#wpbnp-create-preset-modal .wpbnp-modal-close,
+#wpbnp-edit-preset-modal .wpbnp-modal-close {
     background: none;
     border: none;
     color: white;
@@ -1866,29 +1873,35 @@ input:checked + .wpbnp-toggle-slider:before {
     transition: background 0.2s ease;
 }
 
-.wpbnp-modal-close:hover {
+#wpbnp-create-preset-modal .wpbnp-modal-close:hover,
+#wpbnp-edit-preset-modal .wpbnp-modal-close:hover {
     background: rgba(255, 255, 255, 0.2);
 }
 
-.wpbnp-modal-body {
+#wpbnp-create-preset-modal .wpbnp-modal-body,
+#wpbnp-edit-preset-modal .wpbnp-modal-body {
     padding: 24px;
     max-height: 60vh;
     overflow-y: auto;
 }
 
-.wpbnp-form-group {
+#wpbnp-create-preset-modal .wpbnp-form-group,
+#wpbnp-edit-preset-modal .wpbnp-form-group {
     margin-bottom: 20px;
 }
 
-.wpbnp-form-group label {
+#wpbnp-create-preset-modal .wpbnp-form-group label,
+#wpbnp-edit-preset-modal .wpbnp-form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
     color: #333;
 }
 
-.wpbnp-form-group input[type="text"],
-.wpbnp-form-group textarea {
+#wpbnp-create-preset-modal .wpbnp-form-group input[type="text"],
+#wpbnp-create-preset-modal .wpbnp-form-group textarea,
+#wpbnp-edit-preset-modal .wpbnp-form-group input[type="text"],
+#wpbnp-edit-preset-modal .wpbnp-form-group textarea {
     width: 100%;
     padding: 12px 16px;
     border: 2px solid #ddd;
@@ -1898,28 +1911,33 @@ input:checked + .wpbnp-toggle-slider:before {
     box-sizing: border-box;
 }
 
-.wpbnp-form-group input[type="text"]:focus,
-.wpbnp-form-group textarea:focus {
+#wpbnp-create-preset-modal .wpbnp-form-group input[type="text"]:focus,
+#wpbnp-create-preset-modal .wpbnp-form-group textarea:focus,
+#wpbnp-edit-preset-modal .wpbnp-form-group input[type="text"]:focus,
+#wpbnp-edit-preset-modal .wpbnp-form-group textarea:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.wpbnp-form-group small {
+#wpbnp-create-preset-modal .wpbnp-form-group small,
+#wpbnp-edit-preset-modal .wpbnp-form-group small {
     display: block;
     margin-top: 6px;
     color: #666;
     font-size: 12px;
 }
 
-.wpbnp-current-items-preview {
+#wpbnp-create-preset-modal .wpbnp-current-items-preview,
+#wpbnp-edit-preset-modal .wpbnp-current-items-preview {
     background: #f8f9fa;
     border: 2px solid #e9ecef;
     border-radius: 8px;
     padding: 16px;
 }
 
-.wpbnp-items-count {
+#wpbnp-create-preset-modal .wpbnp-items-count,
+#wpbnp-edit-preset-modal .wpbnp-items-count {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1928,7 +1946,8 @@ input:checked + .wpbnp-toggle-slider:before {
     color: #333;
 }
 
-.wpbnp-count-badge {
+#wpbnp-create-preset-modal .wpbnp-count-badge,
+#wpbnp-edit-preset-modal .wpbnp-count-badge {
     background: #667eea;
     color: white;
     padding: 4px 8px;
@@ -1939,16 +1958,19 @@ input:checked + .wpbnp-toggle-slider:before {
     text-align: center;
 }
 
-.wpbnp-count-badge.wpbnp-count-empty {
+#wpbnp-create-preset-modal .wpbnp-count-badge.wpbnp-count-empty,
+#wpbnp-edit-preset-modal .wpbnp-count-badge.wpbnp-count-empty {
     background: #dc3545;
 }
 
-.wpbnp-count-badge.wpbnp-count-warning {
+#wpbnp-create-preset-modal .wpbnp-count-badge.wpbnp-count-warning,
+#wpbnp-edit-preset-modal .wpbnp-count-badge.wpbnp-count-warning {
     background: #ffc107;
     color: #333;
 }
 
-.wpbnp-items-list {
+#wpbnp-create-preset-modal .wpbnp-items-list,
+#wpbnp-edit-preset-modal .wpbnp-items-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -1956,7 +1978,8 @@ input:checked + .wpbnp-toggle-slider:before {
     overflow-y: auto;
 }
 
-.wpbnp-preview-item {
+#wpbnp-create-preset-modal .wpbnp-preview-item,
+#wpbnp-edit-preset-modal .wpbnp-preview-item {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1967,29 +1990,34 @@ input:checked + .wpbnp-toggle-slider:before {
     transition: all 0.2s ease;
 }
 
-.wpbnp-preview-item:hover {
+#wpbnp-create-preset-modal .wpbnp-preview-item:hover,
+#wpbnp-edit-preset-modal .wpbnp-preview-item:hover {
     border-color: #667eea;
     background: #f8f9ff;
 }
 
-.wpbnp-preview-item.wpbnp-disabled {
+#wpbnp-create-preset-modal .wpbnp-preview-item.wpbnp-disabled,
+#wpbnp-edit-preset-modal .wpbnp-preview-item.wpbnp-disabled {
     opacity: 0.6;
     background: #f8f9fa;
 }
 
-.wpbnp-item-icon {
+#wpbnp-create-preset-modal .wpbnp-item-icon,
+#wpbnp-edit-preset-modal .wpbnp-item-icon {
     font-size: 16px;
     width: 20px;
     text-align: center;
 }
 
-.wpbnp-item-label {
+#wpbnp-create-preset-modal .wpbnp-item-label,
+#wpbnp-edit-preset-modal .wpbnp-item-label {
     flex: 1;
     font-size: 14px;
     color: #333;
 }
 
-.wpbnp-disabled-badge {
+#wpbnp-create-preset-modal .wpbnp-disabled-badge,
+#wpbnp-edit-preset-modal .wpbnp-disabled-badge {
     background: #6c757d;
     color: white;
     padding: 2px 6px;
@@ -1998,7 +2026,8 @@ input:checked + .wpbnp-toggle-slider:before {
     font-weight: bold;
 }
 
-.wpbnp-preset-info-display {
+#wpbnp-create-preset-modal .wpbnp-preset-info-display,
+#wpbnp-edit-preset-modal .wpbnp-preset-info-display {
     background: white;
     border-radius: 6px;
     padding: 12px;
@@ -2006,22 +2035,26 @@ input:checked + .wpbnp-toggle-slider:before {
     border: 1px solid #e9ecef;
 }
 
-.wpbnp-preset-info-display p {
+#wpbnp-create-preset-modal .wpbnp-preset-info-display p,
+#wpbnp-edit-preset-modal .wpbnp-preset-info-display p {
     margin: 0 0 8px 0;
     font-size: 13px;
     color: #333;
 }
 
-.wpbnp-preset-info-display p:last-child {
+#wpbnp-create-preset-modal .wpbnp-preset-info-display p:last-child,
+#wpbnp-edit-preset-modal .wpbnp-preset-info-display p:last-child {
     margin-bottom: 0;
 }
 
-.wpbnp-preset-info-display strong {
+#wpbnp-create-preset-modal .wpbnp-preset-info-display strong,
+#wpbnp-edit-preset-modal .wpbnp-preset-info-display strong {
     color: #667eea;
     font-weight: 600;
 }
 
-.wpbnp-checkbox-group {
+#wpbnp-create-preset-modal .wpbnp-checkbox-group,
+#wpbnp-edit-preset-modal .wpbnp-checkbox-group {
     display: flex;
     align-items: flex-start;
     gap: 12px;
@@ -2031,7 +2064,8 @@ input:checked + .wpbnp-toggle-slider:before {
     border: 1px solid #e9ecef;
 }
 
-.wpbnp-checkbox-group label {
+#wpbnp-create-preset-modal .wpbnp-checkbox-group label,
+#wpbnp-edit-preset-modal .wpbnp-checkbox-group label {
     display: flex;
     align-items: flex-start;
     gap: 8px;
@@ -2041,12 +2075,14 @@ input:checked + .wpbnp-toggle-slider:before {
     color: #333;
 }
 
-.wpbnp-checkbox-group input[type="checkbox"] {
+#wpbnp-create-preset-modal .wpbnp-checkbox-group input[type="checkbox"],
+#wpbnp-edit-preset-modal .wpbnp-checkbox-group input[type="checkbox"] {
     margin: 0;
     margin-top: 2px;
 }
 
-.wpbnp-modal-footer {
+#wpbnp-create-preset-modal .wpbnp-modal-footer,
+#wpbnp-edit-preset-modal .wpbnp-modal-footer {
     padding: 20px 24px;
     background: #f8f9fa;
     border-top: 1px solid #e9ecef;
@@ -2055,7 +2091,8 @@ input:checked + .wpbnp-toggle-slider:before {
     gap: 12px;
 }
 
-.wpbnp-btn {
+#wpbnp-create-preset-modal .wpbnp-btn,
+#wpbnp-edit-preset-modal .wpbnp-btn {
     padding: 10px 20px;
     border: none;
     border-radius: 6px;
@@ -2068,64 +2105,77 @@ input:checked + .wpbnp-toggle-slider:before {
     gap: 8px;
 }
 
-.wpbnp-btn:disabled {
+#wpbnp-create-preset-modal .wpbnp-btn:disabled,
+#wpbnp-edit-preset-modal .wpbnp-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-.wpbnp-btn-primary {
+#wpbnp-create-preset-modal .wpbnp-btn-primary,
+#wpbnp-edit-preset-modal .wpbnp-btn-primary {
     background: #667eea;
     color: white;
 }
 
-.wpbnp-btn-primary:hover:not(:disabled) {
+#wpbnp-create-preset-modal .wpbnp-btn-primary:hover:not(:disabled),
+#wpbnp-edit-preset-modal .wpbnp-btn-primary:hover:not(:disabled) {
     background: #5a67d8;
     transform: translateY(-1px);
 }
 
-.wpbnp-btn-secondary {
+#wpbnp-create-preset-modal .wpbnp-btn-secondary,
+#wpbnp-edit-preset-modal .wpbnp-btn-secondary {
     background: #6c757d;
     color: white;
 }
 
-.wpbnp-btn-secondary:hover:not(:disabled) {
+#wpbnp-create-preset-modal .wpbnp-btn-secondary:hover:not(:disabled),
+#wpbnp-edit-preset-modal .wpbnp-btn-secondary:hover:not(:disabled) {
     background: #5a6268;
 }
 
-.wpbnp-btn-loading {
+#wpbnp-create-preset-modal .wpbnp-btn-loading,
+#wpbnp-edit-preset-modal .wpbnp-btn-loading {
     display: none;
 }
 
 /* Loading state for buttons */
-.wpbnp-btn:disabled .wpbnp-btn-text {
+#wpbnp-create-preset-modal .wpbnp-btn:disabled .wpbnp-btn-text,
+#wpbnp-edit-preset-modal .wpbnp-btn:disabled .wpbnp-btn-text {
     display: none;
 }
 
-.wpbnp-btn:disabled .wpbnp-btn-loading {
+#wpbnp-create-preset-modal .wpbnp-btn:disabled .wpbnp-btn-loading,
+#wpbnp-edit-preset-modal .wpbnp-btn:disabled .wpbnp-btn-loading {
     display: inline-block;
 }
 
 /* Responsive adjustments for modal */
 @media (max-width: 768px) {
-    .wpbnp-modal {
+    #wpbnp-create-preset-modal .wpbnp-modal,
+    #wpbnp-edit-preset-modal .wpbnp-modal {
         width: 95%;
         margin: 20px;
     }
     
-    .wpbnp-modal-header {
+    #wpbnp-create-preset-modal .wpbnp-modal-header,
+    #wpbnp-edit-preset-modal .wpbnp-modal-header {
         padding: 16px 20px;
     }
     
-    .wpbnp-modal-body {
+    #wpbnp-create-preset-modal .wpbnp-modal-body,
+    #wpbnp-edit-preset-modal .wpbnp-modal-body {
         padding: 20px;
     }
     
-    .wpbnp-modal-footer {
+    #wpbnp-create-preset-modal .wpbnp-modal-footer,
+    #wpbnp-edit-preset-modal .wpbnp-modal-footer {
         padding: 16px 20px;
         flex-direction: column;
     }
     
-    .wpbnp-btn {
+    #wpbnp-create-preset-modal .wpbnp-btn,
+    #wpbnp-edit-preset-modal .wpbnp-btn {
         width: 100%;
         justify-content: center;
     }
