@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 // Define plugin constants
 // NOTE: When merging with pro branch, use semantic versioning (e.g., 1.2.0)
-define('WPBNP_VERSION', '1.1.7'); // Fixed icons and removed test pages
+define('WPBNP_VERSION', '1.1.8'); // Fixed page targeting logic and added debugging
 define('WPBNP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPBNP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WPBNP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -120,6 +120,13 @@ class WP_Bottom_Navigation_Pro {
         
         // Footer hook for navigation display
         add_action('wp_footer', array($this, 'display_navigation'), 999);
+        
+        // Debug hook for page targeting (add ?wpbnp_debug=1 to any URL)
+        if (isset($_GET['wpbnp_debug']) && $_GET['wpbnp_debug'] == '1' && current_user_can('manage_options')) {
+            add_action('wp_footer', function() {
+                wpbnp_debug_page_targeting();
+            }, 1000);
+        }
         
         // Developer hooks
         do_action('wpbnp_init', $this);

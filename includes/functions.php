@@ -3647,6 +3647,7 @@ function wpbnp_is_pro_license_active() {
 function wpbnp_get_active_page_targeting_config() {
     // Check if pro license is active
     if (!wpbnp_is_pro_license_active()) {
+        error_log('WPBNP Page Targeting - Pro license not active');
         return null;
     }
     
@@ -3654,14 +3655,18 @@ function wpbnp_get_active_page_targeting_config() {
     $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
     
     if (!isset($page_targeting['enabled']) || !$page_targeting['enabled']) {
+        error_log('WPBNP Page Targeting - Page targeting not enabled');
         return null;
     }
     
     $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
     
     if (empty($configurations)) {
+        error_log('WPBNP Page Targeting - No configurations found');
         return null;
     }
+    
+    error_log('WPBNP Page Targeting - Found ' . count($configurations) . ' configurations');
     
     // Sort configurations by priority (higher first)
     usort($configurations, function($a, $b) {
@@ -3671,12 +3676,15 @@ function wpbnp_get_active_page_targeting_config() {
     });
     
     // Check each configuration's conditions
-    foreach ($configurations as $config) {
+    foreach ($configurations as $index => $config) {
+        error_log('WPBNP Page Targeting - Checking configuration ' . ($index + 1) . ': ' . ($config['name'] ?? 'Unnamed'));
         if (wpbnp_check_page_targeting_conditions($config)) {
+            error_log('WPBNP Page Targeting - Using configuration: ' . ($config['name'] ?? 'Unnamed'));
             return $config;
         }
     }
     
+    error_log('WPBNP Page Targeting - No matching configuration found');
     return null;
 }
 
@@ -3692,55 +3700,164 @@ function wpbnp_check_page_targeting_conditions($config) {
     
     // If all conditions are empty, this is a fallback configuration
     $has_conditions = false;
+    $matches = array();
     
     // Check specific pages
     if (!empty($conditions['pages'])) {
         $has_conditions = true;
+        $page_match = false;
         if (is_page() && in_array(get_the_ID(), $conditions['pages'])) {
-            return true;
+            $page_match = true;
         }
+        $matches['pages'] = $page_match;
+        
+        // Debug logging
+        error_log('WPBNP Page Targeting - Pages check: Current page ID: ' . get_the_ID() . ', Target pages: ' . implode(',', $conditions['pages']) . ', Match: ' . ($page_match ? 'YES' : 'NO'));
     }
     
     // Check post types
     if (!empty($conditions['post_types'])) {
         $has_conditions = true;
+        $post_type_match = false;
         $current_post_type = get_post_type();
         if ($current_post_type && in_array($current_post_type, $conditions['post_types'])) {
-            return true;
+            $post_type_match = true;
         }
+        $matches['post_types'] = $post_type_match;
+        
+        // Debug logging
+        error_log('WPBNP Page Targeting - Post types check: Current type: ' . $current_post_type . ', Target types: ' . implode(',', $conditions['post_types']) . ', Match: ' . ($post_type_match ? 'YES' : 'NO'));
     }
     
     // Check categories
     if (!empty($conditions['categories'])) {
         $has_conditions = true;
+        $category_match = false;
+        
         if (is_single() || is_category()) {
             $post_categories = wp_get_post_categories(get_the_ID());
             if (array_intersect($post_categories, $conditions['categories'])) {
-                return true;
+                $category_match = true;
             }
         }
         if (is_category() && in_array(get_queried_object_id(), $conditions['categories'])) {
-            return true;
+            $category_match = true;
         }
+        $matches['categories'] = $category_match;
+        
+        // Debug logging
+        error_log('WPBNP Page Targeting - Categories check: Match: ' . ($category_match ? 'YES' : 'NO'));
     }
     
     // Check user roles
     if (!empty($conditions['user_roles'])) {
         $has_conditions = true;
+        $role_match = false;
+        
         if (is_user_logged_in()) {
             $user = wp_get_current_user();
             if (array_intersect($user->roles, $conditions['user_roles'])) {
-                return true;
+                $role_match = true;
             }
         }
+        $matches['user_roles'] = $role_match;
+        
+        // Debug logging
+        $user_roles = is_user_logged_in() ? wp_get_current_user()->roles : array('not_logged_in');
+        error_log('WPBNP Page Targeting - User roles check: Current roles: ' . implode(',', $user_roles) . ', Target roles: ' . implode(',', $conditions['user_roles']) . ', Match: ' . ($role_match ? 'YES' : 'NO'));
     }
     
     // If no conditions were set, this is a fallback configuration
     if (!$has_conditions) {
+        error_log('WPBNP Page Targeting - No conditions set, using as fallback');
         return true;
     }
     
-    return false;
+    // ALL conditions must match (AND logic)
+    $all_match = true;
+    foreach ($matches as $condition_type => $match) {
+        if (!$match) {
+            $all_match = false;
+            break;
+        }
+    }
+    
+    error_log('WPBNP Page Targeting - Final result: ' . ($all_match ? 'SHOW' : 'HIDE') . ' navigation');
+    return $all_match;
+}
+
+/**
+ * Debug function to test page targeting
+ */
+function wpbnp_debug_page_targeting() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+    
+    echo '<div style="background: #fff; border: 1px solid #ccc; padding: 20px; margin: 20px; font-family: monospace;">';
+    echo '<h3>🔍 WP Bottom Navigation Pro - Page Targeting Debug</h3>';
+    
+    // Current page info
+    echo '<h4>📍 Current Page Info:</h4>';
+    echo '<ul>';
+    echo '<li><strong>Page ID:</strong> ' . get_the_ID() . '</li>';
+    echo '<li><strong>Post Type:</strong> ' . get_post_type() . '</li>';
+    echo '<li><strong>Is Page:</strong> ' . (is_page() ? 'Yes' : 'No') . '</li>';
+    echo '<li><strong>Is Single:</strong> ' . (is_single() ? 'Yes' : 'No') . '</li>';
+    echo '<li><strong>Is Category:</strong> ' . (is_category() ? 'Yes' : 'No') . '</li>';
+    echo '<li><strong>Is User Logged In:</strong> ' . (is_user_logged_in() ? 'Yes' : 'No') . '</li>';
+    if (is_user_logged_in()) {
+        $user = wp_get_current_user();
+        echo '<li><strong>User Roles:</strong> ' . implode(', ', $user->roles) . '</li>';
+    }
+    echo '</ul>';
+    
+    // License status
+    echo '<h4>🔑 License Status:</h4>';
+    echo '<ul>';
+    echo '<li><strong>License Key:</strong> ' . (get_option('wpbnp_pro_license_key', '') ? 'Set' : 'Not Set') . '</li>';
+    echo '<li><strong>License Status:</strong> ' . get_option('wpbnp_pro_license_status', 'inactive') . '</li>';
+    echo '<li><strong>Pro Active:</strong> ' . (wpbnp_is_pro_license_active() ? 'Yes' : 'No') . '</li>';
+    echo '</ul>';
+    
+    // Page targeting status
+    echo '<h4>🎯 Page Targeting Status:</h4>';
+    $settings = wpbnp_get_settings();
+    $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
+    echo '<ul>';
+    echo '<li><strong>Page Targeting Enabled:</strong> ' . (isset($page_targeting['enabled']) && $page_targeting['enabled'] ? 'Yes' : 'No') . '</li>';
+    echo '<li><strong>Configurations Count:</strong> ' . count(isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array()) . '</li>';
+    echo '</ul>';
+    
+    // Active configuration
+    echo '<h4>⚡ Active Configuration:</h4>';
+    $active_config = wpbnp_get_active_page_targeting_config();
+    if ($active_config) {
+        echo '<ul>';
+        echo '<li><strong>Name:</strong> ' . ($active_config['name'] ?? 'Unnamed') . '</li>';
+        echo '<li><strong>Priority:</strong> ' . ($active_config['priority'] ?? 1) . '</li>';
+        echo '<li><strong>Conditions:</strong></li>';
+        $conditions = isset($active_config['conditions']) ? $active_config['conditions'] : array();
+        echo '<ul>';
+        if (!empty($conditions['pages'])) {
+            echo '<li><strong>Pages:</strong> ' . implode(', ', $conditions['pages']) . '</li>';
+        }
+        if (!empty($conditions['post_types'])) {
+            echo '<li><strong>Post Types:</strong> ' . implode(', ', $conditions['post_types']) . '</li>';
+        }
+        if (!empty($conditions['categories'])) {
+            echo '<li><strong>Categories:</strong> ' . implode(', ', $conditions['categories']) . '</li>';
+        }
+        if (!empty($conditions['user_roles'])) {
+            echo '<li><strong>User Roles:</strong> ' . implode(', ', $conditions['user_roles']) . '</li>';
+        }
+        echo '</ul>';
+        echo '</ul>';
+    } else {
+        echo '<p><strong>No active configuration (using default navigation)</strong></p>';
+    }
+    
+    echo '</div>';
 }
 
 /**
