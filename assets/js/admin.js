@@ -356,13 +356,28 @@ jQuery(document).ready(function($) {
         
         // Handle tab switching while preserving form state
         handleTabSwitch: function(e) {
+            console.log('Tab switch triggered:', e.target, e.currentTarget);
+            
+            // Get the actual tab link (might be e.target or its parent)
+            const tabLink = $(e.target).closest('.wpbnp-tab')[0];
+            const targetHref = tabLink ? tabLink.href : null;
+            
+            console.log('Tab link found:', tabLink, 'href:', targetHref);
+            
+            // Only proceed if we have a valid href
+            if (!targetHref) {
+                console.warn('Tab click without valid href, ignoring');
+                return;
+            }
+            
             // Save current form state before switching tabs
             this.saveFormState();
             
             // Small delay to ensure state is saved before navigation
             setTimeout(() => {
+                console.log('Navigating to:', targetHref);
                 // Let the navigation proceed
-                window.location.href = e.target.href;
+                window.location.href = targetHref;
             }, 50);
             
             // Prevent immediate navigation to allow state saving
@@ -2054,7 +2069,26 @@ jQuery(document).ready(function($) {
                 this.loadItemsIntoMainInterface(currentItems);
                 
                 // Switch to Items tab
-                $('.wpbnp-tab[data-tab="items"]').click();
+                const itemsTab = $('.wpbnp-tab').filter(function() {
+                    return $(this).attr('href') && $(this).attr('href').includes('tab=items');
+                });
+                
+                if (itemsTab.length > 0) {
+                    // Use direct navigation instead of click to avoid potential issues
+                    const itemsHref = itemsTab.attr('href');
+                    console.log('Switching to Items tab:', itemsHref);
+                    window.location.href = itemsHref;
+                } else {
+                    // Fallback: try to find by text content and get its href
+                    const fallbackTab = $('.wpbnp-tab:contains("Items")').first();
+                    if (fallbackTab.length > 0 && fallbackTab.attr('href')) {
+                        console.log('Using fallback Items tab:', fallbackTab.attr('href'));
+                        window.location.href = fallbackTab.attr('href');
+                    } else {
+                        console.error('Could not find Items tab');
+                        this.showNotification('Could not switch to Items tab. Please click the Items tab manually.', 'error');
+                    }
+                }
                 
                 // Show notification with instructions
                 this.showNotification(`✅ Preset items loaded into Items tab. Edit them, then return here and click "Update Preset Items".`, 'info', 8000);
