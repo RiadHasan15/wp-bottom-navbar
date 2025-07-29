@@ -3079,9 +3079,13 @@ jQuery(document).ready(function ($) {
 
         // Populate pages selector for new configurations
         populatePagesSelector: function ($selector, configIndex) {
-            if (!$selector || !$selector.length) return;
+            if (!$selector || !$selector.length) {
+                console.error('Pages selector not found for config', configIndex);
+                return;
+            }
 
             console.log('Populating pages selector for config', configIndex);
+            console.log('Selector found:', $selector.length);
 
             // Make AJAX call to get pages
             $.ajax({
@@ -3092,6 +3096,7 @@ jQuery(document).ready(function ($) {
                     nonce: wpbnp_admin.nonce
                 },
                 success: function (response) {
+                    console.log('Pages AJAX response:', response);
                     if (response.success && response.data.pages) {
                         $selector.empty();
                         $selector.append('<option value="">Select pages...</option>');
@@ -3102,10 +3107,13 @@ jQuery(document).ready(function ($) {
 
                         console.log('Pages populated:', response.data.pages.length);
                     } else {
+                        console.log('No pages found in response');
                         $selector.html('<option value="" disabled>No pages found - Create some pages first</option>');
                     }
                 },
-                error: function () {
+                error: function (xhr, status, error) {
+                    console.error('Pages AJAX error:', status, error);
+                    console.error('Response:', xhr.responseText);
                     $selector.html('<option value="" disabled>Error loading pages</option>');
                 }
             });
@@ -3113,9 +3121,13 @@ jQuery(document).ready(function ($) {
 
         // Populate categories selector for new configurations
         populateCategoriesSelector: function ($selector, configIndex) {
-            if (!$selector || !$selector.length) return;
+            if (!$selector || !$selector.length) {
+                console.error('Categories selector not found for config', configIndex);
+                return;
+            }
 
             console.log('Populating categories selector for config', configIndex);
+            console.log('Selector found:', $selector.length);
 
             // Make AJAX call to get categories
             $.ajax({
@@ -3126,6 +3138,7 @@ jQuery(document).ready(function ($) {
                     nonce: wpbnp_admin.nonce
                 },
                 success: function (response) {
+                    console.log('Categories AJAX response:', response);
                     if (response.success && response.data.categories) {
                         $selector.empty();
                         $selector.append('<option value="">Select categories...</option>');
@@ -3136,10 +3149,13 @@ jQuery(document).ready(function ($) {
 
                         console.log('Categories populated:', response.data.categories.length);
                     } else {
+                        console.log('No categories found in response');
                         $selector.html('<option value="" disabled>No categories found</option>');
                     }
                 },
-                error: function () {
+                error: function (xhr, status, error) {
+                    console.error('Categories AJAX error:', status, error);
+                    console.error('Response:', xhr.responseText);
                     $selector.html('<option value="" disabled>Error loading categories</option>');
                 }
             });
