@@ -1503,6 +1503,30 @@ input:checked + .wpbnp-toggle-slider:before {
     border-radius: 8px;
 }
 
+/* Preset Selector in Page Targeting */
+.wpbnp-preset-selector {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+}
+
+.wpbnp-preset-selector optgroup {
+    font-weight: bold;
+    color: #333;
+}
+
+.wpbnp-preset-selector option {
+    padding: 4px 8px;
+}
+
+.wpbnp-preset-selector option:disabled {
+    color: #999;
+    font-style: italic;
+}
+
 .wpbnp-config-toggle:hover {
     background: #e2e8f0;
     color: #2d3748;
