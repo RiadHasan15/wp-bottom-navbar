@@ -669,7 +669,7 @@ class WPBNP_Admin_UI {
                                     <p class="description"><?php esc_html_e('Enter your Pro license key to unlock advanced features.', 'wp-bottom-navigation-pro'); ?></p>
                                 </div>
                                 <div class="wpbnp-field">
-                                    <button type="submit" class="wpbnp-pro-button">
+                                    <button type="button" id="wpbnp-activate-license-btn" class="wpbnp-pro-button">
                                         <?php esc_html_e('Activate License', 'wp-bottom-navigation-pro'); ?>
                                     </button>
                                 </div>

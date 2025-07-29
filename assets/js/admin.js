@@ -1664,10 +1664,11 @@ jQuery(document).ready(function($) {
                 }
             });
             
-            // License form submission
-            $(document).on('submit', '#wpbnp-license-form', function(e) {
+            // License activation button click
+            $(document).on('click', '#wpbnp-activate-license-btn', function(e) {
                 e.preventDefault();
-                console.log('License form submitted');
+                e.stopPropagation();
+                console.log('License activation button clicked');
                 
                 const licenseKey = $('#wpbnp-license-key').val().trim();
                 console.log('License key:', licenseKey);
@@ -1676,9 +1677,13 @@ jQuery(document).ready(function($) {
                     return;
                 }
                 
-                const submitBtn = $(this).find('button[type="submit"]');
+                const submitBtn = $(this);
                 const originalText = submitBtn.text();
                 submitBtn.prop('disabled', true).text('Activating...');
+                
+                console.log('Making AJAX call to wpbnp_activate_license');
+                console.log('AJAX URL:', wpbnp_admin.ajax_url);
+                console.log('Nonce:', WPBottomNavAdmin.nonce);
                 
                 $.ajax({
                     url: wpbnp_admin.ajax_url,
@@ -1693,15 +1698,19 @@ jQuery(document).ready(function($) {
                         if (response.success) {
                             WPBottomNavAdmin.showNotification('License activated successfully!', 'success');
                             $('#wpbnp-license-modal').hide();
+                            console.log('Reloading page in 1 second...');
                             setTimeout(() => {
+                                console.log('Reloading page now');
                                 window.location.reload();
                             }, 1000);
                         } else {
+                            console.log('License activation failed:', response);
                             WPBottomNavAdmin.showNotification(response.data ? response.data.message : 'Error activating license', 'error');
                         }
                     },
-                    error: function() {
-                        WPBottomNavAdmin.showNotification('Ajax error occurred', 'error');
+                    error: function(xhr, status, error) {
+                        console.log('AJAX error:', xhr, status, error);
+                        WPBottomNavAdmin.showNotification('Ajax error occurred: ' + error, 'error');
                     },
                     complete: function() {
                         submitBtn.prop('disabled', false).text(originalText);
