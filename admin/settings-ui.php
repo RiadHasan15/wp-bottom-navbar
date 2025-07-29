@@ -897,20 +897,12 @@ class WPBNP_Admin_UI {
         ?>
         <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
             <option value=""><?php esc_html_e('Select pages...', 'wp-bottom-navigation-pro'); ?></option>
-            
-            <!-- Debug: Always show some test options -->
-            <option value="1">🏠 Home Page (Test)</option>
-            <option value="2">📄 About Page (Test)</option>
-            <option value="3">📞 Contact Page (Test)</option>
-            <option value="4">⚙️ Services Page (Test)</option>
-            
             <?php if (empty($pages)): ?>
-                <option value="" disabled><?php esc_html_e('No WordPress pages found', 'wp-bottom-navigation-pro'); ?></option>
+                <option value="" disabled><?php esc_html_e('No pages found - Create some pages first', 'wp-bottom-navigation-pro'); ?></option>
             <?php else: ?>
-                <option value="" disabled>--- WordPress Pages ---</option>
                 <?php foreach ($pages as $page): ?>
                     <option value="<?php echo esc_attr($page->ID); ?>" <?php selected(in_array($page->ID, $selected_pages)); ?>>
-                        <?php echo esc_html($page->post_title); ?> (ID: <?php echo $page->ID; ?>)
+                        <?php echo esc_html($page->post_title); ?>
                     </option>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -992,12 +984,10 @@ class WPBNP_Admin_UI {
                 </div>
                 <div class="wpbnp-config-actions">
                     <button type="button" class="wpbnp-config-toggle" title="Toggle Configuration">
-                        <span class="dashicons dashicons-arrow-down"></span>
-                        <span class="wpbnp-fallback-text" style="display: none;">▼</span>
+                        <span class="wpbnp-arrow-icon">▼</span>
                     </button>
                     <button type="button" class="wpbnp-config-delete" title="Delete Configuration">
-                        <span class="dashicons dashicons-trash"></span>
-                        <span class="wpbnp-fallback-text" style="display: none;">🗑</span>
+                        <span class="wpbnp-delete-icon">×</span>
                     </button>
                 </div>
             </div>
