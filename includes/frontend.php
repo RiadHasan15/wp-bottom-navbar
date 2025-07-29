@@ -31,7 +31,19 @@ class WPBNP_Frontend {
      * Output navigation HTML
      */
     private function output_navigation_html($settings) {
-        $items = $settings['items'];
+        // Check for page targeting (Pro feature)
+        $active_config = wpbnp_get_active_page_targeting_config();
+        
+        if ($active_config) {
+            // Use page targeting configuration
+            $items = wpbnp_get_targeted_navigation_items();
+            
+            // Add configuration info as HTML comment for debugging
+            echo '<!-- WP Bottom Navigation Pro: Using page targeting configuration "' . esc_html($active_config['name'] ?? 'Unnamed') . '" (Priority: ' . esc_html($active_config['priority'] ?? 1) . ') -->' . "\n";
+        } else {
+            // Use default items
+            $items = $settings['items'];
+        }
         
         if (empty($items)) {
             return;

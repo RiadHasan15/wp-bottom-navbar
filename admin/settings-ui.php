@@ -36,6 +36,7 @@ class WPBNP_Admin_UI {
             'animations' => __('Animations', 'wp-bottom-navigation-pro'),
             'badges' => __('Badges', 'wp-bottom-navigation-pro'),
             'display_rules' => __('Display Rules', 'wp-bottom-navigation-pro'),
+            'page_targeting' => __('Page Targeting', 'wp-bottom-navigation-pro') . ' <span class="wpbnp-pro-badge">PRO</span>',
             'presets' => __('Presets', 'wp-bottom-navigation-pro'),
             'advanced' => __('Advanced', 'wp-bottom-navigation-pro')
         );
@@ -195,6 +196,9 @@ class WPBNP_Admin_UI {
                 break;
             case 'display_rules':
                 $this->render_display_rules_tab($settings);
+                break;
+            case 'page_targeting':
+                $this->render_page_targeting_tab($settings);
                 break;
             case 'presets':
                 $this->render_presets_tab($settings);
@@ -598,6 +602,289 @@ class WPBNP_Admin_UI {
                 <p class="description"><?php esc_html_e('Add custom CSS rules. Use .wpbnp-bottom-nav as the base selector.', 'wp-bottom-navigation-pro'); ?></p>
             </div>
         </div>
+        <?php
+    }
+    
+    /**
+     * Render page targeting tab (PRO feature)
+     */
+    private function render_page_targeting_tab($settings) {
+        $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
+        $is_pro_active = $this->is_pro_license_active();
+        
+        ?>
+        <div class="wpbnp-tab-content" id="wpbnp-page-targeting">
+            <h2><?php esc_html_e('Page Targeting', 'wp-bottom-navigation-pro'); ?> <span class="wpbnp-pro-badge">PRO</span></h2>
+            <p class="description"><?php esc_html_e('Create different navigation bars for specific pages, posts, or post types.', 'wp-bottom-navigation-pro'); ?></p>
+            
+            <?php if (!$is_pro_active): ?>
+                <div class="wpbnp-pro-notice">
+                    <div class="wpbnp-pro-notice-content">
+                        <h3><?php esc_html_e('🚀 Unlock Page Targeting (PRO Feature)', 'wp-bottom-navigation-pro'); ?></h3>
+                        <p><?php esc_html_e('Create multiple navigation configurations and display them on specific pages, posts, or post types. Perfect for e-commerce sites, blogs, and complex websites.', 'wp-bottom-navigation-pro'); ?></p>
+                        
+                        <div class="wpbnp-pro-features">
+                            <ul>
+                                <li>✅ <?php esc_html_e('Multiple Navigation Configurations', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('Page-Specific Navigation Bars', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('Post Type Targeting', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('Category & Tag Targeting', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('User Role Based Display', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('Priority System', 'wp-bottom-navigation-pro'); ?></li>
+                                <li>✅ <?php esc_html_e('Advanced Conditional Logic', 'wp-bottom-navigation-pro'); ?></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="wpbnp-pro-actions">
+                            <a href="#" class="wpbnp-pro-button" id="wpbnp-activate-license">
+                                <?php esc_html_e('Enter License Key', 'wp-bottom-navigation-pro'); ?>
+                            </a>
+                            <a href="https://riadhasan.info/" target="_blank" class="wpbnp-pro-button wpbnp-pro-button-secondary">
+                                <?php esc_html_e('Get Pro License', 'wp-bottom-navigation-pro'); ?>
+                            </a>
+                        </div>
+                        
+                        <div class="wpbnp-demo-note">
+                            <p><strong>🧪 Demo Testing:</strong> For testing purposes, use any license key that is at least 10 characters long and contains both letters and numbers (e.g., "demo123456789").</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- License Activation Modal -->
+                <div id="wpbnp-license-modal" class="wpbnp-modal" style="display: none;">
+                    <div class="wpbnp-modal-content">
+                        <div class="wpbnp-modal-header">
+                            <h3><?php esc_html_e('Activate Pro License', 'wp-bottom-navigation-pro'); ?></h3>
+                            <span class="wpbnp-modal-close">&times;</span>
+                        </div>
+                        <div class="wpbnp-modal-body">
+                            <form id="wpbnp-license-form">
+                                <div class="wpbnp-field">
+                                    <label for="wpbnp-license-key"><?php esc_html_e('License Key', 'wp-bottom-navigation-pro'); ?></label>
+                                    <input type="text" id="wpbnp-license-key" name="license_key" placeholder="<?php esc_attr_e('Enter your license key...', 'wp-bottom-navigation-pro'); ?>" required>
+                                    <p class="description"><?php esc_html_e('Enter your Pro license key to unlock advanced features.', 'wp-bottom-navigation-pro'); ?></p>
+                                </div>
+                                <div class="wpbnp-field">
+                                    <button type="submit" class="wpbnp-pro-button">
+                                        <?php esc_html_e('Activate License', 'wp-bottom-navigation-pro'); ?>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+            <?php else: ?>
+                <!-- PRO Features - Page Targeting Interface -->
+                <div class="wpbnp-page-targeting-interface">
+                    <div class="wpbnp-targeting-header">
+                        <h3><?php esc_html_e('Navigation Configurations', 'wp-bottom-navigation-pro'); ?></h3>
+                        <button type="button" class="wpbnp-add-config-btn" id="wpbnp-add-config">
+                            <?php esc_html_e('+ Add Configuration', 'wp-bottom-navigation-pro'); ?>
+                        </button>
+                    </div>
+                    
+                    <div class="wpbnp-configurations-list" id="wpbnp-configurations-list">
+                        <?php $this->render_page_targeting_configurations($page_targeting); ?>
+                    </div>
+                </div>
+                
+                <!-- Configuration Template (Hidden) -->
+                <div id="wpbnp-config-template" style="display: none;">
+                    <?php $this->render_configuration_template(); ?>
+                </div>
+                
+            <?php endif; ?>
+            
+            <!-- Hidden fields for page targeting settings -->
+            <input type="hidden" name="settings[page_targeting][enabled]" value="<?php echo $is_pro_active ? '1' : '0'; ?>">
+        </div>
+        <?php
+    }
+    
+    /**
+     * Check if pro license is active
+     */
+    private function is_pro_license_active() {
+        $license_key = get_option('wpbnp_pro_license_key', '');
+        $license_status = get_option('wpbnp_pro_license_status', 'inactive');
+        
+        // For demo purposes, you can temporarily return true to test the interface
+        // return true;
+        
+        return !empty($license_key) && $license_status === 'active';
+    }
+    
+    /**
+     * Render page targeting configurations
+     */
+    private function render_page_targeting_configurations($page_targeting) {
+        $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
+        
+        if (empty($configurations)) {
+            echo '<p class="wpbnp-no-configs">' . esc_html__('No configurations created yet. Click "Add Configuration" to get started.', 'wp-bottom-navigation-pro') . '</p>';
+            return;
+        }
+        
+        foreach ($configurations as $index => $config) {
+            $this->render_configuration_item($config, $index);
+        }
+    }
+    
+    /**
+     * Render individual configuration item
+     */
+    private function render_configuration_item($config, $index) {
+        $config_id = isset($config['id']) ? $config['id'] : 'config_' . $index;
+        $config_name = isset($config['name']) ? $config['name'] : __('Untitled Configuration', 'wp-bottom-navigation-pro');
+        $priority = isset($config['priority']) ? $config['priority'] : 1;
+        $conditions = isset($config['conditions']) ? $config['conditions'] : array();
+        
+        ?>
+        <div class="wpbnp-config-item" data-config-id="<?php echo esc_attr($config_id); ?>">
+            <div class="wpbnp-config-header">
+                <div class="wpbnp-config-title">
+                    <span class="wpbnp-config-name"><?php echo esc_html($config_name); ?></span>
+                    <span class="wpbnp-config-priority">Priority: <?php echo esc_html($priority); ?></span>
+                </div>
+                <div class="wpbnp-config-actions">
+                    <button type="button" class="wpbnp-config-toggle" title="<?php esc_attr_e('Expand/Collapse', 'wp-bottom-navigation-pro'); ?>">
+                        <span class="dashicons dashicons-arrow-down"></span>
+                    </button>
+                    <button type="button" class="wpbnp-config-delete" title="<?php esc_attr_e('Delete Configuration', 'wp-bottom-navigation-pro'); ?>">
+                        <span class="dashicons dashicons-trash"></span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="wpbnp-config-content" style="display: none;">
+                <div class="wpbnp-config-settings">
+                    <div class="wpbnp-field">
+                        <label><?php esc_html_e('Configuration Name', 'wp-bottom-navigation-pro'); ?></label>
+                        <input type="text" name="settings[page_targeting][configurations][<?php echo $index; ?>][name]" 
+                               value="<?php echo esc_attr($config_name); ?>" placeholder="<?php esc_attr_e('Enter configuration name...', 'wp-bottom-navigation-pro'); ?>">
+                    </div>
+                    
+                    <div class="wpbnp-field">
+                        <label><?php esc_html_e('Priority', 'wp-bottom-navigation-pro'); ?></label>
+                        <input type="number" name="settings[page_targeting][configurations][<?php echo $index; ?>][priority]" 
+                               value="<?php echo esc_attr($priority); ?>" min="1" max="100">
+                        <p class="description"><?php esc_html_e('Higher priority configurations will override lower ones when conditions match.', 'wp-bottom-navigation-pro'); ?></p>
+                    </div>
+                    
+                    <div class="wpbnp-targeting-conditions">
+                        <h4><?php esc_html_e('Display Conditions', 'wp-bottom-navigation-pro'); ?></h4>
+                        
+                        <div class="wpbnp-condition-group">
+                            <label><?php esc_html_e('Specific Pages', 'wp-bottom-navigation-pro'); ?></label>
+                            <?php $this->render_page_selector($conditions, $index); ?>
+                        </div>
+                        
+                        <div class="wpbnp-condition-group">
+                            <label><?php esc_html_e('Post Types', 'wp-bottom-navigation-pro'); ?></label>
+                            <?php $this->render_post_type_selector($conditions, $index); ?>
+                        </div>
+                        
+                        <div class="wpbnp-condition-group">
+                            <label><?php esc_html_e('Categories', 'wp-bottom-navigation-pro'); ?></label>
+                            <?php $this->render_category_selector($conditions, $index); ?>
+                        </div>
+                        
+                        <div class="wpbnp-condition-group">
+                            <label><?php esc_html_e('User Roles', 'wp-bottom-navigation-pro'); ?></label>
+                            <?php $this->render_user_role_selector($conditions, $index); ?>
+                        </div>
+                    </div>
+                    
+                    <div class="wpbnp-navigation-config">
+                        <h4><?php esc_html_e('Navigation Configuration', 'wp-bottom-navigation-pro'); ?></h4>
+                        <div class="wpbnp-field">
+                            <label><?php esc_html_e('Navigation Items', 'wp-bottom-navigation-pro'); ?></label>
+                            <p class="description"><?php esc_html_e('This configuration will use the items defined in the main Items tab with the conditions above.', 'wp-bottom-navigation-pro'); ?></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden fields -->
+            <input type="hidden" name="settings[page_targeting][configurations][<?php echo $index; ?>][id]" value="<?php echo esc_attr($config_id); ?>">
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render page selector
+     */
+    private function render_page_selector($conditions, $index) {
+        $selected_pages = isset($conditions['pages']) ? $conditions['pages'] : array();
+        $pages = get_pages();
+        
+        ?>
+        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
+            <option value=""><?php esc_html_e('Select pages...', 'wp-bottom-navigation-pro'); ?></option>
+            <?php foreach ($pages as $page): ?>
+                <option value="<?php echo esc_attr($page->ID); ?>" <?php selected(in_array($page->ID, $selected_pages)); ?>>
+                    <?php echo esc_html($page->post_title); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <?php
+    }
+    
+    /**
+     * Render post type selector
+     */
+    private function render_post_type_selector($conditions, $index) {
+        $selected_post_types = isset($conditions['post_types']) ? $conditions['post_types'] : array();
+        $post_types = get_post_types(array('public' => true), 'objects');
+        
+        ?>
+        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][post_types][]" multiple class="wpbnp-multiselect">
+            <option value=""><?php esc_html_e('Select post types...', 'wp-bottom-navigation-pro'); ?></option>
+            <?php foreach ($post_types as $post_type): ?>
+                <option value="<?php echo esc_attr($post_type->name); ?>" <?php selected(in_array($post_type->name, $selected_post_types)); ?>>
+                    <?php echo esc_html($post_type->label); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <?php
+    }
+    
+    /**
+     * Render category selector
+     */
+    private function render_category_selector($conditions, $index) {
+        $selected_categories = isset($conditions['categories']) ? $conditions['categories'] : array();
+        $categories = get_categories();
+        
+        ?>
+        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][categories][]" multiple class="wpbnp-multiselect">
+            <option value=""><?php esc_html_e('Select categories...', 'wp-bottom-navigation-pro'); ?></option>
+            <?php foreach ($categories as $category): ?>
+                <option value="<?php echo esc_attr($category->term_id); ?>" <?php selected(in_array($category->term_id, $selected_categories)); ?>>
+                    <?php echo esc_html($category->name); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <?php
+    }
+    
+    /**
+     * Render user role selector
+     */
+    private function render_user_role_selector($conditions, $index) {
+        $selected_roles = isset($conditions['user_roles']) ? $conditions['user_roles'] : array();
+        $roles = wp_roles()->get_names();
+        
+        ?>
+        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][user_roles][]" multiple class="wpbnp-multiselect">
+            <option value=""><?php esc_html_e('Select user roles...', 'wp-bottom-navigation-pro'); ?></option>
+            <?php foreach ($roles as $role_key => $role_name): ?>
+                <option value="<?php echo esc_attr($role_key); ?>" <?php selected(in_array($role_key, $selected_roles)); ?>>
+                    <?php echo esc_html($role_name); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
         <?php
     }
 }

@@ -1644,11 +1644,217 @@ jQuery(document).ready(function($) {
                 $('#wpbnp-icon-count').text(`${totalIcons} icons`);
                 $('#wpbnp-visible-count').text(`${visibleCount} visible`);
             });
+        },
+        
+        // Initialize pro features
+        initProFeatures: function() {
+            // License activation modal
+            $(document).on('click', '#wpbnp-activate-license', function(e) {
+                e.preventDefault();
+                $('#wpbnp-license-modal').show();
+            });
+            
+            $(document).on('click', '#wpbnp-license-modal .wpbnp-modal-close', function() {
+                $('#wpbnp-license-modal').hide();
+            });
+            
+            $(document).on('click', '#wpbnp-license-modal', function(e) {
+                if (e.target === this) {
+                    $('#wpbnp-license-modal').hide();
+                }
+            });
+            
+            // License form submission
+            $(document).on('submit', '#wpbnp-license-form', function(e) {
+                e.preventDefault();
+                
+                const licenseKey = $('#wpbnp-license-key').val().trim();
+                if (!licenseKey) {
+                    WPBottomNavAdmin.showNotification('Please enter a license key', 'error');
+                    return;
+                }
+                
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalText = submitBtn.text();
+                submitBtn.prop('disabled', true).text('Activating...');
+                
+                $.ajax({
+                    url: wpbnp_admin.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'wpbnp_activate_license',
+                        license_key: licenseKey,
+                        nonce: WPBottomNavAdmin.nonce
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            WPBottomNavAdmin.showNotification('License activated successfully!', 'success');
+                            $('#wpbnp-license-modal').hide();
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            WPBottomNavAdmin.showNotification(response.data ? response.data.message : 'Error activating license', 'error');
+                        }
+                    },
+                    error: function() {
+                        WPBottomNavAdmin.showNotification('Ajax error occurred', 'error');
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).text(originalText);
+                    }
+                });
+            });
+            
+            // Page targeting configuration management
+            $(document).on('click', '#wpbnp-add-config', function(e) {
+                e.preventDefault();
+                WPBottomNavAdmin.addPageTargetingConfig();
+            });
+            
+            $(document).on('click', '.wpbnp-config-toggle', function(e) {
+                e.preventDefault();
+                const configItem = $(this).closest('.wpbnp-config-item');
+                const content = configItem.find('.wpbnp-config-content');
+                const icon = $(this).find('.dashicons');
+                
+                content.slideToggle();
+                icon.toggleClass('dashicons-arrow-down dashicons-arrow-up');
+            });
+            
+            $(document).on('click', '.wpbnp-config-delete', function(e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to delete this configuration?')) {
+                    $(this).closest('.wpbnp-config-item').fadeOut(() => {
+                        $(this).closest('.wpbnp-config-item').remove();
+                        WPBottomNavAdmin.reindexConfigurations();
+                    });
+                }
+            });
+        },
+        
+        // Add new page targeting configuration
+        addPageTargetingConfig: function() {
+            const configIndex = $('.wpbnp-config-item').length;
+            const configId = 'config_' + Date.now();
+            
+            const configHtml = `
+                <div class="wpbnp-config-item" data-config-id="${configId}">
+                    <div class="wpbnp-config-header">
+                        <div class="wpbnp-config-title">
+                            <span class="wpbnp-config-name">New Configuration</span>
+                            <span class="wpbnp-config-priority">Priority: 1</span>
+                        </div>
+                        <div class="wpbnp-config-actions">
+                            <button type="button" class="wpbnp-config-toggle">
+                                <span class="dashicons dashicons-arrow-down"></span>
+                            </button>
+                            <button type="button" class="wpbnp-config-delete">
+                                <span class="dashicons dashicons-trash"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="wpbnp-config-content" style="display: block;">
+                        <div class="wpbnp-config-settings">
+                            <div class="wpbnp-field">
+                                <label>Configuration Name</label>
+                                <input type="text" name="settings[page_targeting][configurations][${configIndex}][name]" 
+                                       value="New Configuration" placeholder="Enter configuration name...">
+                            </div>
+                            
+                            <div class="wpbnp-field">
+                                <label>Priority</label>
+                                <input type="number" name="settings[page_targeting][configurations][${configIndex}][priority]" 
+                                       value="1" min="1" max="100">
+                                <p class="description">Higher priority configurations will override lower ones when conditions match.</p>
+                            </div>
+                            
+                            <div class="wpbnp-targeting-conditions">
+                                <h4>Display Conditions</h4>
+                                <p class="description">Leave all conditions empty to use as default fallback.</p>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Specific Pages</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][pages][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select pages...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Post Types</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][post_types][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select post types...</option>
+                                        <option value="post">Posts</option>
+                                        <option value="page">Pages</option>
+                                        <option value="product">Products (WooCommerce)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Categories</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][categories][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select categories...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>User Roles</label>
+                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][user_roles][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select user roles...</option>
+                                        <option value="administrator">Administrator</option>
+                                        <option value="editor">Editor</option>
+                                        <option value="author">Author</option>
+                                        <option value="contributor">Contributor</option>
+                                        <option value="subscriber">Subscriber</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="wpbnp-navigation-config">
+                                <h4>Navigation Configuration</h4>
+                                <div class="wpbnp-field">
+                                    <label>Navigation Items</label>
+                                    <p class="description">This configuration will use the items defined in the main Items tab with the conditions above.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="settings[page_targeting][configurations][${configIndex}][id]" value="${configId}">
+                </div>
+            `;
+            
+            if ($('.wpbnp-no-configs').length) {
+                $('.wpbnp-no-configs').remove();
+            }
+            
+            $('#wpbnp-configurations-list').append(configHtml);
+            this.showNotification('New configuration added!', 'success');
+        },
+        
+        // Reindex configurations after deletion
+        reindexConfigurations: function() {
+            $('.wpbnp-config-item').each(function(index) {
+                $(this).find('input, select').each(function() {
+                    const name = $(this).attr('name');
+                    if (name && name.includes('[configurations][')) {
+                        const newName = name.replace(/\[configurations\]\[\d+\]/, `[configurations][${index}]`);
+                        $(this).attr('name', newName);
+                    }
+                });
+            });
+            
+            if ($('.wpbnp-config-item').length === 0) {
+                $('#wpbnp-configurations-list').html('<p class="wpbnp-no-configs">No configurations created yet. Click "Add Configuration" to get started.</p>');
+            }
         }
     };
     
     // Initialize admin
     WPBottomNavAdmin.init();
+    
+    // Initialize pro features
+    WPBottomNavAdmin.initProFeatures();
     
     // Handle file import when file is selected
     $('#wpbnp-import-file').on('change', function(e) {
