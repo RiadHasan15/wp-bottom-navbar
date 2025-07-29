@@ -219,6 +219,112 @@ jQuery(document).ready(function($) {
                 $('#wpbnp-icon-count').text(`${totalIcons} icons`);
                 $('#wpbnp-visible-count').text(`${visibleCount} visible`);
             });
+            
+            // Navigation items functionality
+            $(document).on('click', '#wpbnp-add-item', function(e) {
+                e.preventDefault();
+                WPBottomNavAdmin.handleAddItem(e);
+            });
+            
+            $(document).on('click', '.wpbnp-item-toggle', function(e) {
+                e.preventDefault();
+                WPBottomNavAdmin.handleToggleItem(e);
+            });
+            
+            $(document).on('click', '.wpbnp-item-remove', function(e) {
+                e.preventDefault();
+                WPBottomNavAdmin.handleRemoveItem(e);
+            });
+            
+            // Preset application
+            $(document).on('click', '.wpbnp-apply-preset', function(e) {
+                e.preventDefault();
+                WPBottomNavAdmin.applyPreset(e);
+            });
+            
+            // License activation
+            $(document).on('click', '#wpbnp-activate-license', function(e) {
+                e.preventDefault();
+                $('#wpbnp-license-modal').show();
+            });
+            
+            $(document).on('click', '#wpbnp-activate-license-presets', function(e) {
+                e.preventDefault();
+                $('#wpbnp-license-modal').show();
+            });
+            
+            $(document).on('click', '#wpbnp-activate-license-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('License activation button clicked');
+                
+                const licenseKey = $('#wpbnp-license-key').val().trim();
+                console.log('License key:', licenseKey);
+                if (!licenseKey) {
+                    WPBottomNavAdmin.showNotification('Please enter a license key', 'error');
+                    return;
+                }
+                
+                const submitBtn = $(this);
+                const originalText = submitBtn.text();
+                submitBtn.prop('disabled', true).text('Activating...');
+                
+                console.log('Making AJAX call to wpbnp_activate_license');
+                console.log('AJAX URL:', wpbnp_admin.ajax_url);
+                console.log('Nonce:', WPBottomNavAdmin.nonce);
+                
+                $.ajax({
+                    url: wpbnp_admin.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'wpbnp_activate_license',
+                        license_key: licenseKey,
+                        nonce: WPBottomNavAdmin.nonce
+                    },
+                    success: function(response) {
+                        console.log('License activation response:', response);
+                        if (response.success) {
+                            WPBottomNavAdmin.showNotification('License activated successfully!', 'success');
+                            $('#wpbnp-license-modal').hide();
+                            console.log('Reloading page in 1 second...');
+                            setTimeout(() => {
+                                console.log('Reloading page now');
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            console.log('License activation failed:', response);
+                            WPBottomNavAdmin.showNotification(response.data ? response.data.message : 'Error activating license', 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('AJAX error:', xhr, status, error);
+                        WPBottomNavAdmin.showNotification('Ajax error occurred: ' + error, 'error');
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).text(originalText);
+                    }
+                });
+            });
+            
+            // Auto-save on form changes
+            $(document).on('change', '#wpbnp-settings-form input, #wpbnp-settings-form select, #wpbnp-settings-form textarea', 
+                WPBottomNavAdmin.debounce(function() {
+                    WPBottomNavAdmin.saveFormState();
+                }, 1000)
+            );
+            
+            // Debounce function
+            debounce: function(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
         },
         
         // Handle form submission
@@ -1316,24 +1422,568 @@ jQuery(document).ready(function($) {
             }
         },
         
+        // Load form data
         loadFormData: function() {
-            // Load any additional form data
             console.log('Loading form data...');
+            this.populateFormFields();
         },
         
-        initializeItems: function() {
-            // Initialize navigation items
-            console.log('Initializing navigation items...');
-        },
-        
-        updateItemsDisplay: function() {
+        // Populate form fields with current settings
+        populateFormFields: function() {
+            console.log('Populating form fields with settings:', this.settings);
+            
+            // Populate items list
+            if (this.settings.items && Array.isArray(this.settings.items)) {
+                this.settings.items.forEach((item, index) => {
+                    this.addItemRow(item, index);
+                });
+            }
+            
             // Update items display
-            console.log('Updating items display...');
+            this.updateItemsDisplay();
         },
         
+        // Initialize navigation items
+        initializeItems: function() {
+            console.log('Initializing navigation items...');
+            
+            // If no items exist, add default items
+            if ($('#wpbnp-items-list .wpbnp-nav-item-row').length === 0) {
+                const defaultItems = [
+                    {
+                        id: 'home',
+                        label: 'Home',
+                        icon: 'bi bi-house-door',
+                        url: home_url || '/',
+                        enabled: true,
+                        target: '_self',
+                        show_badge: false,
+                        badge_type: 'count',
+                        custom_badge_text: '',
+                        user_roles: []
+                    },
+                    {
+                        id: 'shop',
+                        label: 'Shop',
+                        icon: 'bi bi-cart',
+                        url: '#',
+                        enabled: true,
+                        target: '_self',
+                        show_badge: false,
+                        badge_type: 'count',
+                        custom_badge_text: '',
+                        user_roles: []
+                    },
+                    {
+                        id: 'account',
+                        label: 'Account',
+                        icon: 'bi bi-person',
+                        url: '#',
+                        enabled: true,
+                        target: '_self',
+                        show_badge: false,
+                        badge_type: 'count',
+                        custom_badge_text: '',
+                        user_roles: []
+                    }
+                ];
+                
+                defaultItems.forEach((item, index) => {
+                    this.addItemRow(item, index);
+                });
+            }
+        },
+        
+        // Add navigation item row
+        addItemRow: function(item = null, index = null) {
+            const itemIndex = index !== null ? index : $('#wpbnp-items-list .wpbnp-nav-item-row').length;
+            const itemData = item || {
+                id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                label: '',
+                icon: '',
+                url: '',
+                enabled: true,
+                target: '_self',
+                show_badge: false,
+                badge_type: 'count',
+                custom_badge_text: '',
+                user_roles: []
+            };
+            
+            const itemHtml = `
+                <div class="wpbnp-nav-item-row" data-item-index="${itemIndex}">
+                    <div class="wpbnp-item-header">
+                        <div class="wpbnp-sort-handle">⋮⋮</div>
+                        <div class="wpbnp-item-toggle">
+                            <input type="checkbox" name="settings[items][${itemIndex}][enabled]" 
+                                   value="1" ${itemData.enabled ? 'checked' : ''}>
+                        </div>
+                        <div class="wpbnp-item-actions">
+                            <button type="button" class="wpbnp-item-remove" title="Remove Item">×</button>
+                        </div>
+                    </div>
+                    
+                    <div class="wpbnp-item-content">
+                        <div class="wpbnp-field-group">
+                            <div class="wpbnp-field">
+                                <label>Label</label>
+                                <input type="text" name="settings[items][${itemIndex}][label]" 
+                                       value="${itemData.label}" placeholder="Item label">
+                            </div>
+                            
+                            <div class="wpbnp-field">
+                                <label>Icon</label>
+                                <div class="wpbnp-icon-input">
+                                    <input type="text" name="settings[items][${itemIndex}][icon]" 
+                                           value="${itemData.icon}" placeholder="Icon class" readonly>
+                                    <button type="button" class="wpbnp-icon-picker">📱</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="wpbnp-field-group">
+                            <div class="wpbnp-field">
+                                <label>URL</label>
+                                <input type="url" name="settings[items][${itemIndex}][url]" 
+                                       value="${itemData.url}" placeholder="https://example.com">
+                            </div>
+                            
+                            <div class="wpbnp-field">
+                                <label>Target</label>
+                                <select name="settings[items][${itemIndex}][target]">
+                                    <option value="_self" ${itemData.target === '_self' ? 'selected' : ''}>Same Window</option>
+                                    <option value="_blank" ${itemData.target === '_blank' ? 'selected' : ''}>New Window</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="wpbnp-field-group">
+                            <div class="wpbnp-field">
+                                <label>
+                                    <input type="checkbox" name="settings[items][${itemIndex}][show_badge]" 
+                                           value="1" ${itemData.show_badge ? 'checked' : ''}>
+                                    Show Badge
+                                </label>
+                            </div>
+                            
+                            <div class="wpbnp-field">
+                                <label>Badge Type</label>
+                                <select name="settings[items][${itemIndex}][badge_type]">
+                                    <option value="count" ${itemData.badge_type === 'count' ? 'selected' : ''}>Count</option>
+                                    <option value="dot" ${itemData.badge_type === 'dot' ? 'selected' : ''}>Dot</option>
+                                    <option value="custom" ${itemData.badge_type === 'custom' ? 'selected' : ''}>Custom Text</option>
+                                </select>
+                            </div>
+                            
+                            <div class="wpbnp-field">
+                                <label>Custom Badge Text</label>
+                                <input type="text" name="settings[items][${itemIndex}][custom_badge_text]" 
+                                       value="${itemData.custom_badge_text}" placeholder="Custom badge text">
+                            </div>
+                        </div>
+                        
+                        <div class="wpbnp-field-group">
+                            <div class="wpbnp-field">
+                                <label>User Roles</label>
+                                <div class="wpbnp-user-roles">
+                                    <label class="wpbnp-checkbox-label">
+                                        <input type="checkbox" name="settings[items][${itemIndex}][user_roles][]" 
+                                               value="administrator" ${itemData.user_roles.includes('administrator') ? 'checked' : ''}>
+                                        Administrator
+                                    </label>
+                                    <label class="wpbnp-checkbox-label">
+                                        <input type="checkbox" name="settings[items][${itemIndex}][user_roles][]" 
+                                               value="editor" ${itemData.user_roles.includes('editor') ? 'checked' : ''}>
+                                        Editor
+                                    </label>
+                                    <label class="wpbnp-checkbox-label">
+                                        <input type="checkbox" name="settings[items][${itemIndex}][user_roles][]" 
+                                               value="author" ${itemData.user_roles.includes('author') ? 'checked' : ''}>
+                                        Author
+                                    </label>
+                                    <label class="wpbnp-checkbox-label">
+                                        <input type="checkbox" name="settings[items][${itemIndex}][user_roles][]" 
+                                               value="contributor" ${itemData.user_roles.includes('contributor') ? 'checked' : ''}>
+                                        Contributor
+                                    </label>
+                                    <label class="wpbnp-checkbox-label">
+                                        <input type="checkbox" name="settings[items][${itemIndex}][user_roles][]" 
+                                               value="subscriber" ${itemData.user_roles.includes('subscriber') ? 'checked' : ''}>
+                                        Subscriber
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="settings[items][${itemIndex}][id]" value="${itemData.id}">
+                </div>
+            `;
+            
+            $('#wpbnp-items-list').append(itemHtml);
+            this.reindexItems();
+        },
+        
+        // Add navigation item to the interface
         addNavigationItem: function(item, index) {
-            // Add navigation item to the interface
-            console.log('Adding navigation item:', item);
+            this.addItemRow(item, index);
+        },
+        
+        // Handle add item button
+        handleAddItem: function(e) {
+            e.preventDefault();
+            this.addItemRow();
+            this.updateItemsDisplay();
+        },
+        
+        // Handle toggle item
+        handleToggleItem: function(e) {
+            const $row = $(e.target).closest('.wpbnp-nav-item-row');
+            const $content = $row.find('.wpbnp-item-content');
+            
+            if ($content.is(':visible')) {
+                $content.slideUp();
+                $row.removeClass('expanded');
+            } else {
+                $content.slideDown();
+                $row.addClass('expanded');
+            }
+        },
+        
+        // Handle remove item
+        handleRemoveItem: function(e) {
+            e.preventDefault();
+            const $row = $(e.target).closest('.wpbnp-nav-item-row');
+            
+            if (confirm('Are you sure you want to remove this item?')) {
+                $row.fadeOut(300, function() {
+                    $(this).remove();
+                    WPBottomNavAdmin.reindexItems();
+                    WPBottomNavAdmin.updateItemsDisplay();
+                });
+            }
+        },
+        
+        // Open icon picker
+        openIconPicker: function(e) {
+            e.preventDefault();
+            const $input = $(e.target).siblings('input[type="text"]');
+            this.createIconModal();
+            $('#wpbnp-icon-modal').data('target-input', $input).show();
+            this.updateLibraryInfo();
+        },
+        
+        // Create icon picker modal
+        createIconModal: function() {
+            if ($('#wpbnp-icon-modal').length > 0) {
+                return; // Modal already exists
+            }
+            
+            const modalHtml = `
+                <div id="wpbnp-icon-modal" class="wpbnp-modal">
+                    <div class="wpbnp-modal-content">
+                        <div class="wpbnp-modal-header">
+                            <h3>Select Icon</h3>
+                            <span class="wpbnp-modal-close">&times;</span>
+                        </div>
+                        <div class="wpbnp-modal-body">
+                            <div class="wpbnp-icon-search">
+                                <input type="text" id="wpbnp-icon-search" placeholder="Search icons...">
+                            </div>
+                            
+                            <div class="wpbnp-icon-tabs">
+                                <button class="wpbnp-icon-tab active" data-library="bootstrap">
+                                    <span class="wpbnp-tab-name">Bootstrap Icons</span>
+                                    <span class="wpbnp-tab-count">(1,000+)</span>
+                                </button>
+                                <button class="wpbnp-icon-tab" data-library="fontawesome">
+                                    <span class="wpbnp-tab-name">Font Awesome</span>
+                                    <span class="wpbnp-tab-count">(1,600+)</span>
+                                </button>
+                                <button class="wpbnp-icon-tab" data-library="material">
+                                    <span class="wpbnp-tab-name">Material Icons</span>
+                                    <span class="wpbnp-tab-count">(1,000+)</span>
+                                </button>
+                                <button class="wpbnp-icon-tab" data-library="feather">
+                                    <span class="wpbnp-tab-name">Feather Icons</span>
+                                    <span class="wpbnp-tab-count">(287)</span>
+                                </button>
+                                <button class="wpbnp-icon-tab" data-library="dashicons">
+                                    <span class="wpbnp-tab-name">Dashicons</span>
+                                    <span class="wpbnp-tab-count">(400+)</span>
+                                </button>
+                            </div>
+                            
+                            <div class="wpbnp-icon-libraries">
+                                <div class="wpbnp-icon-library-content active" data-library="bootstrap">
+                                    <!-- Bootstrap icons will be populated -->
+                                </div>
+                                <div class="wpbnp-icon-library-content" data-library="fontawesome">
+                                    <!-- Font Awesome icons will be populated -->
+                                </div>
+                                <div class="wpbnp-icon-library-content" data-library="material">
+                                    <!-- Material icons will be populated -->
+                                </div>
+                                <div class="wpbnp-icon-library-content" data-library="feather">
+                                    <!-- Feather icons will be populated -->
+                                </div>
+                                <div class="wpbnp-icon-library-content" data-library="dashicons">
+                                    <!-- Dashicons will be populated -->
+                                </div>
+                            </div>
+                            
+                            <div class="wpbnp-icon-info">
+                                <span id="wpbnp-icon-count">0 icons</span>
+                                <span id="wpbnp-visible-count">0 visible</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            $('body').append(modalHtml);
+            this.populateIconLibraries();
+        },
+        
+        // Populate icon libraries
+        populateIconLibraries: function() {
+            // Bootstrap Icons
+            const bootstrapIcons = [
+                'bi bi-house-door', 'bi bi-cart', 'bi bi-person', 'bi bi-heart', 'bi bi-star',
+                'bi bi-search', 'bi bi-gear', 'bi bi-bell', 'bi bi-bookmark', 'bi bi-share',
+                'bi bi-phone', 'bi bi-envelope', 'bi bi-calendar', 'bi bi-clock', 'bi bi-map',
+                'bi bi-camera', 'bi bi-music', 'bi bi-play', 'bi bi-pause', 'bi bi-stop',
+                'bi bi-skip-forward', 'bi bi-skip-backward', 'bi bi-volume-up', 'bi bi-volume-mute',
+                'bi bi-wifi', 'bi bi-battery-full', 'bi bi-battery-half', 'bi bi-battery-empty'
+            ];
+            
+            const $bootstrapContent = $('.wpbnp-icon-library-content[data-library="bootstrap"]');
+            bootstrapIcons.forEach(icon => {
+                $bootstrapContent.append(`
+                    <div class="wpbnp-icon-option" data-icon="${icon}">
+                        <i class="${icon}"></i>
+                        <span class="wpbnp-icon-label">${icon}</span>
+                    </div>
+                `);
+            });
+            
+            // Font Awesome Icons
+            const fontAwesomeIcons = [
+                'fas fa-home', 'fas fa-shopping-cart', 'fas fa-user', 'fas fa-heart', 'fas fa-star',
+                'fas fa-search', 'fas fa-cog', 'fas fa-bell', 'fas fa-bookmark', 'fas fa-share',
+                'fas fa-phone', 'fas fa-envelope', 'fas fa-calendar', 'fas fa-clock', 'fas fa-map',
+                'fas fa-camera', 'fas fa-music', 'fas fa-play', 'fas fa-pause', 'fas fa-stop',
+                'fas fa-forward', 'fas fa-backward', 'fas fa-volume-up', 'fas fa-volume-mute',
+                'fas fa-wifi', 'fas fa-battery-full', 'fas fa-battery-half', 'fas fa-battery-empty'
+            ];
+            
+            const $fontAwesomeContent = $('.wpbnp-icon-library-content[data-library="fontawesome"]');
+            fontAwesomeIcons.forEach(icon => {
+                $fontAwesomeContent.append(`
+                    <div class="wpbnp-icon-option" data-icon="${icon}">
+                        <i class="${icon}"></i>
+                        <span class="wpbnp-icon-label">${icon}</span>
+                    </div>
+                `);
+            });
+            
+            // Material Icons
+            const materialIcons = [
+                'material-icons home', 'material-icons shopping_cart', 'material-icons person', 'material-icons favorite', 'material-icons star',
+                'material-icons search', 'material-icons settings', 'material-icons notifications', 'material-icons bookmark', 'material-icons share',
+                'material-icons phone', 'material-icons email', 'material-icons calendar_today', 'material-icons access_time', 'material-icons place',
+                'material-icons camera_alt', 'material-icons music_note', 'material-icons play_arrow', 'material-icons pause', 'material-icons stop',
+                'material-icons skip_next', 'material-icons skip_previous', 'material-icons volume_up', 'material-icons volume_off',
+                'material-icons wifi', 'material-icons battery_full', 'material-icons battery_half', 'material-icons battery_empty'
+            ];
+            
+            const $materialContent = $('.wpbnp-icon-library-content[data-library="material"]');
+            materialIcons.forEach(icon => {
+                $materialContent.append(`
+                    <div class="wpbnp-icon-option" data-icon="${icon}">
+                        <span class="${icon}"></span>
+                        <span class="wpbnp-icon-label">${icon}</span>
+                    </div>
+                `);
+            });
+            
+            // Feather Icons
+            const featherIcons = [
+                'feather-home', 'feather-shopping-cart', 'feather-user', 'feather-heart', 'feather-star',
+                'feather-search', 'feather-settings', 'feather-bell', 'feather-bookmark', 'feather-share',
+                'feather-phone', 'feather-mail', 'feather-calendar', 'feather-clock', 'feather-map-pin',
+                'feather-camera', 'feather-music', 'feather-play', 'feather-pause', 'feather-square',
+                'feather-skip-forward', 'feather-skip-back', 'feather-volume-2', 'feather-volume-x',
+                'feather-wifi', 'feather-battery', 'feather-battery-charging', 'feather-battery-dead'
+            ];
+            
+            const $featherContent = $('.wpbnp-icon-library-content[data-library="feather"]');
+            featherIcons.forEach(icon => {
+                $featherContent.append(`
+                    <div class="wpbnp-icon-option" data-icon="${icon}">
+                        <i data-feather="${icon.replace('feather-', '')}"></i>
+                        <span class="wpbnp-icon-label">${icon}</span>
+                    </div>
+                `);
+            });
+            
+            // Dashicons
+            const dashicons = [
+                'dashicons-admin-home', 'dashicons-cart', 'dashicons-admin-users', 'dashicons-heart', 'dashicons-star-filled',
+                'dashicons-search', 'dashicons-admin-generic', 'dashicons-bell', 'dashicons-bookmark', 'dashicons-share',
+                'dashicons-phone', 'dashicons-email', 'dashicons-calendar', 'dashicons-clock', 'dashicons-location',
+                'dashicons-camera', 'dashicons-controls-volumeon', 'dashicons-controls-play', 'dashicons-controls-pause', 'dashicons-controls-stop',
+                'dashicons-controls-forward', 'dashicons-controls-back', 'dashicons-controls-volumeon', 'dashicons-controls-volumeoff',
+                'dashicons-wifi', 'dashicons-battery-full', 'dashicons-battery-half', 'dashicons-battery-empty'
+            ];
+            
+            const $dashiconsContent = $('.wpbnp-icon-library-content[data-library="dashicons"]');
+            dashicons.forEach(icon => {
+                $dashiconsContent.append(`
+                    <div class="wpbnp-icon-option" data-icon="${icon}">
+                        <span class="${icon}"></span>
+                        <span class="wpbnp-icon-label">${icon}</span>
+                    </div>
+                `);
+            });
+            
+            this.updateIconCount();
+        },
+        
+        // Apply preset
+        applyPreset: function(e) {
+            e.preventDefault();
+            const $card = $(e.target).closest('.wpbnp-preset-card');
+            const presetKey = $card.data('preset');
+            const preset = this.presets[presetKey];
+            
+            if (!preset) {
+                this.showNotification('Preset not found', 'error');
+                return;
+            }
+            
+            this.doApplyPreset(preset, presetKey, $card, e);
+        },
+        
+        // Do apply preset
+        doApplyPreset: function(preset, presetKey, $target, originalEvent) {
+            console.log('Applying preset:', presetKey, preset);
+            
+            // Update preset field
+            $('input[name="settings[preset]"]').val(presetKey);
+            
+            // Update style fields
+            if (preset.style) {
+                Object.keys(preset.style).forEach(key => {
+                    const $field = $(`input[name="settings[style][${key}]"]`);
+                    if ($field.length) {
+                        $field.val(preset.style[key]);
+                        // Trigger change event for color pickers
+                        $field.trigger('change');
+                    }
+                });
+            }
+            
+            // Update active state
+            $('.wpbnp-preset-card').removeClass('active');
+            $target.addClass('active');
+            
+            this.showNotification(`Preset "${preset.name}" applied successfully!`, 'success');
+            
+            // Auto-save after a short delay
+            setTimeout(() => {
+                this.saveFormState();
+            }, 500);
+        },
+        
+        // Reindex items
+        reindexItems: function() {
+            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function(index) {
+                $(this).find('input, select').each(function() {
+                    const name = $(this).attr('name');
+                    if (name && name.includes('[items][')) {
+                        const newName = name.replace(/\[items\]\[\d+\]/, `[items][${index}]`);
+                        $(this).attr('name', newName);
+                    }
+                });
+            });
+        },
+        
+        // Update items data
+        updateItemsData: function() {
+            const items = [];
+            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function() {
+                const $row = $(this);
+                const item = {
+                    id: $row.find('input[name*="[id]"]').val(),
+                    label: $row.find('input[name*="[label]"]').val(),
+                    icon: $row.find('input[name*="[icon]"]').val(),
+                    url: $row.find('input[name*="[url]"]').val(),
+                    enabled: $row.find('input[name*="[enabled]"]').is(':checked'),
+                    target: $row.find('select[name*="[target]"]').val(),
+                    show_badge: $row.find('input[name*="[show_badge]"]').is(':checked'),
+                    badge_type: $row.find('select[name*="[badge_type]"]').val(),
+                    custom_badge_text: $row.find('input[name*="[custom_badge_text]"]').val(),
+                    user_roles: []
+                };
+                
+                $row.find('input[name*="[user_roles][]"]:checked').each(function() {
+                    item.user_roles.push($(this).val());
+                });
+                
+                items.push(item);
+            });
+            
+            return items;
+        },
+        
+        // Refresh items list
+        refreshItemsList: function() {
+            $('#wpbnp-items-list').empty();
+            this.populateFormFields();
+        },
+        
+        // Update items display
+        updateItemsDisplay: function() {
+            const itemCount = $('#wpbnp-items-list .wpbnp-nav-item-row').length;
+            console.log(`Updated items display. Total items: ${itemCount}`);
+        },
+        
+        // Save settings
+        saveSettings: function() {
+            console.log('Saving settings...');
+            
+            const formData = new FormData($('#wpbnp-settings-form')[0]);
+            
+            // Ensure unchecked checkboxes are included
+            $('#wpbnp-settings-form input[type="checkbox"]').each(function() {
+                const checkbox = $(this);
+                const name = checkbox.attr('name');
+                if (name && !checkbox.is(':checked')) {
+                    formData.append(name, '0');
+                }
+            });
+            
+            formData.append('action', 'wpbnp_save_settings');
+            formData.append('nonce', wpbnp_admin.nonce);
+            
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        WPBottomNavAdmin.showNotification('Settings saved successfully!', 'success');
+                    } else {
+                        WPBottomNavAdmin.showNotification('Error saving settings', 'error');
+                    }
+                },
+                error: function() {
+                    WPBottomNavAdmin.showNotification('Ajax error occurred', 'error');
+                }
+            });
         },
         
         // Reset settings

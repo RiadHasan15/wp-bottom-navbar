@@ -346,69 +346,74 @@ function wpbnp_sanitize_settings($settings) {
  * Get available presets
  */
 function wpbnp_get_presets() {
-    $presets_file = WPBNP_PLUGIN_DIR . 'presets/default-presets.json';
+    $presets_file = plugin_dir_path(__FILE__) . '../presets/default-presets.json';
     
     if (file_exists($presets_file)) {
-        $presets_json = file_get_contents($presets_file);
-        $presets = json_decode($presets_json, true);
+        $presets_data = file_get_contents($presets_file);
+        $presets = json_decode($presets_data, true);
         
-        if (json_last_error() === JSON_ERROR_NONE) {
+        if (json_last_error() === JSON_ERROR_NONE && is_array($presets)) {
             return $presets;
         }
     }
     
-    // Fallback presets
+    // Fallback presets if file doesn't exist or is invalid
     return array(
-        'minimal' => array(
-            'name' => __('Minimal', 'wp-bottom-navigation-pro'),
-            'description' => __('Clean and simple design', 'wp-bottom-navigation-pro'),
+        'default' => array(
+            'name' => 'Default',
+            'description' => 'Clean and simple design',
             'style' => array(
                 'background_color' => '#ffffff',
                 'text_color' => '#333333',
                 'active_color' => '#0073aa',
+                'hover_color' => '#0085ba',
+                'icon_color' => '#666666',
                 'border_color' => '#e0e0e0',
-                'height' => 60,
-                'border_radius' => 0,
+                'height' => '60',
+                'border_radius' => '0',
+                'font_size' => '12',
+                'font_weight' => '400',
+                'icon_size' => '20',
+                'padding' => '10',
                 'box_shadow' => '0 -2px 8px rgba(0,0,0,0.1)'
             )
         ),
         'dark' => array(
-            'name' => __('Dark Mode', 'wp-bottom-navigation-pro'),
-            'description' => __('Dark theme for better night viewing', 'wp-bottom-navigation-pro'),
+            'name' => 'Dark Theme',
+            'description' => 'Modern dark design',
             'style' => array(
-                'background_color' => '#1a1a1a',
-                'text_color' => '#ffffff',
-                'active_color' => '#4a9eff',
-                'border_color' => '#333333',
-                'height' => 60,
-                'border_radius' => 0,
+                'background_color' => '#2c3e50',
+                'text_color' => '#ecf0f1',
+                'active_color' => '#3498db',
+                'hover_color' => '#2980b9',
+                'icon_color' => '#bdc3c7',
+                'border_color' => '#34495e',
+                'height' => '60',
+                'border_radius' => '0',
+                'font_size' => '12',
+                'font_weight' => '400',
+                'icon_size' => '20',
+                'padding' => '10',
                 'box_shadow' => '0 -2px 8px rgba(0,0,0,0.3)'
             )
         ),
         'material' => array(
-            'name' => __('Material Design', 'wp-bottom-navigation-pro'),
-            'description' => __('Google Material Design inspired', 'wp-bottom-navigation-pro'),
+            'name' => 'Material Design',
+            'description' => 'Google Material Design inspired',
             'style' => array(
-                'background_color' => '#f5f5f5',
+                'background_color' => '#ffffff',
                 'text_color' => '#424242',
                 'active_color' => '#2196f3',
+                'hover_color' => '#1976d2',
+                'icon_color' => '#757575',
                 'border_color' => '#e0e0e0',
-                'height' => 56,
-                'border_radius' => 0,
-                'box_shadow' => '0 -4px 8px rgba(0,0,0,0.12)'
-            )
-        ),
-        'ios' => array(
-            'name' => __('iOS Style', 'wp-bottom-navigation-pro'),
-            'description' => __('Apple iOS inspired design', 'wp-bottom-navigation-pro'),
-            'style' => array(
-                'background_color' => '#f8f8f8',
-                'text_color' => '#8e8e93',
-                'active_color' => '#007aff',
-                'border_color' => '#c6c6c8',
-                'height' => 83,
-                'border_radius' => 0,
-                'box_shadow' => '0 -1px 0 rgba(0,0,0,0.1)'
+                'height' => '56',
+                'border_radius' => '0',
+                'font_size' => '12',
+                'font_weight' => '500',
+                'icon_size' => '24',
+                'padding' => '8',
+                'box_shadow' => '0 -2px 4px rgba(0,0,0,0.12)'
             )
         )
     );
