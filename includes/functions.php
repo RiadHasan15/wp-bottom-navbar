@@ -61,7 +61,7 @@ function wpbnp_get_default_settings() {
             'hover_color' => '#0085ba',
             'icon_color' => '#666666',
             'border_color' => '#e0e0e0',
-            'height' => '60',
+            'height' => '70',
             'border_radius' => '0',
             'box_shadow' => '0 -2px 8px rgba(0,0,0,0.1)',
             'font_size' => '14',
