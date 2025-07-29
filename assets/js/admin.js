@@ -1978,6 +1978,11 @@ jQuery(document).ready(function($) {
             this.addPresetToDOM(newPreset);
             this.updateAllPresetSelectors();
             this.showNotification(`Custom preset "${presetName}" created successfully!`, 'success');
+            
+            // Important reminder to save
+            setTimeout(() => {
+                this.showNotification(`⚠️ Remember to click "Save Changes" to permanently save your custom preset!`, 'warning', 5000);
+            }, 2000);
         },
         
         // Get current navigation items
@@ -2302,8 +2307,10 @@ jQuery(document).ready(function($) {
                 if (wpbnp_admin.settings) {
                     console.log('custom_presets exists:', !!wpbnp_admin.settings.custom_presets);
                     if (wpbnp_admin.settings.custom_presets) {
+                        console.log('custom_presets enabled:', wpbnp_admin.settings.custom_presets.enabled);
                         console.log('presets array exists:', !!wpbnp_admin.settings.custom_presets.presets);
-                        console.log('presets array:', wpbnp_admin.settings.custom_presets.presets);
+                        console.log('presets array length:', wpbnp_admin.settings.custom_presets.presets ? wpbnp_admin.settings.custom_presets.presets.length : 'N/A');
+                        console.log('presets array content:', wpbnp_admin.settings.custom_presets.presets);
                     }
                 }
             }
@@ -2449,6 +2456,21 @@ jQuery(document).ready(function($) {
             
             console.log('=== END DEBUG ===');
         },
+        
+        // Test function to save form and check if presets persist
+        testPresetSave: function() {
+            console.log('=== TESTING PRESET SAVE ===');
+            console.log('1. DOM presets before save:', $('.wpbnp-preset-item').length);
+            
+            // Trigger form save
+            $('#wpbnp-settings-form').trigger('submit');
+            
+            setTimeout(() => {
+                console.log('2. Form should be saved now, checking...');
+                // This won't work because page doesn't reload, but it's a test
+                console.log('3. You should now go to another tab and back to see if presets persist');
+            }, 2000);
+        },
 
         
         // Reindex configurations after deletion
@@ -2478,11 +2500,28 @@ jQuery(document).ready(function($) {
         // Initialize custom presets
         WPBottomNavAdmin.initCustomPresets();
         
-        // Debug: Check what's available in settings
-        console.log('WPBNP Admin Settings:', wpbnp_admin);
+        // Debug: Check what's available in settings vs DOM
+        console.log('=== PRESET DETECTION DEBUG ===');
+        console.log('1. WPBNP Admin Settings:', wpbnp_admin);
         if (wpbnp_admin && wpbnp_admin.settings && wpbnp_admin.settings.custom_presets) {
-            console.log('Custom Presets in Settings:', wpbnp_admin.settings.custom_presets);
+            console.log('2. Custom Presets in Settings (from database):', wpbnp_admin.settings.custom_presets);
+            console.log('   - Enabled:', wpbnp_admin.settings.custom_presets.enabled);
+            console.log('   - Presets count:', wpbnp_admin.settings.custom_presets.presets ? wpbnp_admin.settings.custom_presets.presets.length : 0);
+        } else {
+            console.log('2. No custom presets in settings data!');
         }
+        
+        console.log('3. DOM Preset Elements:', $('.wpbnp-preset-item').length);
+        $('.wpbnp-preset-item').each(function(index) {
+            const $item = $(this);
+            console.log(`   DOM Preset ${index + 1}:`, {
+                id: $item.data('preset-id'),
+                name: $item.find('.wpbnp-preset-name').text(),
+                hasItemsInput: $item.find('input[name*="[items]"]').length > 0,
+                itemsValue: $item.find('input[name*="[items]"]').val()
+            });
+        });
+        console.log('=== END DEBUG ===');
         
         // Populate existing preset selectors (with delay to ensure DOM is ready)
         setTimeout(() => {
