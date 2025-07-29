@@ -1800,25 +1800,32 @@ input:checked + .wpbnp-toggle-slider:before {
 /* Custom Preset Modal Styles - Fixed */
 #wpbnp-create-preset-modal,
 #wpbnp-edit-preset-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    z-index: 9999999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    /* Ensure modal is not clipped by parent containers */
+    transform: translateZ(0);
+    will-change: opacity, visibility;
+    /* Override any parent container styles */
+    overflow: visible !important;
 }
 
 #wpbnp-create-preset-modal.wpbnp-modal-show,
 #wpbnp-edit-preset-modal.wpbnp-modal-show {
     opacity: 1;
     visibility: visible;
+    /* Ensure modal is properly positioned when shown */
+    transform: translateZ(0);
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal,
@@ -1832,11 +1839,15 @@ input:checked + .wpbnp-toggle-slider:before {
     overflow: hidden;
     transform: scale(0.9);
     transition: transform 0.3s ease;
+    position: relative;
+    z-index: 9999999;
+    /* Ensure modal is not clipped */
+    transform-origin: center center;
 }
 
 #wpbnp-create-preset-modal.wpbnp-modal-show .wpbnp-modal,
 #wpbnp-edit-preset-modal.wpbnp-modal-show .wpbnp-modal {
-    transform: scale(1);
+    transform: scale(1) translateZ(0);
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal-header,
