@@ -18,10 +18,14 @@
                 this.settings = wpbnp_frontend.settings;
             }
             
+            // Check if navigation exists
+            if ($('.wpbnp-nav-item').length === 0) {
+                return;
+            }
+            
             this.bindEvents();
             this.updateBadges();
             this.addRippleEffect();
-            this.handleKeyboardNavigation();
             this.initializeAnimations();
             
             // Update badges periodically if WooCommerce is active
@@ -110,9 +114,9 @@
         },
         
         /**
-         * Handle keyboard navigation setup
+         * Setup keyboard navigation
          */
-        handleKeyboardNavigation: function() {
+        setupKeyboardNavigation: function() {
             // Make navigation items focusable
             $('.wpbnp-nav-item').attr('tabindex', '0');
             
@@ -170,6 +174,9 @@
             
             // Handle navigation item clicks
             $('.wpbnp-nav-item').on('click', this.handleItemClick.bind(this));
+            
+            // Setup keyboard navigation
+            this.setupKeyboardNavigation();
             
             // Update cart badge when WooCommerce fragments update
             $(document.body).on('wc_fragments_refreshed', function() {
