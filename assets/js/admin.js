@@ -1977,8 +1977,14 @@ jQuery(document).ready(function ($) {
 
                 $('#wpbnp-configurations-list').append(configHtml);
 
+                // Debug: Check what was actually appended
+                console.log('Config HTML length:', configHtml.length);
+                console.log('Total config items now:', $('.wpbnp-config-item').length);
+                
                 // Populate all selectors in the new configuration
                 const $newConfig = $('.wpbnp-config-item').last();
+                console.log('New config element found:', $newConfig.length);
+                console.log('New config HTML:', $newConfig.html());
 
                 // Populate custom presets
                 const newPresetSelector = $newConfig.find('.wpbnp-preset-selector');
@@ -1986,14 +1992,22 @@ jQuery(document).ready(function ($) {
                     this.populatePresetSelector(newPresetSelector);
                 }
 
+                // Debug: Check all select elements in the new config
+                console.log('All select elements in new config:', $newConfig.find('select').length);
+                $newConfig.find('select').each(function(i, el) {
+                    console.log('Select', i, 'name:', $(el).attr('name'), 'class:', $(el).attr('class'));
+                });
+                
                 // Populate pages selector - try multiple selector approaches
                 let pagesSelector = $newConfig.find('select[name*="pages"]');
+                console.log('Direct pages selector found:', pagesSelector.length);
                 if (!pagesSelector.length) {
                     pagesSelector = $newConfig.find('select').filter(function() {
                         return $(this).attr('name') && $(this).attr('name').includes('pages');
                     });
+                    console.log('Filtered pages selector found:', pagesSelector.length);
                 }
-                console.log('Pages selector found:', pagesSelector.length, 'Name:', pagesSelector.attr('name'));
+                console.log('Final pages selector found:', pagesSelector.length, 'Name:', pagesSelector.attr('name'));
                 if (pagesSelector.length > 0) {
                     this.populatePagesSelector(pagesSelector, configIndex);
                 }
