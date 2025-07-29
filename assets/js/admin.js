@@ -1884,7 +1884,11 @@ jQuery(document).ready(function($) {
                 console.log('Total configs now:', $('.wpbnp-config-item').length);
                 
                 // Populate custom presets in the new configuration
-                this.populatePresetSelector($('.wpbnp-config-item').last().find('.wpbnp-preset-selector'));
+                const newSelector = $('.wpbnp-config-item').last().find('.wpbnp-preset-selector');
+                console.log('New selector found:', newSelector.length, newSelector[0]);
+                console.log('About to populate selector...');
+                this.populatePresetSelector(newSelector);
+                console.log('Selector population completed');
                 
                 this.showNotification('New configuration added!', 'success');
             } catch (error) {
@@ -2292,6 +2296,18 @@ jQuery(document).ready(function($) {
             console.log('Getting available custom presets...');
             
             // First try to get from settings data (more reliable)
+            console.log('Checking wpbnp_admin object:', typeof wpbnp_admin !== 'undefined' ? 'exists' : 'undefined');
+            if (typeof wpbnp_admin !== 'undefined') {
+                console.log('wpbnp_admin.settings exists:', !!wpbnp_admin.settings);
+                if (wpbnp_admin.settings) {
+                    console.log('custom_presets exists:', !!wpbnp_admin.settings.custom_presets);
+                    if (wpbnp_admin.settings.custom_presets) {
+                        console.log('presets array exists:', !!wpbnp_admin.settings.custom_presets.presets);
+                        console.log('presets array:', wpbnp_admin.settings.custom_presets.presets);
+                    }
+                }
+            }
+            
             if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings && wpbnp_admin.settings.custom_presets && wpbnp_admin.settings.custom_presets.presets) {
                 const settingsPresets = wpbnp_admin.settings.custom_presets.presets;
                 console.log(`Found ${settingsPresets.length} presets in settings data`);
@@ -2307,37 +2323,51 @@ jQuery(document).ready(function($) {
                         });
                     }
                 });
+            } else {
+                console.log('Settings presets not available, reason:');
+                console.log('- wpbnp_admin undefined:', typeof wpbnp_admin === 'undefined');
+                console.log('- settings missing:', !wpbnp_admin?.settings);
+                console.log('- custom_presets missing:', !wpbnp_admin?.settings?.custom_presets);
+                console.log('- presets array missing:', !wpbnp_admin?.settings?.custom_presets?.presets);
             }
             
-            // If no presets from settings, try DOM (fallback for when on Items tab)
-            if (presets.length === 0) {
-                console.log('No presets in settings data, trying DOM...');
-                $('.wpbnp-preset-item').each(function() {
-                    const $item = $(this);
-                    const preset = {
-                        id: $item.data('preset-id'),
-                        name: $item.find('.wpbnp-preset-name').text(),
-                        items: []
-                    };
-                    
-                    // Try to get items from hidden input
-                    const itemsJson = $item.find('input[name*="[items]"]').val();
-                    if (itemsJson) {
-                        try {
-                            preset.items = JSON.parse(itemsJson);
-                            console.log(`DOM preset "${preset.name}": ${preset.items.length} items`);
-                        } catch (e) {
-                            console.warn('Failed to parse preset items:', e);
-                        }
-                    } else {
-                        console.warn(`No items JSON found for preset "${preset.name}"`);
+            // Always also check DOM for additional presets (might be newly created)
+            console.log('Checking DOM for additional presets...');
+            const settingsPresetIds = presets.map(p => p.id);
+            $('.wpbnp-preset-item').each(function() {
+                const $item = $(this);
+                const presetId = $item.data('preset-id');
+                
+                // Skip if we already have this preset from settings
+                if (settingsPresetIds.includes(presetId)) {
+                    console.log(`Skipping DOM preset ${presetId} - already in settings`);
+                    return;
+                }
+                
+                const preset = {
+                    id: presetId,
+                    name: $item.find('.wpbnp-preset-name').text(),
+                    items: []
+                };
+                
+                // Try to get items from hidden input
+                const itemsJson = $item.find('input[name*="[items]"]').val();
+                if (itemsJson) {
+                    try {
+                        preset.items = JSON.parse(itemsJson);
+                        console.log(`DOM preset "${preset.name}": ${preset.items.length} items`);
+                    } catch (e) {
+                        console.warn('Failed to parse preset items:', e);
                     }
-                    
-                    if (preset.id && preset.name) {
-                        presets.push(preset);
-                    }
-                });
-            }
+                } else {
+                    console.warn(`No items JSON found for preset "${preset.name}"`);
+                }
+                
+                if (preset.id && preset.name) {
+                    presets.push(preset);
+                    console.log(`Added DOM preset "${preset.name}" to available presets`);
+                }
+            });
             
             console.log(`Total found ${presets.length} custom presets`);
             return presets;
@@ -2393,10 +2423,31 @@ jQuery(document).ready(function($) {
             const selectorCount = $('.wpbnp-preset-selector').length;
             console.log(`Found ${selectorCount} preset selectors`);
             
+            if (selectorCount === 0) {
+                console.log('No preset selectors found on current page');
+                return;
+            }
+            
             $('.wpbnp-preset-selector').each((index, element) => {
                 console.log(`Updating selector ${index + 1}/${selectorCount}`);
                 this.populatePresetSelector($(element));
             });
+        },
+        
+        // Manual debug function - can be called from console
+        debugPresets: function() {
+            console.log('=== PRESET DEBUG INFORMATION ===');
+            console.log('1. wpbnp_admin object:', wpbnp_admin);
+            console.log('2. Settings presets:', wpbnp_admin?.settings?.custom_presets);
+            console.log('3. DOM preset items:', $('.wpbnp-preset-item').length);
+            console.log('4. Available presets:', this.getAvailableCustomPresets());
+            console.log('5. Preset selectors on page:', $('.wpbnp-preset-selector').length);
+            
+            $('.wpbnp-preset-selector').each((index, element) => {
+                console.log(`Selector ${index + 1}:`, element, 'Options:', $(element).find('option').length);
+            });
+            
+            console.log('=== END DEBUG ===');
         },
 
         
@@ -2435,8 +2486,17 @@ jQuery(document).ready(function($) {
         
         // Populate existing preset selectors (with delay to ensure DOM is ready)
         setTimeout(() => {
+            console.log('Initial preset selector population...');
             WPBottomNavAdmin.updateAllPresetSelectors();
         }, 100);
+        
+        // Also populate when switching to page targeting tab
+        $(document).on('click', '.wpbnp-tab[href*="tab=page_targeting"]', function() {
+            setTimeout(() => {
+                console.log('Page targeting tab clicked, updating selectors...');
+                WPBottomNavAdmin.updateAllPresetSelectors();
+            }, 200);
+        });
         
         // Icons are now using Unicode, no need to check dashicons
     
