@@ -66,6 +66,8 @@ jQuery(document).ready(function($) {
         currentTab: 'items',
         
         init: function() {
+            console.log('Initializing WP Bottom Navigation Pro Admin...');
+            
             this.currentTab = this.getCurrentTab();
             
             // CRITICAL: Immediately save current form state on load to capture any existing values
@@ -83,6 +85,9 @@ jQuery(document).ready(function($) {
                 this.loadFormData();
                 this.initializeItems();
                 
+                // CRITICAL: Initialize custom presets from database
+                this.initCustomPresetsFromDatabase();
+                
                 // Restore form state if switching tabs (delay to ensure elements are ready)
                 if (localStorage.getItem('wpbnp_form_state')) {
                     setTimeout(() => {
@@ -90,6 +95,37 @@ jQuery(document).ready(function($) {
                     }, 100);
                 }
             }, 200);
+            
+            console.log('Admin initialization complete');
+        },
+        
+        // Initialize custom presets from database
+        initCustomPresetsFromDatabase: function() {
+            console.log('Initializing custom presets from database...');
+            
+            // Check if we have custom presets in the database settings
+            if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings && wpbnp_admin.settings.custom_presets) {
+                const dbPresets = wpbnp_admin.settings.custom_presets.presets;
+                if (dbPresets && dbPresets.length > 0) {
+                    console.log(`Found ${dbPresets.length} custom presets in database`);
+                    
+                    // Check if we already have presets in DOM
+                    const domPresets = $('.wpbnp-preset-item').length;
+                    console.log(`Found ${domPresets} presets in DOM`);
+                    
+                    // If no presets in DOM, restore from database
+                    if (domPresets === 0) {
+                        console.log('No presets in DOM, restoring from database...');
+                        this.restoreCustomPresets(dbPresets);
+                    } else {
+                        console.log('Presets already in DOM, skipping database restoration');
+                    }
+                } else {
+                    console.log('No custom presets found in database');
+                }
+            } else {
+                console.log('No custom presets settings found in database');
+            }
         },
         
         // Get current tab from URL or default
@@ -282,8 +318,35 @@ jQuery(document).ready(function($) {
         
         // Bind all events
         bindEvents: function() {
+            // Tab switching
+            $(document).on('click', '.wpbnp-tab', function(e) {
+                e.preventDefault();
+                
+                // CRITICAL: Save form state before switching tabs to preserve custom presets
+                WPBottomNavAdmin.saveFormState();
+                console.log('Form state saved before tab switch');
+                
+                const targetTab = $(this).attr('href').split('=')[1];
+                WPBottomNavAdmin.switchTab(targetTab);
+            });
+            
             // Form submission
-            $(document).on('submit', '#wpbnp-settings-form', this.handleFormSubmit.bind(this));
+            $('#wpbnp-settings-form').on('submit', this.handleFormSubmit);
+            
+            // Reset button
+            $('#wpbnp-reset-settings').on('click', this.handleReset);
+            
+            // Export button
+            $('#wpbnp-export-settings').on('click', this.handleExport);
+            
+            // Import button
+            $('#wpbnp-import-settings').on('click', this.handleImport);
+            
+            // License activation from custom presets section
+            $(document).on('click', '#wpbnp-activate-license-presets', function(e) {
+                e.preventDefault();
+                WPBottomNavAdmin.activateLicense();
+            });
             
             // Add item button
             $(document).on('click', '#wpbnp-add-item', this.handleAddItem.bind(this));
@@ -560,12 +623,16 @@ jQuery(document).ready(function($) {
                         }
                     });
                     
-                    console.log('Form state restored successfully');
+                    console.log('Form state restored successfully from localStorage');
                 } catch (e) {
                     console.error('Error restoring form state:', e);
                     // Clear corrupted state
                     localStorage.removeItem('wpbnp_form_state');
                 }
+            } else {
+                // No localStorage data, check if we need to restore custom presets from database
+                console.log('No localStorage data found, checking database for custom presets...');
+                this.initCustomPresetsFromDatabase();
             }
         },
 
@@ -582,6 +649,7 @@ jQuery(document).ready(function($) {
             if (presetsData && presetsData.length > 0) {
                 // Add each preset back to DOM
                 presetsData.forEach(preset => {
+                    console.log('Restoring preset:', preset.name, 'with', preset.items ? preset.items.length : 0, 'items');
                     this.addPresetToDOM(preset);
                 });
                 
@@ -650,9 +718,23 @@ jQuery(document).ready(function($) {
                         // Update local settings from response
                         if (response.data && response.data.settings) {
                             WPBottomNavAdmin.settings = response.data.settings;
+                            
+                            // CRITICAL: Update wpbnp_admin.settings to ensure consistency
+                            if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
+                                wpbnp_admin.settings = response.data.settings;
+                                console.log('Updated wpbnp_admin.settings from response');
+                            }
+                            
+                            // CRITICAL: Restore custom presets from the database response
+                            if (response.data.settings.custom_presets && response.data.settings.custom_presets.presets) {
+                                console.log('Restoring custom presets from database response:', response.data.settings.custom_presets.presets);
+                                WPBottomNavAdmin.restoreCustomPresets(response.data.settings.custom_presets.presets);
+                            }
                         }
-                        // Clear saved form state after successful save
+                        
+                        // Only clear localStorage after successful restoration
                         localStorage.removeItem('wpbnp_form_state');
+                        console.log('Form state cleared after successful save and restoration');
                     } else {
                         WPBottomNavAdmin.showNotification(response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings', 'error');
                     }
@@ -2083,11 +2165,59 @@ jQuery(document).ready(function($) {
             // Update all preset selectors immediately
             this.updateAllPresetSelectors();
             
-            // Save form state to preserve the new preset
+            // CRITICAL: Save form state immediately to preserve the new preset
             this.saveFormState();
+            
+            // CRITICAL: Also save to database immediately to prevent loss
+            this.saveCustomPresetsToDatabase();
             
             this.showNotification(`Custom preset "${presetName}" created successfully!`, 'success');
             this.showNotification(`⚠️ Remember to click "Save Changes" to permanently save your custom preset!`, 'warning', 5000);
+        },
+        
+        // Save custom presets to database immediately
+        saveCustomPresetsToDatabase: function() {
+            const customPresets = this.getCustomPresetsData();
+            if (customPresets.length === 0) {
+                console.log('No custom presets to save to database');
+                return;
+            }
+            
+            console.log('Saving custom presets to database immediately:', customPresets);
+            
+            // Create a minimal form data with just the custom presets
+            const formData = new FormData();
+            formData.append('action', 'wpbnp_save_settings');
+            formData.append('nonce', this.nonce);
+            formData.append('wpbnp_custom_presets_data', JSON.stringify(customPresets));
+            
+            // Add minimal settings to ensure the save works
+            formData.append('settings[enabled]', this.settings.enabled ? '1' : '0');
+            
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        console.log('Custom presets saved to database successfully');
+                        // Update the settings object with the response
+                        if (response.data && response.data.settings) {
+                            WPBottomNavAdmin.settings = response.data.settings;
+                            if (typeof wpbnp_admin !== 'undefined' && wpbnp_admin.settings) {
+                                wpbnp_admin.settings = response.data.settings;
+                            }
+                        }
+                    } else {
+                        console.error('Failed to save custom presets to database:', response);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saving custom presets to database:', error);
+                }
+            });
         },
         
         // Get current navigation items
