@@ -1724,7 +1724,7 @@ jQuery(document).ready(function($) {
                 console.log('Add configuration button clicked');
                 console.log('Button element:', this);
                 console.log('Configurations list exists:', $('#wpbnp-configurations-list').length > 0);
-                // alert('Add Configuration button clicked!'); // Temporary debug
+                alert('Add Configuration button clicked!'); // Temporary debug
                 WPBottomNavAdmin.addPageTargetingConfig();
             });
             
@@ -1849,8 +1849,10 @@ jQuery(document).ready(function($) {
                 }
             
                 console.log('Appending config HTML to:', $('#wpbnp-configurations-list'));
+                console.log('Config HTML:', configHtml);
                 $('#wpbnp-configurations-list').append(configHtml);
                 console.log('Configuration added successfully');
+                console.log('Total configs now:', $('.wpbnp-config-item').length);
                 this.showNotification('New configuration added!', 'success');
             } catch (error) {
                 console.error('Error adding configuration:', error);
