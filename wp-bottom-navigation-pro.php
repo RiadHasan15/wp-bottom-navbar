@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 // Define plugin constants
 // NOTE: When merging with pro branch, use semantic versioning (e.g., 1.2.0)
-define('WPBNP_VERSION', '1.2.9'); // Cleaned up project and fixed pages dropdown with auto-creation
+define('WPBNP_VERSION', '1.3.0'); // Fixed display conditions not loading and presets/configurations disappearing
 define('WPBNP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPBNP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WPBNP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -117,6 +117,10 @@ class WP_Bottom_Navigation_Pro {
         // NOTE: When merging with pro branch, ensure these don't conflict with existing handlers
         add_action('wp_ajax_wpbnp_activate_license', array($this, 'activate_license'));
         add_action('wp_ajax_wpbnp_deactivate_license', array($this, 'deactivate_license'));
+        
+        // AJAX handlers for dynamic content loading
+        add_action('wp_ajax_wpbnp_get_pages', array($this, 'ajax_get_pages'));
+        add_action('wp_ajax_wpbnp_get_categories', array($this, 'ajax_get_categories'));
         
         // Footer hook for navigation display
         add_action('wp_footer', array($this, 'display_navigation'), 999);
@@ -1270,6 +1274,92 @@ class WP_Bottom_Navigation_Pro {
         
         return isset($data['valid']) && $data['valid'] === true;
         */
+    }
+
+    /**
+     * AJAX handler to get pages for page targeting
+     */
+    public function ajax_get_pages() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'wpbnp_admin_nonce')) {
+            wp_die('Security check failed');
+        }
+        
+        // Check user permissions
+        if (!current_user_can('manage_options')) {
+            wp_die('Insufficient permissions');
+        }
+        
+        // Get pages
+        $pages = get_posts(array(
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+            'orderby' => 'title',
+            'order' => 'ASC'
+        ));
+        
+        // If no pages, try posts
+        if (empty($pages)) {
+            $pages = get_posts(array(
+                'post_type' => 'post',
+                'post_status' => 'publish',
+                'numberposts' => -1,
+                'orderby' => 'title',
+                'order' => 'ASC'
+            ));
+        }
+        
+        // If still no pages, create a sample page
+        if (empty($pages) && current_user_can('edit_pages')) {
+            $sample_page_id = wp_insert_post(array(
+                'post_title' => 'Sample Page',
+                'post_content' => 'This is a sample page created for testing the page targeting feature.',
+                'post_status' => 'publish',
+                'post_type' => 'page'
+            ));
+            
+            if ($sample_page_id && !is_wp_error($sample_page_id)) {
+                // Refresh the pages list
+                $pages = get_posts(array(
+                    'post_type' => 'page',
+                    'post_status' => 'publish',
+                    'numberposts' => -1,
+                    'orderby' => 'title',
+                    'order' => 'ASC'
+                ));
+            }
+        }
+        
+        wp_send_json_success(array(
+            'pages' => $pages
+        ));
+    }
+
+    /**
+     * AJAX handler to get categories for page targeting
+     */
+    public function ajax_get_categories() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'wpbnp_admin_nonce')) {
+            wp_die('Security check failed');
+        }
+        
+        // Check user permissions
+        if (!current_user_can('manage_options')) {
+            wp_die('Insufficient permissions');
+        }
+        
+        // Get categories
+        $categories = get_categories(array(
+            'hide_empty' => false,
+            'orderby' => 'name',
+            'order' => 'ASC'
+        ));
+        
+        wp_send_json_success(array(
+            'categories' => $categories
+        ));
     }
 }
 

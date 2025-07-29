@@ -1,5 +1,22 @@
 # WP Bottom Navigation Pro - Changelog
 
+## Version 1.3.0 - 2024-12-19
+### Fixed
+- **Display Conditions Loading Issue**: Fixed pages and categories not showing when creating new configurations (now loads via AJAX)
+- **Presets/Configurations Disappearing**: Fixed automatic removal of presets and configurations by improving form state preservation
+- **Dynamic Content Population**: Added AJAX handlers to populate pages and categories in new configurations immediately
+
+### Technical Changes
+- Added `populatePagesSelector()` and `populateCategoriesSelector()` JavaScript functions
+- Added AJAX handlers `ajax_get_pages()` and `ajax_get_categories()` in PHP
+- Enhanced form state saving when creating presets and configurations
+- Improved error handling and user feedback
+
+### Files Modified
+- `assets/js/admin.js` - Added dynamic selector population functions
+- `wp-bottom-navigation-pro.php` - Added AJAX handlers and updated version
+- `CHANGELOG.md` - Updated with latest changes
+
 ## Version 1.2.9 - 2024-12-19
 ### Fixed
 - **Pages Dropdown Issue**: Fixed "Specific Pages" dropdown not showing pages in Page Targeting feature
