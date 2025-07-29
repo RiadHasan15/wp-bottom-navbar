@@ -1667,8 +1667,10 @@ jQuery(document).ready(function($) {
             // License form submission
             $(document).on('submit', '#wpbnp-license-form', function(e) {
                 e.preventDefault();
+                console.log('License form submitted');
                 
                 const licenseKey = $('#wpbnp-license-key').val().trim();
+                console.log('License key:', licenseKey);
                 if (!licenseKey) {
                     WPBottomNavAdmin.showNotification('Please enter a license key', 'error');
                     return;
@@ -1687,6 +1689,7 @@ jQuery(document).ready(function($) {
                         nonce: WPBottomNavAdmin.nonce
                     },
                     success: function(response) {
+                        console.log('License activation response:', response);
                         if (response.success) {
                             WPBottomNavAdmin.showNotification('License activated successfully!', 'success');
                             $('#wpbnp-license-modal').hide();

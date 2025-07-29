@@ -36,7 +36,7 @@ class WPBNP_Admin_UI {
             'animations' => __('Animations', 'wp-bottom-navigation-pro'),
             'badges' => __('Badges', 'wp-bottom-navigation-pro'),
             'display_rules' => __('Display Rules', 'wp-bottom-navigation-pro'),
-            'page_targeting' => __('Page Targeting', 'wp-bottom-navigation-pro') . ' <span class="wpbnp-pro-badge">PRO</span>',
+            'page_targeting' => __('Page Targeting', 'wp-bottom-navigation-pro'),
             'presets' => __('Presets', 'wp-bottom-navigation-pro'),
             'advanced' => __('Advanced', 'wp-bottom-navigation-pro')
         );
@@ -168,6 +168,9 @@ class WPBNP_Admin_UI {
                 <a href="<?php echo esc_url(admin_url('themes.php?page=wp-bottom-navigation-pro&tab=' . $tab_key)); ?>" 
                    class="wpbnp-tab <?php echo $this->current_tab === $tab_key ? 'active' : ''; ?>">
                     <?php echo esc_html($tab_label); ?>
+                    <?php if ($tab_key === 'page_targeting'): ?>
+                        <span class="wpbnp-pro-badge">PRO</span>
+                    <?php endif; ?>
                 </a>
             <?php endforeach; ?>
         </div>
@@ -646,6 +649,7 @@ class WPBNP_Admin_UI {
                         
                         <div class="wpbnp-demo-note">
                             <p><strong>🧪 Demo Testing:</strong> For testing purposes, use any license key that is at least 10 characters long and contains both letters and numbers (e.g., "demo123456789").</p>
+                            <p><strong>Debug Info:</strong> License Key: <code><?php echo esc_html(get_option('wpbnp_pro_license_key', 'None')); ?></code> | Status: <code><?php echo esc_html(get_option('wpbnp_pro_license_status', 'inactive')); ?></code> | Pro Active: <code><?php echo $this->is_pro_license_active() ? 'Yes' : 'No'; ?></code></p>
                         </div>
                     </div>
                 </div>

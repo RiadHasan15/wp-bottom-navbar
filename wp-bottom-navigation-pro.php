@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WPBNP_VERSION', '1.1.0');
+define('WPBNP_VERSION', '1.1.1');
 define('WPBNP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPBNP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WPBNP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -1168,12 +1168,17 @@ class WP_Bottom_Navigation_Pro {
             update_option('wpbnp_pro_license_status', 'active');
             update_option('wpbnp_pro_license_activated_at', current_time('timestamp'));
             
+            // Enable page targeting by default when license is activated
+            $settings = wpbnp_get_settings();
+            $settings['page_targeting']['enabled'] = true;
+            update_option('wpbnp_settings', $settings);
+            
             wp_send_json_success(array(
                 'message' => 'License activated successfully!',
                 'license_key' => $license_key
             ));
         } else {
-            wp_send_json_error(array('message' => 'Invalid license key'));
+            wp_send_json_error(array('message' => 'Invalid license key. Please use a key with at least 10 characters containing both letters and numbers.'));
         }
     }
     
