@@ -337,6 +337,20 @@ jQuery(document).ready(function($) {
             // Form submission
             $('#wpbnp-settings-form').on('submit', this.handleFormSubmit.bind(this));
             
+            // Also add a direct click handler for the save button as a backup
+            $(document).on('click', '#wpbnp-save-settings', function(e) {
+                console.log('Save button clicked directly');
+                console.log('Button element:', this);
+                console.log('Form element:', $('#wpbnp-settings-form').length);
+                
+                // Prevent default to handle manually
+                e.preventDefault();
+                
+                // Trigger form submission manually
+                console.log('Triggering form submission...');
+                $('#wpbnp-settings-form').trigger('submit');
+            });
+            
             // Reset button
             $('#wpbnp-reset-settings').on('click', this.resetSettings.bind(this));
             
@@ -651,14 +665,19 @@ jQuery(document).ready(function($) {
         // Handle form submission
         handleFormSubmit: function(e) {
             try {
+                console.log('=== FORM SUBMISSION DEBUG ===');
                 console.log('handleFormSubmit called');
                 console.log('Event target:', e.target);
+                console.log('Event type:', e.type);
                 console.log('WPBottomNavAdmin object:', typeof WPBottomNavAdmin);
                 console.log('wpbnp_admin object:', typeof wpbnp_admin);
+                console.log('Form element:', $('#wpbnp-settings-form').length);
+                console.log('Save button:', $('#wpbnp-save-settings').length);
                 
                 e.preventDefault();
                 
                 const formData = new FormData(e.target);
+                console.log('FormData created, entries:', formData.entries ? 'available' : 'not available');
                 
                 // Critical fix: Ensure unchecked checkboxes are handled properly
                 // FormData doesn't include unchecked checkboxes, so we need to explicitly add them
@@ -667,6 +686,7 @@ jQuery(document).ready(function($) {
                     const name = checkbox.attr('name');
                     if (name && !checkbox.is(':checked')) {
                         formData.append(name, '0');
+                        console.log('Added unchecked checkbox:', name);
                     }
                 });
                 
@@ -682,6 +702,8 @@ jQuery(document).ready(function($) {
                 formData.append('nonce', wpbnp_admin.nonce);
                 
                 console.log('Form data prepared, submitting...');
+                console.log('AJAX URL:', wpbnp_admin.ajax_url);
+                console.log('Nonce:', wpbnp_admin.nonce);
                 
                 const submitBtn = $('#wpbnp-save-settings');
                 const originalText = submitBtn.text();
@@ -725,6 +747,7 @@ jQuery(document).ready(function($) {
                     },
                     error: function(xhr, status, error) {
                         console.error('AJAX error:', xhr, status, error);
+                        console.error('Response text:', xhr.responseText);
                         WPBottomNavAdmin.showNotification('Ajax error occurred: ' + error, 'error');
                     },
                     complete: function() {
@@ -2949,4 +2972,6 @@ jQuery(document).ready(function($) {
     
     // Make it globally available
     window.WPBottomNavAdmin = WPBottomNavAdmin;
+    
+
 });
