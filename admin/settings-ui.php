@@ -737,10 +737,7 @@ class WPBNP_Admin_UI {
         $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
         $is_pro_active = $this->is_pro_license_active();
         
-        // Debug information
-        error_log('WPBNP: Rendering page targeting tab. Pro active: ' . ($is_pro_active ? 'Yes' : 'No'));
         $custom_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
-        error_log('WPBNP: Page targeting - Custom presets available: ' . count($custom_presets));
         
         ?>
         <div class="wpbnp-tab-content" id="wpbnp-page-targeting">
@@ -854,9 +851,6 @@ class WPBNP_Admin_UI {
      */
     private function render_page_targeting_configurations($page_targeting) {
         $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
-        
-        // Debug information
-        error_log('WPBNP: Rendering configurations. Count: ' . count($configurations));
         
         if (empty($configurations)) {
             echo '<p class="wpbnp-no-configs">' . esc_html__('No configurations created yet. Click "Add Configuration" to get started.', 'wp-bottom-navigation-pro') . '</p>';
@@ -1084,18 +1078,7 @@ class WPBNP_Admin_UI {
         $settings = wpbnp_get_settings();
         $custom_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
         
-        // Debug information
-        error_log('WPBNP: Rendering preset selector - Selected: ' . $selected_preset);
-        error_log('WPBNP: Custom presets count: ' . count($custom_presets));
-        error_log('WPBNP: Settings structure: ' . print_r($settings['custom_presets'] ?? 'NOT SET', true));
-        if (!empty($custom_presets)) {
-            foreach ($custom_presets as $preset) {
-                $items_count = isset($preset['items']) ? count($preset['items']) : 0;
-                error_log('WPBNP: Preset - ID: ' . ($preset['id'] ?? 'no-id') . ', Name: ' . ($preset['name'] ?? 'no-name') . ', Items: ' . $items_count);
-            }
-        } else {
-            error_log('WPBNP: No custom presets found in settings');
-        }
+
         
         ?>
         <select name="settings[page_targeting][configurations][<?php echo $index; ?>][preset_id]" class="wpbnp-preset-selector">

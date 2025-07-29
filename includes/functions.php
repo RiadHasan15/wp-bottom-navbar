@@ -292,16 +292,11 @@ function wpbnp_sanitize_settings($settings) {
                     if (isset($preset['items'])) {
                         // Handle both array and JSON string formats
                         if (is_string($preset['items'])) {
-                            error_log('WPBNP: Processing preset items as JSON string: ' . substr($preset['items'], 0, 100));
                             $preset_items = json_decode($preset['items'], true);
                             if (!is_array($preset_items)) {
-                                error_log('WPBNP: Failed to decode JSON items');
                                 $preset_items = array();
-                            } else {
-                                error_log('WPBNP: Successfully decoded ' . count($preset_items) . ' items');
                             }
                         } elseif (is_array($preset['items'])) {
-                            error_log('WPBNP: Processing preset items as array: ' . count($preset['items']) . ' items');
                             $preset_items = $preset['items'];
                         }
                     }
@@ -333,7 +328,6 @@ function wpbnp_sanitize_settings($settings) {
                     }
                     
                     $sanitized['custom_presets']['presets'][] = $sanitized_preset;
-                    error_log('WPBNP: Saved preset: ' . $sanitized_preset['name'] . ' with ' . count($sanitized_preset['items']) . ' items');
                 }
             }
         }
@@ -3737,18 +3731,14 @@ function wpbnp_get_active_page_targeting_config() {
     $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
     
     if (!isset($page_targeting['enabled']) || !$page_targeting['enabled']) {
-        error_log('WPBNP Page Targeting - Page targeting not enabled');
         return null;
     }
     
     $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
     
     if (empty($configurations)) {
-        error_log('WPBNP Page Targeting - No configurations found');
         return null;
     }
-    
-    error_log('WPBNP Page Targeting - Found ' . count($configurations) . ' configurations');
     
     // Sort configurations by priority (higher first)
     usort($configurations, function($a, $b) {
@@ -3759,14 +3749,11 @@ function wpbnp_get_active_page_targeting_config() {
     
     // Check each configuration's conditions
     foreach ($configurations as $index => $config) {
-        error_log('WPBNP Page Targeting - Checking configuration ' . ($index + 1) . ': ' . ($config['name'] ?? 'Unnamed'));
         if (wpbnp_check_page_targeting_conditions($config)) {
-            error_log('WPBNP Page Targeting - Using configuration: ' . ($config['name'] ?? 'Unnamed'));
             return $config;
         }
     }
     
-    error_log('WPBNP Page Targeting - No matching configuration found');
     return null;
 }
 
@@ -3792,9 +3779,6 @@ function wpbnp_check_page_targeting_conditions($config) {
             $page_match = true;
         }
         $matches['pages'] = $page_match;
-        
-        // Debug logging
-        error_log('WPBNP Page Targeting - Pages check: Current page ID: ' . get_the_ID() . ', Target pages: ' . implode(',', $conditions['pages']) . ', Match: ' . ($page_match ? 'YES' : 'NO'));
     }
     
     // Check post types
@@ -3806,9 +3790,6 @@ function wpbnp_check_page_targeting_conditions($config) {
             $post_type_match = true;
         }
         $matches['post_types'] = $post_type_match;
-        
-        // Debug logging
-        error_log('WPBNP Page Targeting - Post types check: Current type: ' . $current_post_type . ', Target types: ' . implode(',', $conditions['post_types']) . ', Match: ' . ($post_type_match ? 'YES' : 'NO'));
     }
     
     // Check categories
@@ -3826,9 +3807,6 @@ function wpbnp_check_page_targeting_conditions($config) {
             $category_match = true;
         }
         $matches['categories'] = $category_match;
-        
-        // Debug logging
-        error_log('WPBNP Page Targeting - Categories check: Match: ' . ($category_match ? 'YES' : 'NO'));
     }
     
     // Check user roles
@@ -3864,7 +3842,6 @@ function wpbnp_check_page_targeting_conditions($config) {
         }
     }
     
-    error_log('WPBNP Page Targeting - Final result: ' . ($all_match ? 'SHOW' : 'HIDE') . ' navigation');
     return $all_match;
 }
 
@@ -3958,13 +3935,9 @@ function wpbnp_get_targeted_navigation_items() {
             
             foreach ($custom_presets as $preset) {
                 if (isset($preset['id']) && $preset['id'] === $preset_id) {
-                    error_log('WPBNP Page Targeting - Using custom preset: ' . ($preset['name'] ?? 'Unnamed'));
                     return isset($preset['items']) ? $preset['items'] : array();
                 }
             }
-            
-            // If preset not found, fall back to default
-            error_log('WPBNP Page Targeting - Custom preset not found, falling back to default');
         }
         
         // Use default items from the main settings

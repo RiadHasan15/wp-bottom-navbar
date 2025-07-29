@@ -31,10 +31,13 @@
             this.addRippleEffect();
             this.initializeAnimations();
             
-            // Update badges periodically if WooCommerce is active
-            if (typeof wc_cart_fragments_params !== 'undefined') {
-                setInterval(this.updateBadges.bind(this), 30000); // Every 30 seconds
-            }
+                    // Update badges periodically if WooCommerce is active
+        if (typeof wc_cart_fragments_params !== 'undefined') {
+            setInterval(this.updateBadges.bind(this), 30000); // Every 30 seconds
+        }
+        
+        // Add error boundary for AJAX requests
+        this.setupErrorHandling();
             
             // Add touch support improvements
             this.enhanceTouchSupport();
@@ -553,9 +556,33 @@
                     }
                 }
             } catch (e) {
-                console.warn('Error getting cart count from fragments:', e);
+                // Silent error handling for cart count
             }
             return 0;
+        },
+        
+        /**
+         * Setup error handling for AJAX requests
+         */
+        setupErrorHandling: function() {
+            // Override jQuery AJAX error handling
+            const originalAjax = $.ajax;
+            $.ajax = function(options) {
+                const originalError = options.error;
+                options.error = function(xhr, status, error) {
+                    // Log error for debugging
+                    if (window.console && console.error) {
+                        console.error('AJAX Error:', {xhr, status, error});
+                    }
+                    
+                    // Call original error handler if provided
+                    if (originalError) {
+                        originalError.call(this, xhr, status, error);
+                    }
+                };
+                
+                return originalAjax.call(this, options);
+            };
         },
         
         /**

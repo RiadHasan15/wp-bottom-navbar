@@ -2,8 +2,8 @@
 
 /* Ensure body has proper spacing for fixed navigation */
 body.wpbnp-active {
-    padding-bottom: 70px !important;
-    margin-bottom: 0 !important;
+    padding-bottom: 70px;
+    margin-bottom: 0;
 }
 
 /* Prevent content from being hidden behind navigation */
@@ -63,29 +63,24 @@ body.wpbnp-active {
   and (max-device-width: 1024px) 
   and (-webkit-min-device-pixel-ratio: 1) {
     .wpbnp-bottom-nav {
-        position: fixed !important;
-        bottom: 0px !important;
-        left: 0px !important;
-        right: 0px !important;
-        z-index: 99999 !important;
-        transform: translate3d(0, 0, 0) !important;
-        -webkit-transform: translate3d(0, 0, 0) !important;
+        position: fixed;
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+        z-index: 99999;
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
         /* Use viewport height to force positioning */
-        top: calc(100vh - 70px) !important;
-        bottom: auto !important;
-        margin: 0 !important;
-        padding-bottom: 10px !important;
-        /* Ensure it's always visible */
-        position: absolute !important;
-        /* Alternative: use sticky positioning */
-        position: -webkit-sticky !important;
-        position: sticky !important;
+        top: calc(100vh - 70px);
+        bottom: auto;
+        margin: 0;
+        padding-bottom: 10px;
     }
     
     /* Ensure body has proper height for iPad */
     body.wpbnp-active {
-        min-height: 100vh !important;
-        padding-bottom: 70px !important;
+        min-height: 100vh;
+        padding-bottom: 70px;
     }
 }
 

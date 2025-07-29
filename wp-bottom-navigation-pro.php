@@ -1,17 +1,30 @@
 <?php
 /**
  * Plugin Name: WP Bottom Navigation Pro
- * Plugin URI: https://wordpress.org/plugins/wp-bottom-navigation-pro
- * Description: A fully customizable, mobile-first bottom navigation bar with visual design presets, notification badges, animations, and role/device-based display rules.
- * Version: 1.0.0
- * Author: WP Bottom Navigation Pro
+ * Plugin URI: https://riadhasan.info/
+ * Description: A comprehensive WordPress plugin for creating customizable bottom navigation bars with advanced features like page targeting, custom presets, and WooCommerce integration.
+ * Version: 1.3.1
+ * Author: Riad Hasan
+ * Author URI: https://riadhasan.info/
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wp-bottom-navigation-pro
  * Domain Path: /languages
  * Requires at least: 5.0
- * Tested up to: 6.3
+ * Tested up to: 6.4
  * Requires PHP: 7.4
- * License: GPL v2 or later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Network: false
+ *
+ * @package WP_Bottom_Navigation_Pro
+ * @version 1.3.1
+ * @author Riad Hasan
+ * @license GPL v2 or later
+ * 
+ * @since 1.0.0
+ * @since 1.1.0 Added custom presets functionality
+ * @since 1.2.0 Added page targeting feature
+ * @since 1.3.0 Added WooCommerce integration
+ * @since 1.3.1 Fixed custom presets persistence and performance issues
  */
 
 // Prevent direct access
@@ -1002,9 +1015,9 @@ class WP_Bottom_Navigation_Pro {
                 $settings['custom_presets']['presets'] = $custom_presets;
                 $settings['custom_presets']['enabled'] = true;
                 
-                error_log('WPBNP: Custom presets data saved: ' . count($custom_presets) . ' presets');
+                // Custom presets data saved successfully
             } else {
-                error_log('WPBNP: Error parsing custom presets data: ' . json_last_error_msg());
+                // Error parsing custom presets data
             }
         }
         
@@ -1154,6 +1167,9 @@ class WP_Bottom_Navigation_Pro {
             update_option('wpbnp_settings', wpbnp_get_default_settings());
         }
         
+        // Set database version for future updates
+        update_option('wpbnp_db_version', '1.0.0');
+        
         // Create capabilities if needed
         $role = get_role('administrator');
         if ($role) {
@@ -1187,27 +1203,21 @@ class WP_Bottom_Navigation_Pro {
      */
     public function activate_license() {
         // Log that the function is being called
-        error_log('WPBNP: License activation function called');
-        
         // Verify nonce
-        if (!check_ajax_referer('wpbnp_admin_nonce', 'nonce', false)) {
-            error_log('WPBNP: Nonce verification failed');
+        if (!check_ajax_referer('wpbnp_admin_nonce', 'nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
             return;
         }
         
         // Check user capabilities
         if (!current_user_can('manage_options')) {
-            error_log('WPBNP: User capabilities check failed');
             wp_send_json_error(array('message' => 'Insufficient permissions'));
             return;
         }
         
         $license_key = sanitize_text_field(wp_unslash($_POST['license_key'] ?? ''));
-        error_log('WPBNP: License key received: ' . $license_key);
         
         if (empty($license_key)) {
-            error_log('WPBNP: Empty license key');
             wp_send_json_error(array('message' => 'License key is required'));
             return;
         }
@@ -1215,7 +1225,6 @@ class WP_Bottom_Navigation_Pro {
         // For demo purposes, we'll accept any non-empty license key
         // In a real implementation, you would validate against your license server
         $is_valid = $this->validate_license_key($license_key);
-        error_log('WPBNP: License validation result: ' . ($is_valid ? 'valid' : 'invalid'));
         
         if ($is_valid) {
             update_option('wpbnp_pro_license_key', $license_key);
@@ -1227,14 +1236,11 @@ class WP_Bottom_Navigation_Pro {
             $settings['page_targeting']['enabled'] = true;
             update_option('wpbnp_settings', $settings);
             
-            error_log('WPBNP: License activated successfully');
             wp_send_json_success(array(
                 'message' => 'License activated successfully!',
-                'license_key' => $license_key,
-                'debug' => 'License activation completed'
+                'license_key' => $license_key
             ));
         } else {
-            error_log('WPBNP: License validation failed');
             wp_send_json_error(array('message' => 'Invalid license key. Please use a key with at least 10 characters containing both letters and numbers.'));
         }
     }
@@ -1320,8 +1326,8 @@ class WP_Bottom_Navigation_Pro {
         $formatted_pages = array();
         foreach ($pages as $page) {
             $formatted_pages[] = array(
-                'ID' => $page->ID,
-                'post_title' => $page->post_title
+                'ID' => absint($page->ID),
+                'post_title' => sanitize_text_field($page->post_title)
             );
         }
         
@@ -1349,8 +1355,8 @@ class WP_Bottom_Navigation_Pro {
         $formatted_categories = array();
         foreach ($categories as $category) {
             $formatted_categories[] = array(
-                'term_id' => $category->term_id,
-                'name' => $category->name
+                'term_id' => absint($category->term_id),
+                'name' => sanitize_text_field($category->name)
             );
         }
         
