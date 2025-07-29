@@ -2127,6 +2127,7 @@ jQuery(document).ready(function($) {
         getAvailableCustomPresets: function() {
             const presets = [];
             
+            console.log('Getting available custom presets...');
             $('.wpbnp-preset-item').each(function() {
                 const $item = $(this);
                 const preset = {
@@ -2140,20 +2141,29 @@ jQuery(document).ready(function($) {
                 if (itemsJson) {
                     try {
                         preset.items = JSON.parse(itemsJson);
+                        console.log(`Preset "${preset.name}": ${preset.items.length} items`);
                     } catch (e) {
                         console.warn('Failed to parse preset items:', e);
                     }
+                } else {
+                    console.warn(`No items JSON found for preset "${preset.name}"`);
                 }
                 
                 presets.push(preset);
             });
             
+            console.log(`Found ${presets.length} custom presets`);
             return presets;
         },
         
         // Update all preset selectors when presets change
         updateAllPresetSelectors: function() {
+            console.log('Updating all preset selectors...');
+            const selectorCount = $('.wpbnp-preset-selector').length;
+            console.log(`Found ${selectorCount} preset selectors`);
+            
             $('.wpbnp-preset-selector').each((index, element) => {
+                console.log(`Updating selector ${index + 1}/${selectorCount}`);
                 this.populatePresetSelector($(element));
             });
         },
@@ -2186,8 +2196,10 @@ jQuery(document).ready(function($) {
         // Initialize custom presets
         WPBottomNavAdmin.initCustomPresets();
         
-        // Populate existing preset selectors
-        WPBottomNavAdmin.updateAllPresetSelectors();
+        // Populate existing preset selectors (with delay to ensure DOM is ready)
+        setTimeout(() => {
+            WPBottomNavAdmin.updateAllPresetSelectors();
+        }, 100);
         
         // Icons are now using Unicode, no need to check dashicons
     

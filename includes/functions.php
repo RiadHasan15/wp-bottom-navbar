@@ -288,8 +288,26 @@ function wpbnp_sanitize_settings($settings) {
                     );
                     
                     // Sanitize preset items (same as regular items)
-                    if (isset($preset['items']) && is_array($preset['items'])) {
-                        foreach ($preset['items'] as $item) {
+                    $preset_items = array();
+                    if (isset($preset['items'])) {
+                        // Handle both array and JSON string formats
+                        if (is_string($preset['items'])) {
+                            error_log('WPBNP: Processing preset items as JSON string: ' . substr($preset['items'], 0, 100));
+                            $preset_items = json_decode($preset['items'], true);
+                            if (!is_array($preset_items)) {
+                                error_log('WPBNP: Failed to decode JSON items');
+                                $preset_items = array();
+                            } else {
+                                error_log('WPBNP: Successfully decoded ' . count($preset_items) . ' items');
+                            }
+                        } elseif (is_array($preset['items'])) {
+                            error_log('WPBNP: Processing preset items as array: ' . count($preset['items']) . ' items');
+                            $preset_items = $preset['items'];
+                        }
+                    }
+                    
+                    if (!empty($preset_items)) {
+                        foreach ($preset_items as $item) {
                             if (is_array($item)) {
                                 $sanitized_item = array(
                                     'id' => sanitize_key($item['id'] ?? ''),
@@ -315,6 +333,7 @@ function wpbnp_sanitize_settings($settings) {
                     }
                     
                     $sanitized['custom_presets']['presets'][] = $sanitized_preset;
+                    error_log('WPBNP: Saved preset: ' . $sanitized_preset['name'] . ' with ' . count($sanitized_preset['items']) . ' items');
                 }
             }
         }
