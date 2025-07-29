@@ -110,6 +110,12 @@ function wpbnp_get_default_settings() {
         'page_targeting' => array(
             'enabled' => false,
             'configurations' => array()
+        ),
+        
+        // Pro feature: Custom presets
+        'custom_presets' => array(
+            'enabled' => false,
+            'presets' => array()
         )
     ));
 }
@@ -227,6 +233,7 @@ function wpbnp_sanitize_settings($settings) {
                         'id' => sanitize_key($config['id'] ?? ''),
                         'name' => sanitize_text_field($config['name'] ?? ''),
                         'priority' => absint($config['priority'] ?? 1),
+                        'preset_id' => sanitize_key($config['preset_id'] ?? 'default'),
                         'conditions' => array(
                             'pages' => array(),
                             'post_types' => array(),
@@ -257,6 +264,57 @@ function wpbnp_sanitize_settings($settings) {
                     }
                     
                     $sanitized['page_targeting']['configurations'][] = $sanitized_config;
+                }
+            }
+        }
+    }
+    
+    // Custom presets settings (Pro feature)
+    if (isset($settings['custom_presets']) && is_array($settings['custom_presets'])) {
+        $sanitized['custom_presets'] = array(
+            'enabled' => !empty($settings['custom_presets']['enabled']),
+            'presets' => array()
+        );
+        
+        if (isset($settings['custom_presets']['presets']) && is_array($settings['custom_presets']['presets'])) {
+            foreach ($settings['custom_presets']['presets'] as $preset) {
+                if (is_array($preset)) {
+                    $sanitized_preset = array(
+                        'id' => sanitize_key($preset['id'] ?? ''),
+                        'name' => sanitize_text_field($preset['name'] ?? ''),
+                        'description' => sanitize_text_field($preset['description'] ?? ''),
+                        'created_at' => absint($preset['created_at'] ?? time()),
+                        'items' => array()
+                    );
+                    
+                    // Sanitize preset items (same as regular items)
+                    if (isset($preset['items']) && is_array($preset['items'])) {
+                        foreach ($preset['items'] as $item) {
+                            if (is_array($item)) {
+                                $sanitized_item = array(
+                                    'id' => sanitize_key($item['id'] ?? ''),
+                                    'label' => sanitize_text_field($item['label'] ?? ''),
+                                    'icon' => sanitize_text_field($item['icon'] ?? ''),
+                                    'url' => esc_url_raw($item['url'] ?? ''),
+                                    'enabled' => !empty($item['enabled']),
+                                    'target' => in_array($item['target'] ?? '', array('_self', '_blank')) ? $item['target'] : '_self',
+                                    'show_badge' => !empty($item['show_badge']),
+                                    'badge_type' => in_array($item['badge_type'] ?? '', array('count', 'dot', 'custom')) ? $item['badge_type'] : 'count',
+                                    'custom_badge_text' => sanitize_text_field($item['custom_badge_text'] ?? ''),
+                                    'user_roles' => array()
+                                );
+                                
+                                // Sanitize user roles
+                                if (isset($item['user_roles']) && is_array($item['user_roles'])) {
+                                    $sanitized_item['user_roles'] = array_map('sanitize_key', array_filter($item['user_roles']));
+                                }
+                                
+                                $sanitized_preset['items'][] = $sanitized_item;
+                            }
+                        }
+                    }
+                    
+                    $sanitized['custom_presets']['presets'][] = $sanitized_preset;
                 }
             }
         }
@@ -3867,7 +3925,25 @@ function wpbnp_get_targeted_navigation_items() {
     $active_config = wpbnp_get_active_page_targeting_config();
     
     if ($active_config) {
-        // Use items from the main settings (page targeting uses the same items with different conditions)
+        $preset_id = isset($active_config['preset_id']) ? $active_config['preset_id'] : 'default';
+        
+        // If using a custom preset, get items from that preset
+        if ($preset_id !== 'default') {
+            $settings = wpbnp_get_settings();
+            $custom_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
+            
+            foreach ($custom_presets as $preset) {
+                if (isset($preset['id']) && $preset['id'] === $preset_id) {
+                    error_log('WPBNP Page Targeting - Using custom preset: ' . ($preset['name'] ?? 'Unnamed'));
+                    return isset($preset['items']) ? $preset['items'] : array();
+                }
+            }
+            
+            // If preset not found, fall back to default
+            error_log('WPBNP Page Targeting - Custom preset not found, falling back to default');
+        }
+        
+        // Use default items from the main settings
         $settings = wpbnp_get_settings();
         return isset($settings['items']) ? $settings['items'] : array();
     }
