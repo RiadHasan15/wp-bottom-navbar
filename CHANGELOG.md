@@ -1,5 +1,26 @@
 # WP Bottom Navigation Pro - Changelog
 
+## Version 1.3.1 - 2024-12-19
+### CRITICAL FIX
+- **Custom Presets Persistence**: Fixed major issue where custom presets disappeared when switching tabs and making changes
+- **Form State Enhancement**: Custom presets are now properly saved and restored in localStorage
+- **DOM Restoration**: Custom preset DOM elements are now recreated when returning to Items tab
+
+### Technical Changes
+- Added `getCustomPresetsData()` function to extract preset data from DOM
+- Added `restoreCustomPresets()` function to recreate preset DOM elements
+- Enhanced `saveFormState()` to include custom presets data
+- Enhanced `restoreFormState()` to handle custom presets restoration
+- Added form state saving to all preset operations (create, edit, delete, duplicate)
+
+### Root Cause
+The issue was that custom presets were stored as DOM elements with hidden inputs, but the form state restoration only handled individual form fields. When switching tabs, the DOM structure was lost but not properly restored.
+
+### Files Modified
+- `assets/js/admin.js` - Major enhancements to form state handling
+- `wp-bottom-navigation-pro.php` - Updated version
+- `CHANGELOG.md` - Updated with fix details
+
 ## Version 1.3.0 - 2024-12-19
 ### Fixed
 - **Display Conditions Loading Issue**: Fixed pages and categories not showing when creating new configurations (now loads via AJAX)
