@@ -110,11 +110,8 @@ class WP_Bottom_Navigation_Pro {
         add_action('wp_ajax_wpbnp_reset_settings', array($this, 'reset_settings'));
         add_action('wp_ajax_wpbnp_export_settings', array($this, 'export_settings'));
         add_action('wp_ajax_wpbnp_import_settings', array($this, 'import_settings'));
-        add_action('wp_ajax_wpbnp_get_cart_count', array($this, 'get_cart_count'));
-        add_action('wp_ajax_nopriv_wpbnp_get_cart_count', array($this, 'get_cart_count'));
-        
-        // Pro feature AJAX handlers
-        // NOTE: When merging with pro branch, ensure these don't conflict with existing handlers
+        add_action('wp_ajax_wpbnp_get_pages', array($this, 'ajax_get_pages'));
+        add_action('wp_ajax_wpbnp_get_categories', array($this, 'ajax_get_categories'));
         add_action('wp_ajax_wpbnp_activate_license', array($this, 'activate_license'));
         add_action('wp_ajax_wpbnp_deactivate_license', array($this, 'deactivate_license'));
         
@@ -1034,11 +1031,11 @@ class WP_Bottom_Navigation_Pro {
             wp_die(__('Insufficient permissions', 'wp-bottom-navigation-pro'));
         }
         
+        // Delete the settings option
         delete_option('wpbnp_settings');
         
         wp_send_json_success(array(
-            'message' => __('Settings reset to defaults!', 'wp-bottom-navigation-pro'),
-            'settings' => wpbnp_get_default_settings()
+            'message' => __('Settings reset to defaults successfully!', 'wp-bottom-navigation-pro')
         ));
     }
     
@@ -1053,10 +1050,13 @@ class WP_Bottom_Navigation_Pro {
         }
         
         $settings = wpbnp_get_settings();
+        $export_data = json_encode($settings, JSON_PRETTY_PRINT);
+        
+        $filename = 'wp-bottom-navigation-settings-' . date('Y-m-d-H-i-s') . '.json';
         
         wp_send_json_success(array(
-            'data' => wp_json_encode($settings, JSON_PRETTY_PRINT),
-            'filename' => 'wpbnp-settings-' . date('Y-m-d-H-i-s') . '.json'
+            'data' => $export_data,
+            'filename' => $filename
         ));
     }
     
@@ -1071,6 +1071,13 @@ class WP_Bottom_Navigation_Pro {
         }
         
         $import_data = isset($_POST['import_data']) ? wp_unslash($_POST['import_data']) : '';
+        
+        if (empty($import_data)) {
+            wp_send_json_error(array(
+                'message' => __('No import data provided', 'wp-bottom-navigation-pro')
+            ));
+        }
+        
         $settings = json_decode($import_data, true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -1079,7 +1086,10 @@ class WP_Bottom_Navigation_Pro {
             ));
         }
         
+        // Sanitize the imported settings
         $sanitized_settings = wpbnp_sanitize_settings($settings);
+        
+        // Save the settings
         update_option('wpbnp_settings', $sanitized_settings);
         
         wp_send_json_success(array(
@@ -1230,26 +1240,21 @@ class WP_Bottom_Navigation_Pro {
     }
     
     /**
-     * Deactivate pro license
+     * Deactivate license via AJAX
      */
     public function deactivate_license() {
-        // Verify nonce
-        if (!check_ajax_referer('wpbnp_admin_nonce', 'nonce', false)) {
-            wp_send_json_error(array('message' => 'Security check failed'));
-            return;
-        }
+        check_ajax_referer('wpbnp_admin_nonce', 'nonce');
         
-        // Check user capabilities
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => 'Insufficient permissions'));
-            return;
+            wp_die(__('Insufficient permissions', 'wp-bottom-navigation-pro'));
         }
         
         delete_option('wpbnp_pro_license_key');
         delete_option('wpbnp_pro_license_status');
-        delete_option('wpbnp_pro_license_activated_at');
         
-        wp_send_json_success(array('message' => 'License deactivated successfully!'));
+        wp_send_json_success(array(
+            'message' => __('License deactivated successfully!', 'wp-bottom-navigation-pro')
+        ));
     }
     
     /**
@@ -1297,88 +1302,60 @@ class WP_Bottom_Navigation_Pro {
     }
 
     /**
-     * AJAX handler to get pages for page targeting
+     * Get pages via AJAX
      */
     public function ajax_get_pages() {
-        // Verify nonce
-        if (!wp_verify_nonce($_POST['nonce'], 'wpbnp_admin_nonce')) {
-            wp_die('Security check failed');
-        }
+        check_ajax_referer('wpbnp_admin_nonce', 'nonce');
         
-        // Check user permissions
         if (!current_user_can('manage_options')) {
-            wp_die('Insufficient permissions');
+            wp_die(__('Insufficient permissions', 'wp-bottom-navigation-pro'));
         }
         
-        // Get pages
-        $pages = get_posts(array(
-            'post_type' => 'page',
-            'post_status' => 'publish',
-            'numberposts' => -1,
-            'orderby' => 'title',
-            'order' => 'ASC'
+        $pages = get_pages(array(
+            'sort_column' => 'post_title',
+            'sort_order' => 'ASC',
+            'post_status' => 'publish'
         ));
         
-        // If no pages, try posts
-        if (empty($pages)) {
-            $pages = get_posts(array(
-                'post_type' => 'post',
-                'post_status' => 'publish',
-                'numberposts' => -1,
-                'orderby' => 'title',
-                'order' => 'ASC'
-            ));
-        }
-        
-        // If still no pages, create a sample page
-        if (empty($pages) && current_user_can('edit_pages')) {
-            $sample_page_id = wp_insert_post(array(
-                'post_title' => 'Sample Page',
-                'post_content' => 'This is a sample page created for testing the page targeting feature.',
-                'post_status' => 'publish',
-                'post_type' => 'page'
-            ));
-            
-            if ($sample_page_id && !is_wp_error($sample_page_id)) {
-                // Refresh the pages list
-                $pages = get_posts(array(
-                    'post_type' => 'page',
-                    'post_status' => 'publish',
-                    'numberposts' => -1,
-                    'orderby' => 'title',
-                    'order' => 'ASC'
-                ));
-            }
+        $formatted_pages = array();
+        foreach ($pages as $page) {
+            $formatted_pages[] = array(
+                'ID' => $page->ID,
+                'post_title' => $page->post_title
+            );
         }
         
         wp_send_json_success(array(
-            'pages' => $pages
+            'pages' => $formatted_pages
         ));
     }
-
+    
     /**
-     * AJAX handler to get categories for page targeting
+     * Get categories via AJAX
      */
     public function ajax_get_categories() {
-        // Verify nonce
-        if (!wp_verify_nonce($_POST['nonce'], 'wpbnp_admin_nonce')) {
-            wp_die('Security check failed');
-        }
+        check_ajax_referer('wpbnp_admin_nonce', 'nonce');
         
-        // Check user permissions
         if (!current_user_can('manage_options')) {
-            wp_die('Insufficient permissions');
+            wp_die(__('Insufficient permissions', 'wp-bottom-navigation-pro'));
         }
         
-        // Get categories
         $categories = get_categories(array(
-            'hide_empty' => false,
             'orderby' => 'name',
-            'order' => 'ASC'
+            'order' => 'ASC',
+            'hide_empty' => false
         ));
         
+        $formatted_categories = array();
+        foreach ($categories as $category) {
+            $formatted_categories[] = array(
+                'term_id' => $category->term_id,
+                'name' => $category->name
+            );
+        }
+        
         wp_send_json_success(array(
-            'categories' => $categories
+            'categories' => $formatted_categories
         ));
     }
 }
