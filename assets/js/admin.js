@@ -2148,6 +2148,10 @@ jQuery(document).ready(function ($) {
             // Show modal with animation
             setTimeout(() => {
                 $('#wpbnp-create-preset-modal').addClass('wpbnp-modal-show');
+                // Add a subtle entrance animation for the form
+                setTimeout(() => {
+                    $('#wpbnp-create-preset-form').css('opacity', '0').animate({ opacity: 1 }, 300);
+                }, 100);
             }, 10);
         },
 
@@ -2559,6 +2563,10 @@ jQuery(document).ready(function ($) {
             // Show modal with animation
             setTimeout(() => {
                 $('#wpbnp-edit-preset-modal').addClass('wpbnp-modal-show');
+                // Add a subtle entrance animation for the form
+                setTimeout(() => {
+                    $('#wpbnp-edit-preset-form').css('opacity', '0').animate({ opacity: 1 }, 300);
+                }, 100);
             }, 10);
         },
 
