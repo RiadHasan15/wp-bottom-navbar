@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 // Define plugin constants
 // NOTE: When merging with pro branch, use semantic versioning (e.g., 1.2.0)
-define('WPBNP_VERSION', '1.1.6'); // Ready for pro branch merge
+define('WPBNP_VERSION', '1.1.7'); // Fixed icons and removed test pages
 define('WPBNP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPBNP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WPBNP_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -892,7 +892,7 @@ class WP_Bottom_Navigation_Pro {
             '1.10.0'
         );
 
-        // Enqueue dashicons for admin
+        // Enqueue dashicons for admin (still needed for other WordPress admin elements)
         wp_enqueue_style('dashicons');
         
         wp_enqueue_style(

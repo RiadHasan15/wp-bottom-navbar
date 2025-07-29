@@ -1732,10 +1732,14 @@ jQuery(document).ready(function($) {
                 e.preventDefault();
                 const configItem = $(this).closest('.wpbnp-config-item');
                 const content = configItem.find('.wpbnp-config-content');
-                const icon = $(this).find('.dashicons');
                 
-                content.slideToggle();
-                icon.toggleClass('dashicons-arrow-down dashicons-arrow-up');
+                if (content.is(':visible')) {
+                    content.slideUp();
+                    configItem.removeClass('expanded');
+                } else {
+                    content.slideDown();
+                    configItem.addClass('expanded');
+                }
             });
             
             $(document).on('click', '.wpbnp-config-delete', function(e) {
@@ -1767,12 +1771,10 @@ jQuery(document).ready(function($) {
                         </div>
                         <div class="wpbnp-config-actions">
                             <button type="button" class="wpbnp-config-toggle" title="Toggle Configuration">
-                                <span class="dashicons dashicons-arrow-down"></span>
-                                <span class="wpbnp-fallback-text" style="display: none;">▼</span>
+                                <span class="wpbnp-arrow-icon">▼</span>
                             </button>
                             <button type="button" class="wpbnp-config-delete" title="Delete Configuration">
-                                <span class="dashicons dashicons-trash"></span>
-                                <span class="wpbnp-fallback-text" style="display: none;">🗑</span>
+                                <span class="wpbnp-delete-icon">×</span>
                             </button>
                         </div>
                     </div>
@@ -1856,10 +1858,7 @@ jQuery(document).ready(function($) {
                 console.log('Configuration added successfully');
                 console.log('Total configs now:', $('.wpbnp-config-item').length);
                 
-                // Check if dashicons loaded, if not show fallback
-                setTimeout(() => {
-                    this.checkDashiconsLoaded();
-                }, 100);
+                // Icons are now using Unicode, no need to check dashicons
                 
                 this.showNotification('New configuration added!', 'success');
             } catch (error) {
@@ -1868,33 +1867,7 @@ jQuery(document).ready(function($) {
             }
         },
         
-        // Check if dashicons loaded properly
-        checkDashiconsLoaded: function() {
-            $('.wpbnp-config-toggle, .wpbnp-config-delete').each(function() {
-                const $button = $(this);
-                const $dashicon = $button.find('.dashicons');
-                const $fallback = $button.find('.wpbnp-fallback-text');
-                
-                if ($dashicon.length && $fallback.length) {
-                    // Check if dashicons font is loaded by measuring width
-                    const testElement = $('<span class="dashicons" style="position:absolute;visibility:hidden;font-size:16px;">test</span>');
-                    $('body').append(testElement);
-                    const dashiconWidth = testElement.width();
-                    testElement.remove();
-                    
-                    // If dashicons didn't load properly, show fallback
-                    if (dashiconWidth < 10) {
-                        console.log('Dashicons not loaded, showing fallback');
-                        $dashicon.hide();
-                        $fallback.show();
-                    } else {
-                        console.log('Dashicons loaded successfully');
-                        $dashicon.show();
-                        $fallback.hide();
-                    }
-                }
-            });
-        },
+
         
         // Reindex configurations after deletion
         reindexConfigurations: function() {
@@ -1920,10 +1893,7 @@ jQuery(document).ready(function($) {
         // Initialize pro features
         WPBottomNavAdmin.initProFeatures();
         
-        // Check dashicons after page load
-        setTimeout(() => {
-            WPBottomNavAdmin.checkDashiconsLoaded();
-        }, 500);
+        // Icons are now using Unicode, no need to check dashicons
     
     // Handle file import when file is selected
     $('#wpbnp-import-file').on('change', function(e) {
