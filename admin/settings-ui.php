@@ -366,7 +366,10 @@ class WPBNP_Admin_UI {
                     <?php endif; ?>
                 </div>
                 <div class="wpbnp-preset-actions">
-                    <button type="button" class="wpbnp-preset-edit" title="Edit Preset">
+                    <button type="button" class="wpbnp-preset-edit-items" title="Edit Items">
+                        <span class="wpbnp-edit-items-icon">⚙️</span>
+                    </button>
+                    <button type="button" class="wpbnp-preset-edit" title="Edit Name & Description">
                         <span class="wpbnp-edit-icon">✏️</span>
                     </button>
                     <button type="button" class="wpbnp-preset-duplicate" title="Duplicate Preset">
@@ -736,6 +739,8 @@ class WPBNP_Admin_UI {
         
         // Debug information
         error_log('WPBNP: Rendering page targeting tab. Pro active: ' . ($is_pro_active ? 'Yes' : 'No'));
+        $custom_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
+        error_log('WPBNP: Page targeting - Custom presets available: ' . count($custom_presets));
         
         ?>
         <div class="wpbnp-tab-content" id="wpbnp-page-targeting">
@@ -803,6 +808,24 @@ class WPBNP_Admin_UI {
             <?php else: ?>
                 <!-- PRO Features - Page Targeting Interface -->
                 <div class="wpbnp-page-targeting-interface">
+                    
+                    <!-- Debug Info (temporary) -->
+                    <div style="background: #f0f0f0; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-size: 12px;">
+                        <strong>🔍 Debug Info:</strong> 
+                        <?php 
+                        $debug_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
+                        echo count($debug_presets) . ' custom presets found';
+                        if (!empty($debug_presets)) {
+                            echo ' (';
+                            foreach ($debug_presets as $i => $preset) {
+                                if ($i > 0) echo ', ';
+                                echo '"' . esc_html($preset['name'] ?? 'Unnamed') . '"';
+                            }
+                            echo ')';
+                        }
+                        ?>
+                    </div>
+                    
                     <div class="wpbnp-targeting-header">
                         <h3><?php esc_html_e('Navigation Configurations', 'wp-bottom-navigation-pro'); ?></h3>
                         <button type="button" class="wpbnp-add-config-btn" id="wpbnp-add-config">
@@ -1103,10 +1126,14 @@ class WPBNP_Admin_UI {
         // Debug information
         error_log('WPBNP: Rendering preset selector - Selected: ' . $selected_preset);
         error_log('WPBNP: Custom presets count: ' . count($custom_presets));
+        error_log('WPBNP: Settings structure: ' . print_r($settings['custom_presets'] ?? 'NOT SET', true));
         if (!empty($custom_presets)) {
             foreach ($custom_presets as $preset) {
-                error_log('WPBNP: Preset - ID: ' . ($preset['id'] ?? 'no-id') . ', Name: ' . ($preset['name'] ?? 'no-name'));
+                $items_count = isset($preset['items']) ? count($preset['items']) : 0;
+                error_log('WPBNP: Preset - ID: ' . ($preset['id'] ?? 'no-id') . ', Name: ' . ($preset['name'] ?? 'no-name') . ', Items: ' . $items_count);
             }
+        } else {
+            error_log('WPBNP: No custom presets found in settings');
         }
         
         ?>

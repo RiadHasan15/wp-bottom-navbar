@@ -1466,6 +1466,7 @@ input:checked + .wpbnp-toggle-slider:before {
     gap: 8px;
 }
 
+.wpbnp-preset-edit-items,
 .wpbnp-preset-edit,
 .wpbnp-preset-duplicate,
 .wpbnp-preset-delete {
@@ -1478,9 +1479,20 @@ input:checked + .wpbnp-toggle-slider:before {
     font-size: 14px;
 }
 
+.wpbnp-preset-edit-items:hover,
 .wpbnp-preset-edit:hover {
     background: #e3f2fd;
     border-color: #2196f3;
+}
+
+.wpbnp-preset-edit-items {
+    background: #fff3e0;
+    border-color: #ff9800;
+}
+
+.wpbnp-preset-edit-items:hover {
+    background: #ffe0b2;
+    border-color: #f57c00;
 }
 
 .wpbnp-preset-duplicate:hover {
