@@ -32,7 +32,7 @@
     justify-content: center;
     text-decoration: none;
     color: #333333;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     transition: all 0.3s ease;
     position: relative;
@@ -141,7 +141,7 @@
 
 /* Label Styles */
 .wpbnp-nav-label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.2;
     text-align: center;
@@ -539,7 +539,7 @@
     
     .wpbnp-nav-item {
         max-width: 60px;
-        font-size: 11px;
+        font-size: 13px;
     }
     
     .wpbnp-nav-icon {
@@ -549,7 +549,7 @@
     }
     
     .wpbnp-nav-label {
-        font-size: 10px;
+        font-size: 12px;
     }
 }
 
@@ -560,7 +560,7 @@
     
     .wpbnp-nav-item {
         max-width: 50px;
-        font-size: 10px;
+        font-size: 12px;
         padding: 2px;
     }
     
@@ -571,7 +571,7 @@
     }
     
     .wpbnp-nav-label {
-        font-size: 9px;
+        font-size: 11px;
     }
     
     .wpbnp-badge {
