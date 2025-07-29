@@ -991,6 +991,26 @@ class WP_Bottom_Navigation_Pro {
         }
         
         $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array();
+        
+        // CRITICAL: Handle custom presets data from form submission
+        if (isset($_POST['wpbnp_custom_presets_data'])) {
+            $custom_presets_data = wp_unslash($_POST['wpbnp_custom_presets_data']);
+            $custom_presets = json_decode($custom_presets_data, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && is_array($custom_presets)) {
+                // Ensure custom_presets structure exists
+                if (!isset($settings['custom_presets'])) {
+                    $settings['custom_presets'] = array();
+                }
+                $settings['custom_presets']['presets'] = $custom_presets;
+                $settings['custom_presets']['enabled'] = true;
+                
+                error_log('WPBNP: Custom presets data saved: ' . count($custom_presets) . ' presets');
+            } else {
+                error_log('WPBNP: Error parsing custom presets data: ' . json_last_error_msg());
+            }
+        }
+        
         $sanitized_settings = wpbnp_sanitize_settings($settings);
         
         update_option('wpbnp_settings', $sanitized_settings);
