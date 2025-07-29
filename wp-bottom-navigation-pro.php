@@ -112,6 +112,7 @@ class WP_Bottom_Navigation_Pro {
         add_action('wp_ajax_wpbnp_import_settings', array($this, 'import_settings'));
         add_action('wp_ajax_wpbnp_get_pages', array($this, 'ajax_get_pages'));
         add_action('wp_ajax_wpbnp_get_categories', array($this, 'ajax_get_categories'));
+        add_action('wp_ajax_wpbnp_get_configuration_template', array($this, 'ajax_get_configuration_template'));
         add_action('wp_ajax_wpbnp_activate_license', array($this, 'activate_license'));
         add_action('wp_ajax_wpbnp_deactivate_license', array($this, 'deactivate_license'));
         
@@ -1359,6 +1360,47 @@ class WP_Bottom_Navigation_Pro {
         
         wp_send_json_success(array(
             'categories' => $formatted_categories
+        ));
+    }
+
+    /**
+     * Get configuration template via AJAX
+     */
+    public function ajax_get_configuration_template() {
+        check_ajax_referer('wpbnp_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_die(__('Insufficient permissions', 'wp-bottom-navigation-pro'));
+        }
+        
+        $config_index = isset($_POST['config_index']) ? intval($_POST['config_index']) : 0;
+        $config_id = isset($_POST['config_id']) ? sanitize_text_field($_POST['config_id']) : 'config_' . time();
+        
+        // Create a mock configuration for rendering
+        $config = array(
+            'id' => $config_id,
+            'name' => 'New Configuration',
+            'priority' => 1,
+            'conditions' => array()
+        );
+        
+        // Start output buffering to capture the rendered HTML
+        ob_start();
+        
+        // Include the admin UI class and render the configuration
+        require_once WPBNP_PLUGIN_DIR . 'admin/settings-ui.php';
+        $admin_ui = new WPBNP_Admin_UI();
+        
+        // Use reflection to access the private method
+        $reflection = new ReflectionClass($admin_ui);
+        $method = $reflection->getMethod('render_configuration_item');
+        $method->setAccessible(true);
+        $method->invoke($admin_ui, $config, $config_index);
+        
+        $html = ob_get_clean();
+        
+        wp_send_json_success(array(
+            'html' => $html
         ));
     }
 }

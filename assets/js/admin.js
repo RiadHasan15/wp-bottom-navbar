@@ -1881,158 +1881,48 @@ jQuery(document).ready(function ($) {
                 const configIndex = existingConfigs;
                 const configId = 'config_' + Date.now();
 
-                const configHtml = `
-                <div class="wpbnp-config-item" data-config-id="${configId}">
-                    <div class="wpbnp-config-header">
-                        <div class="wpbnp-config-title">
-                            <span class="wpbnp-config-name">New Configuration</span>
-                            <span class="wpbnp-config-priority">Priority: 1</span>
-                        </div>
-                        <div class="wpbnp-config-actions">
-                            <button type="button" class="wpbnp-config-toggle" title="Toggle Configuration">
-                                <span class="wpbnp-arrow-icon">▼</span>
-                            </button>
-                            <button type="button" class="wpbnp-config-delete" title="Delete Configuration">
-                                <span class="wpbnp-delete-icon">×</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="wpbnp-config-content" style="display: block;">
-                        <div class="wpbnp-config-settings">
-                            <div class="wpbnp-field">
-                                <label>Configuration Name</label>
-                                <input type="text" name="settings[page_targeting][configurations][${configIndex}][name]" 
-                                       value="New Configuration" placeholder="Enter configuration name...">
-                            </div>
-                            
-                            <div class="wpbnp-field">
-                                <label>Priority</label>
-                                <input type="number" name="settings[page_targeting][configurations][${configIndex}][priority]" 
-                                       value="1" min="1" max="100">
-                                <p class="description">Higher priority configurations will override lower ones when conditions match.</p>
-                            </div>
-                            
-                            <div class="wpbnp-targeting-conditions">
-                                <h4>Display Conditions</h4>
-                                <p class="description">Leave all conditions empty to use as default fallback.</p>
-                                
-                                <div class="wpbnp-condition-group">
-                                    <label>Specific Pages</label>
-                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][pages][]" multiple class="wpbnp-multiselect">
-                                        <option value="">Select pages...</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="wpbnp-condition-group">
-                                    <label>Post Types</label>
-                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][post_types][]" multiple class="wpbnp-multiselect">
-                                        <option value="">Select post types...</option>
-                                        <option value="post">Posts</option>
-                                        <option value="page">Pages</option>
-                                        <option value="product">Products (WooCommerce)</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="wpbnp-condition-group">
-                                    <label>Categories</label>
-                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][categories][]" multiple class="wpbnp-multiselect">
-                                        <option value="">Select categories...</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="wpbnp-condition-group">
-                                    <label>User Roles</label>
-                                    <select name="settings[page_targeting][configurations][${configIndex}][conditions][user_roles][]" multiple class="wpbnp-multiselect">
-                                        <option value="">Select user roles...</option>
-                                        <option value="administrator">Administrator</option>
-                                        <option value="editor">Editor</option>
-                                        <option value="author">Author</option>
-                                        <option value="contributor">Contributor</option>
-                                        <option value="subscriber">Subscriber</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="wpbnp-navigation-config">
-                                <h4>Navigation Configuration</h4>
-                                <div class="wpbnp-field">
-                                    <label>Preset to Display</label>
-                                    <select name="settings[page_targeting][configurations][${configIndex}][preset_id]" class="wpbnp-preset-selector">
-                                        <option value="default">Default Navigation (Items Tab)</option>
-                                        <!-- Custom presets will be populated by JavaScript -->
-                                    </select>
-                                    <p class="description">Choose which navigation preset to display when the conditions above are met.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <input type="hidden" name="settings[page_targeting][configurations][${configIndex}][id]" value="${configId}">
-                </div>
-                `;
+                // Make AJAX call to get complete configuration HTML from server
+                $.ajax({
+                    url: wpbnp_admin.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'wpbnp_get_configuration_template',
+                        nonce: wpbnp_admin.nonce,
+                        config_index: configIndex,
+                        config_id: configId
+                    },
+                    success: (response) => {
+                        if (response.success && response.data.html) {
+                            if ($('.wpbnp-no-configs').length) {
+                                $('.wpbnp-no-configs').remove();
+                            }
 
-                if ($('.wpbnp-no-configs').length) {
-                    $('.wpbnp-no-configs').remove();
-                }
+                            $('#wpbnp-configurations-list').append(response.data.html);
 
-                $('#wpbnp-configurations-list').append(configHtml);
+                            // Populate custom presets
+                            const $newConfig = $('.wpbnp-config-item').last();
+                            const newPresetSelector = $newConfig.find('.wpbnp-preset-selector');
+                            if (newPresetSelector.length > 0) {
+                                this.populatePresetSelector(newPresetSelector);
+                            }
 
-                // Debug: Check what was actually appended
-                console.log('Config HTML length:', configHtml.length);
-                console.log('Total config items now:', $('.wpbnp-config-item').length);
-                
-                // Populate all selectors in the new configuration
-                const $newConfig = $('.wpbnp-config-item').last();
-                console.log('New config element found:', $newConfig.length);
-                console.log('New config HTML:', $newConfig.html());
+                            // Save form state to preserve the new configuration
+                            this.saveFormState();
 
-                // Populate custom presets
-                const newPresetSelector = $newConfig.find('.wpbnp-preset-selector');
-                if (newPresetSelector.length > 0) {
-                    this.populatePresetSelector(newPresetSelector);
-                }
-
-                // Debug: Check all select elements in the new config
-                console.log('All select elements in new config:', $newConfig.find('select').length);
-                $newConfig.find('select').each(function(i, el) {
-                    console.log('Select', i, 'name:', $(el).attr('name'), 'class:', $(el).attr('class'));
+                            this.showNotification('New configuration added!', 'success');
+                        } else {
+                            this.showNotification('Error: Could not generate configuration template', 'error');
+                        }
+                    },
+                    error: () => {
+                        this.showNotification('Error: Could not load configuration template', 'error');
+                    }
                 });
-                
-                // Populate pages selector - try multiple selector approaches
-                let pagesSelector = $newConfig.find('select[name*="pages"]');
-                console.log('Direct pages selector found:', pagesSelector.length);
-                if (!pagesSelector.length) {
-                    pagesSelector = $newConfig.find('select').filter(function() {
-                        return $(this).attr('name') && $(this).attr('name').includes('pages');
-                    });
-                    console.log('Filtered pages selector found:', pagesSelector.length);
-                }
-                console.log('Final pages selector found:', pagesSelector.length, 'Name:', pagesSelector.attr('name'));
-                if (pagesSelector.length > 0) {
-                    this.populatePagesSelector(pagesSelector, configIndex);
-                }
-
-                // Populate categories selector - try multiple selector approaches
-                let categoriesSelector = $newConfig.find('select[name*="categories"]');
-                if (!categoriesSelector.length) {
-                    categoriesSelector = $newConfig.find('select').filter(function() {
-                        return $(this).attr('name') && $(this).attr('name').includes('categories');
-                    });
-                }
-                console.log('Categories selector found:', categoriesSelector.length, 'Name:', categoriesSelector.attr('name'));
-                if (categoriesSelector.length > 0) {
-                    this.populateCategoriesSelector(categoriesSelector, configIndex);
-                }
-
-                // Save form state to preserve the new configuration
-                this.saveFormState();
-
-                this.showNotification('New configuration added!', 'success');
             } catch (error) {
                 console.error('Error adding configuration:', error);
                 this.showNotification('Error adding configuration: ' + error.message, 'error');
             }
-        },
+                },
 
         // Custom Preset Management
         initCustomPresets: function () {
