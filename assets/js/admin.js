@@ -1886,7 +1886,15 @@ jQuery(document).ready(function($) {
                 WPBottomNavAdmin.createCustomPreset();
             });
             
-            // Edit custom preset
+            // Edit custom preset items
+            $(document).on('click', '.wpbnp-preset-edit-items', function(e) {
+                e.preventDefault();
+                const presetItem = $(this).closest('.wpbnp-preset-item');
+                const presetId = presetItem.data('preset-id');
+                WPBottomNavAdmin.editCustomPresetItems(presetId);
+            });
+            
+            // Edit custom preset name/description
             $(document).on('click', '.wpbnp-preset-edit', function(e) {
                 e.preventDefault();
                 const presetItem = $(this).closest('.wpbnp-preset-item');
@@ -1912,6 +1920,20 @@ jQuery(document).ready(function($) {
                 if (confirm(`Are you sure you want to delete the preset "${presetName}"? This action cannot be undone.`)) {
                     WPBottomNavAdmin.deleteCustomPreset(presetId);
                 }
+            });
+            
+            // Update preset items
+            $(document).on('click', '.wpbnp-update-preset-btn', function(e) {
+                e.preventDefault();
+                const presetId = $(this).data('preset-id');
+                WPBottomNavAdmin.updatePresetItems(presetId);
+            });
+            
+            // Cancel preset editing
+            $(document).on('click', '.wpbnp-cancel-preset-edit', function(e) {
+                e.preventDefault();
+                const presetId = $(this).data('preset-id');
+                WPBottomNavAdmin.cancelPresetEdit(presetId);
             });
         },
         
@@ -1994,7 +2016,10 @@ jQuery(document).ready(function($) {
                             ${preset.description ? `<p class="wpbnp-preset-description">${preset.description}</p>` : ''}
                         </div>
                         <div class="wpbnp-preset-actions">
-                            <button type="button" class="wpbnp-preset-edit" title="Edit Preset">
+                            <button type="button" class="wpbnp-preset-edit-items" title="Edit Items">
+                                <span class="wpbnp-edit-items-icon">⚙️</span>
+                            </button>
+                            <button type="button" class="wpbnp-preset-edit" title="Edit Name & Description">
                                 <span class="wpbnp-edit-icon">✏️</span>
                             </button>
                             <button type="button" class="wpbnp-preset-duplicate" title="Duplicate Preset">
@@ -2017,7 +2042,68 @@ jQuery(document).ready(function($) {
             presetsContainer.append(presetHtml);
         },
         
-        // Edit custom preset
+        // Edit custom preset items
+        editCustomPresetItems: function(presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const currentItems = JSON.parse(presetItem.find('input[name*="[items]"]').val() || '[]');
+            const presetName = presetItem.find('.wpbnp-preset-name').text();
+            
+            // Show modal or interface to edit items
+            if (confirm(`Edit navigation items for "${presetName}"?\n\nThis will temporarily load the current preset items into the main Items tab for editing. After making changes, come back and click "Update Preset Items" to save them.`)) {
+                // Load items into the main navigation items interface
+                this.loadItemsIntoMainInterface(currentItems);
+                
+                // Switch to Items tab
+                $('.wpbnp-tab[data-tab="items"]').click();
+                
+                // Show notification with instructions
+                this.showNotification(`✅ Preset items loaded into Items tab. Edit them, then return here and click "Update Preset Items".`, 'info', 8000);
+                
+                // Add update button to preset
+                this.addUpdatePresetButton(presetId, presetName);
+            }
+        },
+        
+        // Load items into main interface for editing
+        loadItemsIntoMainInterface: function(items) {
+            // Clear existing items
+            $('#wpbnp-items-list').empty();
+            
+            // Add each item to the main interface
+            items.forEach((item, index) => {
+                this.addNavigationItem(item, index);
+            });
+            
+            // Update the items counter if it exists
+            this.updateItemsDisplay();
+        },
+        
+        // Add update button to preset
+        addUpdatePresetButton: function(presetId, presetName) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            
+            // Remove existing update button if any
+            presetItem.find('.wpbnp-update-preset-items').remove();
+            
+            // Add update button
+            const updateButton = `
+                <div class="wpbnp-update-preset-items" style="margin-top: 10px; padding: 10px; background: #e8f4fd; border: 1px solid #0073aa; border-radius: 4px;">
+                    <p style="margin: 0 0 8px 0; font-weight: 600; color: #0073aa;">📝 Items loaded for editing</p>
+                    <button type="button" class="wpbnp-update-preset-btn" data-preset-id="${presetId}" 
+                            style="background: #0073aa; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">
+                        Update "${presetName}" Items
+                    </button>
+                    <button type="button" class="wpbnp-cancel-preset-edit" data-preset-id="${presetId}" 
+                            style="background: #666; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; margin-left: 8px;">
+                        Cancel
+                    </button>
+                </div>
+            `;
+            
+            presetItem.append(updateButton);
+        },
+        
+        // Edit custom preset name/description
         editCustomPreset: function(presetId) {
             const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
             const currentName = presetItem.find('.wpbnp-preset-name').text();
@@ -2066,6 +2152,39 @@ jQuery(document).ready(function($) {
             this.addPresetToDOM(newPreset);
             this.updateAllPresetSelectors();
             this.showNotification(`Preset "${newPreset.name}" created successfully!`, 'success');
+        },
+        
+        // Update preset items with current items from main interface
+        updatePresetItems: function(presetId) {
+            const currentItems = this.getCurrentNavigationItems();
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            const presetName = presetItem.find('.wpbnp-preset-name').text();
+            
+            // Update the hidden input with new items
+            presetItem.find('input[name*="[items]"]').val(JSON.stringify(currentItems));
+            
+            // Update the items count in the display
+            const itemsCount = currentItems.length;
+            const metaText = presetItem.find('.wpbnp-preset-meta');
+            const currentMeta = metaText.text();
+            const newMeta = currentMeta.replace(/\d+ items/, `${itemsCount} items`);
+            metaText.text(newMeta);
+            
+            // Remove the update button
+            presetItem.find('.wpbnp-update-preset-items').remove();
+            
+            this.updateAllPresetSelectors();
+            this.showNotification(`✅ Preset "${presetName}" updated with ${itemsCount} items!`, 'success');
+        },
+        
+        // Cancel preset editing
+        cancelPresetEdit: function(presetId) {
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            
+            // Remove the update button
+            presetItem.find('.wpbnp-update-preset-items').remove();
+            
+            this.showNotification('Preset editing cancelled.', 'info');
         },
         
         // Delete custom preset
