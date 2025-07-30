@@ -986,6 +986,10 @@ class WP_Bottom_Navigation_Pro {
         
         $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array();
         
+        // DEBUG: Log the incoming form data
+        error_log('WPBNP: Form data received: ' . print_r($_POST, true));
+        error_log('WPBNP: Settings data: ' . print_r($settings, true));
+        
 
         
         // CRITICAL: Handle custom presets data from form submission
@@ -1016,6 +1020,13 @@ class WP_Bottom_Navigation_Pro {
             }
         } else {
             error_log('WPBNP: No custom presets data found in form submission');
+        }
+        
+        // DEBUG: Check page targeting data
+        if (isset($settings['page_targeting'])) {
+            error_log('WPBNP: Page targeting data found: ' . print_r($settings['page_targeting'], true));
+        } else {
+            error_log('WPBNP: No page targeting data found in form submission');
         }
         
         $sanitized_settings = wpbnp_sanitize_settings($settings);

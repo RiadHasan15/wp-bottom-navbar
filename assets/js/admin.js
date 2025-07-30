@@ -446,9 +446,15 @@ jQuery(document).ready(function ($) {
         // Get page targeting configurations from DOM
         getPageTargetingConfigurations: function () {
             const configurations = [];
-            $('.wpbnp-config-item').each(function () {
+            console.log('getPageTargetingConfigurations: Starting to collect configurations...');
+            console.log('Total .wpbnp-config-item elements found:', $('.wpbnp-config-item').length);
+            
+            // First, try to collect from visible DOM elements
+            $('.wpbnp-config-item').each(function (index) {
                 const $config = $(this);
                 const configId = $config.data('config-id');
+                
+                console.log('Processing visible config item', index, 'with config-id:', configId);
                 
                 if (!configId) {
                     console.warn('Configuration item missing config-id');
@@ -467,6 +473,12 @@ jQuery(document).ready(function ($) {
                         user_roles: []
                     }
                 };
+                
+                console.log('Collected config data for', configId, ':', {
+                    name: config.name,
+                    priority: config.priority,
+                    preset_id: config.preset_id
+                });
                 
                 // Collect selected pages
                 $config.find('select[name*="[conditions][pages][]"] option:selected').each(function () {
@@ -504,7 +516,74 @@ jQuery(document).ready(function ($) {
                 console.log('Collected configuration:', config.name, 'with ID:', config.id);
             });
             
-            console.log('Total configurations collected:', configurations.length);
+            console.log('Total configurations collected from visible DOM:', configurations.length);
+            
+            // If no configurations found in visible DOM, try to collect from hidden fields
+            if (configurations.length === 0) {
+                console.log('No visible configurations found, checking hidden fields...');
+                
+                // Find all hidden fields for page targeting configurations
+                const hiddenConfigIds = new Set();
+                $('input[name*="settings[page_targeting][configurations]"][name*="[id]"]').each(function() {
+                    const name = $(this).attr('name');
+                    const match = name.match(/settings\[page_targeting\]\[configurations\]\[([^\]]+)\]\[id\]/);
+                    if (match) {
+                        hiddenConfigIds.add(match[1]);
+                    }
+                });
+                
+                console.log('Found hidden config IDs:', Array.from(hiddenConfigIds));
+                
+                // Collect configurations from hidden fields
+                hiddenConfigIds.forEach(configId => {
+                    const config = {
+                        id: configId,
+                        name: $(`input[name="settings[page_targeting][configurations][${configId}][name]"]`).val() || 'Untitled Configuration',
+                        priority: parseInt($(`input[name="settings[page_targeting][configurations][${configId}][priority]"]`).val()) || 1,
+                        preset_id: $(`input[name="settings[page_targeting][configurations][${configId}][preset_id]"]`).val() || 'default',
+                        conditions: {
+                            pages: [],
+                            post_types: [],
+                            categories: [],
+                            user_roles: []
+                        }
+                    };
+                    
+                    // Collect conditions from hidden fields
+                    $(`input[name="settings[page_targeting][configurations][${configId}][conditions][pages][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            config.conditions.pages.push(value);
+                        }
+                    });
+                    
+                    $(`input[name="settings[page_targeting][configurations][${configId}][conditions][post_types][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            config.conditions.post_types.push(value);
+                        }
+                    });
+                    
+                    $(`input[name="settings[page_targeting][configurations][${configId}][conditions][categories][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            config.conditions.categories.push(value);
+                        }
+                    });
+                    
+                    $(`input[name="settings[page_targeting][configurations][${configId}][conditions][user_roles][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            config.conditions.user_roles.push(value);
+                        }
+                    });
+                    
+                    configurations.push(config);
+                    console.log('Collected hidden config:', config.name, 'with ID:', config.id);
+                });
+            }
+            
+            console.log('Total configurations collected (visible + hidden):', configurations.length);
             return configurations;
         },
 
@@ -655,11 +734,23 @@ jQuery(document).ready(function ($) {
             console.log('Custom presets in form:', customPresets.length, 'presets');
             
             // CRITICAL: Collect page targeting configurations from DOM and add to form data
+            console.log('Looking for page targeting configurations in DOM...');
+            console.log('Found .wpbnp-config-item elements:', $('.wpbnp-config-item').length);
+            console.log('Current tab:', window.location.hash);
+            console.log('All form elements:', $('#wpbnp-settings-form').find('input, select').length);
+            
+            $('.wpbnp-config-item').each(function(index) {
+                console.log('Config item', index, ':', $(this).data('config-id'), $(this).find('.wpbnp-config-name').text());
+                console.log('Config item HTML:', $(this).html().substring(0, 200) + '...');
+            });
+            
             const pageTargetingConfigs = this.getPageTargetingConfigurations();
             console.log('Page targeting configurations in form:', pageTargetingConfigs.length, 'configs');
+            console.log('Configurations found:', pageTargetingConfigs);
             
             // Add page targeting configurations to form data
             pageTargetingConfigs.forEach((config, index) => {
+                console.log('Adding config to form data:', config.id, config.name);
                 formData.append(`settings[page_targeting][configurations][${config.id}][id]`, config.id);
                 formData.append(`settings[page_targeting][configurations][${config.id}][name]`, config.name);
                 formData.append(`settings[page_targeting][configurations][${config.id}][priority]`, config.priority);

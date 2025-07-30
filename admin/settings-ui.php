@@ -117,6 +117,44 @@ class WPBNP_Admin_UI {
                         <input type="hidden" name="settings[preset]" value="<?php echo esc_attr($settings['preset'] ?? 'minimal'); ?>">
                         <?php endif; ?>
                         
+                        <?php if ($this->current_tab !== 'page-targeting'): ?>
+                        <!-- Hidden fields to preserve page targeting configurations on non-page-targeting tabs -->
+                        <?php 
+                        $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
+                        $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
+                        foreach ($configurations as $config_id => $config): ?>
+                            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][id]" value="<?php echo esc_attr($config_id); ?>">
+                            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][name]" value="<?php echo esc_attr($config['name'] ?? ''); ?>">
+                            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][priority]" value="<?php echo esc_attr($config['priority'] ?? 1); ?>">
+                            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][preset_id]" value="<?php echo esc_attr($config['preset_id'] ?? 'default'); ?>">
+                            
+                            <!-- Hidden fields for conditions -->
+                            <?php if (isset($config['conditions']['pages']) && is_array($config['conditions']['pages'])): ?>
+                                <?php foreach ($config['conditions']['pages'] as $page_id): ?>
+                                    <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][pages][]" value="<?php echo esc_attr($page_id); ?>">
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            
+                            <?php if (isset($config['conditions']['post_types']) && is_array($config['conditions']['post_types'])): ?>
+                                <?php foreach ($config['conditions']['post_types'] as $post_type): ?>
+                                    <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][post_types][]" value="<?php echo esc_attr($post_type); ?>">
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            
+                            <?php if (isset($config['conditions']['categories']) && is_array($config['conditions']['categories'])): ?>
+                                <?php foreach ($config['conditions']['categories'] as $category_id): ?>
+                                    <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][categories][]" value="<?php echo esc_attr($category_id); ?>">
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            
+                            <?php if (isset($config['conditions']['user_roles']) && is_array($config['conditions']['user_roles'])): ?>
+                                <?php foreach ($config['conditions']['user_roles'] as $role): ?>
+                                    <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][user_roles][]" value="<?php echo esc_attr($role); ?>">
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
+                        
                         <div class="wpbnp-tab-content">
                             <?php $this->render_tab_content($this->current_tab, $settings); ?>
                         </div>
