@@ -500,37 +500,76 @@ jQuery(document).ready(function ($) {
                     preset_id: config.preset_id
                 });
                 
-                // Collect selected pages
-                $config.find('select[name*="[conditions][pages][]"] option:selected').each(function () {
-                    const value = $(this).val();
-                    if (value && value !== '') {
-                        config.conditions.pages.push(value);
+                // Collect selected pages - handle both multiselect and regular select
+                const pagesSelect = $config.find('select[name*="[conditions][pages][]"]');
+                console.log('Pages select found:', pagesSelect.length, 'elements');
+                if (pagesSelect.length > 0) {
+                    const selectedPages = pagesSelect.val();
+                    console.log('Selected pages for config', configId, ':', selectedPages);
+                    if (selectedPages) {
+                        if (Array.isArray(selectedPages)) {
+                            selectedPages.forEach(pageId => {
+                                if (pageId && pageId !== '') {
+                                    config.conditions.pages.push(pageId);
+                                }
+                            });
+                        } else if (selectedPages !== '') {
+                            config.conditions.pages.push(selectedPages);
+                        }
                     }
-                });
+                    console.log('Final pages array for config', configId, ':', config.conditions.pages);
+                }
                 
-                // Collect selected post types
-                $config.find('select[name*="[conditions][post_types][]"] option:selected').each(function () {
-                    const value = $(this).val();
-                    if (value && value !== '') {
-                        config.conditions.post_types.push(value);
+                // Collect selected post types - handle both multiselect and regular select
+                const postTypesSelect = $config.find('select[name*="[conditions][post_types][]"]');
+                if (postTypesSelect.length > 0) {
+                    const selectedPostTypes = postTypesSelect.val();
+                    if (selectedPostTypes) {
+                        if (Array.isArray(selectedPostTypes)) {
+                            selectedPostTypes.forEach(postType => {
+                                if (postType && postType !== '') {
+                                    config.conditions.post_types.push(postType);
+                                }
+                            });
+                        } else if (selectedPostTypes !== '') {
+                            config.conditions.post_types.push(selectedPostTypes);
+                        }
                     }
-                });
+                }
                 
-                // Collect selected categories
-                $config.find('select[name*="[conditions][categories][]"] option:selected').each(function () {
-                    const value = $(this).val();
-                    if (value && value !== '') {
-                        config.conditions.categories.push(value);
+                // Collect selected categories - handle both multiselect and regular select
+                const categoriesSelect = $config.find('select[name*="[conditions][categories][]"]');
+                if (categoriesSelect.length > 0) {
+                    const selectedCategories = categoriesSelect.val();
+                    if (selectedCategories) {
+                        if (Array.isArray(selectedCategories)) {
+                            selectedCategories.forEach(categoryId => {
+                                if (categoryId && categoryId !== '') {
+                                    config.conditions.categories.push(categoryId);
+                                }
+                            });
+                        } else if (selectedCategories !== '') {
+                            config.conditions.categories.push(selectedCategories);
+                        }
                     }
-                });
+                }
                 
-                // Collect selected user roles
-                $config.find('select[name*="[conditions][user_roles][]"] option:selected').each(function () {
-                    const value = $(this).val();
-                    if (value && value !== '') {
-                        config.conditions.user_roles.push(value);
+                // Collect selected user roles - handle both multiselect and regular select
+                const userRolesSelect = $config.find('select[name*="[conditions][user_roles][]"]');
+                if (userRolesSelect.length > 0) {
+                    const selectedUserRoles = userRolesSelect.val();
+                    if (selectedUserRoles) {
+                        if (Array.isArray(selectedUserRoles)) {
+                            selectedUserRoles.forEach(role => {
+                                if (role && role !== '') {
+                                    config.conditions.user_roles.push(role);
+                                }
+                            });
+                        } else if (selectedUserRoles !== '') {
+                            config.conditions.user_roles.push(selectedUserRoles);
+                        }
                     }
-                });
+                }
                 
                 configurations.push(config);
                 console.log('Collected configuration:', config.name, 'with ID:', config.id);
