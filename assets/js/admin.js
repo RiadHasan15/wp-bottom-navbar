@@ -560,20 +560,87 @@ jQuery(document).ready(function ($) {
                 configurations.push(config);
             });
             
-            // If no configurations found in visible DOM, try to collect from hidden fields
-            if (configurations.length === 0) {
-                // Find all hidden fields for page targeting configurations
-                const hiddenConfigIds = new Set();
-                $('input[name*="settings[page_targeting][configurations]"][name*="[id]"]').each(function() {
-                    const name = $(this).attr('name');
-                    const match = name.match(/settings\[page_targeting\]\[configurations\]\[([^\]]+)\]\[id\]/);
-                    if (match) {
-                        hiddenConfigIds.add(match[1]);
+            // Always also check for hidden fields even if visible configurations exist
+            // This ensures we get the most up-to-date data
+            const allHiddenConfigIds = new Set();
+            $('input[name*="settings[page_targeting][configurations]"][name*="[id]"]').each(function() {
+                const name = $(this).attr('name');
+                const match = name.match(/settings\[page_targeting\]\[configurations\]\[([^\]]+)\]\[id\]/);
+                if (match) {
+                    allHiddenConfigIds.add(match[1]);
+                }
+            });
+            
+            // Update existing configurations with hidden field data if available
+            configurations.forEach(config => {
+                if (allHiddenConfigIds.has(config.id)) {
+                    // Update with hidden field data
+                    const hiddenName = $(`input[name="settings[page_targeting][configurations][${config.id}][name]"]`).val();
+                    if (hiddenName) {
+                        config.name = hiddenName;
                     }
-                });
-                
+                    
+                    const hiddenPriority = parseInt($(`input[name="settings[page_targeting][configurations][${config.id}][priority]"]`).val());
+                    if (!isNaN(hiddenPriority)) {
+                        config.priority = hiddenPriority;
+                    }
+                    
+                    const hiddenPresetId = $(`input[name="settings[page_targeting][configurations][${config.id}][preset_id]"]`).val();
+                    if (hiddenPresetId) {
+                        config.preset_id = hiddenPresetId;
+                    }
+                    
+                    // Update conditions from hidden fields
+                    const hiddenPages = [];
+                    $(`input[name="settings[page_targeting][configurations][${config.id}][conditions][pages][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            hiddenPages.push(value);
+                        }
+                    });
+                    if (hiddenPages.length > 0) {
+                        config.conditions.pages = hiddenPages;
+                    }
+                    
+                    const hiddenPostTypes = [];
+                    $(`input[name="settings[page_targeting][configurations][${config.id}][conditions][post_types][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            hiddenPostTypes.push(value);
+                        }
+                    });
+                    if (hiddenPostTypes.length > 0) {
+                        config.conditions.post_types = hiddenPostTypes;
+                    }
+                    
+                    const hiddenCategories = [];
+                    $(`input[name="settings[page_targeting][configurations][${config.id}][conditions][categories][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            hiddenCategories.push(value);
+                        }
+                    });
+                    if (hiddenCategories.length > 0) {
+                        config.conditions.categories = hiddenCategories;
+                    }
+                    
+                    const hiddenUserRoles = [];
+                    $(`input[name="settings[page_targeting][configurations][${config.id}][conditions][user_roles][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            hiddenUserRoles.push(value);
+                        }
+                    });
+                    if (hiddenUserRoles.length > 0) {
+                        config.conditions.user_roles = hiddenUserRoles;
+                    }
+                }
+            });
+            
+            // If no configurations found in visible DOM, also collect from hidden fields
+            if (configurations.length === 0) {
                 // Collect configurations from hidden fields
-                hiddenConfigIds.forEach(configId => {
+                allHiddenConfigIds.forEach(configId => {
                     const config = {
                         id: configId,
                         name: $(`input[name="settings[page_targeting][configurations][${configId}][name]"]`).val() || 'Untitled Configuration',
@@ -975,13 +1042,15 @@ jQuery(document).ready(function ($) {
                                 console.log('No custom presets in server response');
                             }
                             
-                            // Update page targeting configurations from server response
+                            // Update page targeting configurations from server response (but don't restore if they already exist)
                             if (this.settings.page_targeting && this.settings.page_targeting.configurations) {
                                 console.log('Page targeting configurations in server response:', this.settings.page_targeting.configurations);
-                                // Always restore from server response to ensure data is up-to-date
-                                setTimeout(() => {
-                                    this.restorePageTargetingConfigurations(this.settings.page_targeting.configurations);
-                                }, 100);
+                                // Only restore if no configurations exist in DOM
+                                if ($('.wpbnp-config-item').length === 0) {
+                                    setTimeout(() => {
+                                        this.restorePageTargetingConfigurations(this.settings.page_targeting.configurations);
+                                    }, 100);
+                                }
                             } else {
                                 console.log('No page targeting configurations in server response');
                             }
@@ -1016,10 +1085,6 @@ jQuery(document).ready(function ($) {
 
         // Restore page targeting configurations from server data
         restorePageTargetingConfigurations: function (serverConfigurations) {
-            console.log('=== DEBUG: restorePageTargetingConfigurations ===');
-            console.log('Server configurations:', serverConfigurations);
-            console.log('Current tab:', window.location.hash);
-            console.log('Existing config items in DOM:', $('.wpbnp-config-item').length);
             
             // Clear existing configurations in DOM
             $('.wpbnp-config-item').remove();
@@ -1036,7 +1101,6 @@ jQuery(document).ready(function ($) {
             // Add each configuration to DOM
             configsArray.forEach(config => {
                 if (config.id && config.name) {
-                    console.log('Restoring configuration:', config.name, 'with ID:', config.id, 'conditions:', config.conditions);
                     this.addConfigurationToDOM(config);
                 }
             });

@@ -988,6 +988,8 @@ class WP_Bottom_Navigation_Pro {
         
         $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array();
         
+
+        
         // Handle custom presets data from form submission
         // First, check if custom presets are in the regular form data (from hidden inputs)
         if (isset($settings['custom_presets']) && isset($settings['custom_presets']['presets'])) {
@@ -1012,6 +1014,8 @@ class WP_Bottom_Navigation_Pro {
         }
         
         $sanitized_settings = wpbnp_sanitize_settings($settings);
+        
+
         
         update_option('wpbnp_settings', $sanitized_settings);
         
