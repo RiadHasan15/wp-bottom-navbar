@@ -2475,32 +2475,78 @@ jQuery(document).ready(function ($) {
                 <div id="wpbnp-create-preset-modal" class="wpbnp-modal-overlay">
                     <div class="wpbnp-modal">
                         <div class="wpbnp-modal-header">
-                            <h3>🚀 Create New Custom Preset</h3>
-                            <button type="button" class="wpbnp-modal-close" title="Close">×</button>
+                            <div class="wpbnp-modal-header-content">
+                                <div class="wpbnp-modal-icon">✨</div>
+                                <div class="wpbnp-modal-title">
+                                    <h3>Create Custom Preset</h3>
+                                    <p>Save your current navigation configuration as a reusable preset</p>
+                                </div>
+                            </div>
+                            <button type="button" class="wpbnp-modal-close" title="Close">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
                         </div>
                         <div class="wpbnp-modal-body">
                             <form id="wpbnp-create-preset-form">
-                                <div class="wpbnp-form-group">
-                                    <label for="preset-name">Preset Name *</label>
-                                    <input type="text" id="preset-name" name="preset-name" 
-                                           placeholder="Enter a descriptive name for your preset" 
-                                           required maxlength="50">
-                                    <small>This will be the name displayed in the preset selector</small>
+                                <div class="wpbnp-form-section">
+                                    <div class="wpbnp-section-header">
+                                        <div class="wpbnp-section-icon">📝</div>
+                                        <div class="wpbnp-section-title">
+                                            <h4>Preset Details</h4>
+                                            <p>Give your preset a name and description</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="wpbnp-form-group">
+                                        <label for="preset-name">
+                                            <span class="wpbnp-label-text">Preset Name</span>
+                                            <span class="wpbnp-required">*</span>
+                                        </label>
+                                        <div class="wpbnp-input-wrapper">
+                                            <input type="text" id="preset-name" name="preset-name" 
+                                                   placeholder="e.g., Homepage Navigation, Mobile Menu, etc." 
+                                                   required maxlength="50">
+                                            <div class="wpbnp-input-icon">📋</div>
+                                        </div>
+                                        <small class="wpbnp-help-text">This name will be displayed in the preset selector</small>
+                                    </div>
+                                    
+                                    <div class="wpbnp-form-group">
+                                        <label for="preset-description">
+                                            <span class="wpbnp-label-text">Description</span>
+                                            <span class="wpbnp-optional">(Optional)</span>
+                                        </label>
+                                        <div class="wpbnp-input-wrapper">
+                                            <textarea id="preset-description" name="preset-description" 
+                                                      placeholder="Describe what this preset is for, when to use it, etc." 
+                                                      rows="3" maxlength="200"></textarea>
+                                            <div class="wpbnp-input-icon">💭</div>
+                                        </div>
+                                        <small class="wpbnp-help-text">Help others understand when to use this preset</small>
+                                    </div>
                                 </div>
                                 
-                                <div class="wpbnp-form-group">
-                                    <label for="preset-description">Description (Optional)</label>
-                                    <textarea id="preset-description" name="preset-description" 
-                                              placeholder="Describe what this preset is for..." 
-                                              rows="3" maxlength="200"></textarea>
-                                    <small>Help others understand what this preset is for</small>
-                                </div>
-                                
-                                <div class="wpbnp-form-group">
-                                    <label>Current Navigation Items</label>
+                                <div class="wpbnp-form-section">
+                                    <div class="wpbnp-section-header">
+                                        <div class="wpbnp-section-icon">🎯</div>
+                                        <div class="wpbnp-section-title">
+                                            <h4>Navigation Items</h4>
+                                            <p>Preview of items that will be included in this preset</p>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="wpbnp-current-items-preview">
-                                        <div class="wpbnp-items-count">
-                                            <span class="wpbnp-count-badge">0</span> items will be included
+                                        <div class="wpbnp-items-summary">
+                                            <div class="wpbnp-items-count">
+                                                <span class="wpbnp-count-badge">0</span>
+                                                <span class="wpbnp-count-text">items selected</span>
+                                            </div>
+                                            <div class="wpbnp-items-status">
+                                                <span class="wpbnp-status-indicator wpbnp-status-ready">Ready to create</span>
+                                            </div>
                                         </div>
                                         <div class="wpbnp-items-list"></div>
                                     </div>
@@ -2508,11 +2554,25 @@ jQuery(document).ready(function ($) {
                             </form>
                         </div>
                         <div class="wpbnp-modal-footer">
-                            <button type="button" class="wpbnp-btn wpbnp-btn-secondary wpbnp-modal-cancel">Cancel</button>
-                            <button type="button" class="wpbnp-btn wpbnp-btn-primary wpbnp-create-preset-btn" disabled>
-                                <span class="wpbnp-btn-text">Create Preset</span>
-                                <span class="wpbnp-btn-loading" style="display: none;">Creating...</span>
-                            </button>
+                            <div class="wpbnp-modal-actions">
+                                <button type="button" class="wpbnp-btn wpbnp-btn-secondary wpbnp-modal-cancel">
+                                    <span class="wpbnp-btn-icon">✕</span>
+                                    <span class="wpbnp-btn-text">Cancel</span>
+                                </button>
+                                <button type="button" class="wpbnp-btn wpbnp-btn-primary wpbnp-create-preset-btn" disabled>
+                                    <span class="wpbnp-btn-icon">✨</span>
+                                    <span class="wpbnp-btn-text">Create Preset</span>
+                                    <span class="wpbnp-btn-loading" style="display: none;">
+                                        <svg class="wpbnp-spinner" width="16" height="16" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                                <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                                <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                            </circle>
+                                        </svg>
+                                        Creating...
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2675,10 +2735,8 @@ jQuery(document).ready(function ($) {
 
             // Get current navigation items
             const currentItems = this.getCurrentNavigationItems();
-            console.log('handleCreatePresetSubmit: Current items collected:', currentItems);
             
             const itemsToInclude = currentItems; // Include all items
-            console.log('handleCreatePresetSubmit: Items to include in preset:', itemsToInclude);
 
             if (itemsToInclude.length === 0) {
                 this.showNotification('No items to include in the preset. Please add some navigation items first.', 'error');
@@ -2736,8 +2794,6 @@ jQuery(document).ready(function ($) {
         // Get current navigation items
         getCurrentNavigationItems: function () {
             const items = [];
-            console.log('getCurrentNavigationItems: Starting to collect items...');
-            console.log('Total .wpbnp-nav-item-row elements found:', $('#wpbnp-items-list .wpbnp-nav-item-row').length);
             
             $('#wpbnp-items-list .wpbnp-nav-item-row').each(function (index) {
                 const $row = $(this);
@@ -2746,15 +2802,6 @@ jQuery(document).ready(function ($) {
                 const enabledValue = enabledInput.attr('type') === 'hidden' ? 
                     enabledInput.val() === '1' : 
                     enabledInput.is(':checked');
-                
-                console.log(`Item ${index + 1}:`, {
-                    id: $row.find('input[name*="[id]"]').val(),
-                    label: $row.find('input[name*="[label]"]').val(),
-                    enabled: enabledValue,
-                    enabledInputType: enabledInput.attr('type'),
-                    enabledInputValue: enabledInput.val(),
-                    enabledInputChecked: enabledInput.is(':checked')
-                });
                 
                 const item = {
                     id: $row.find('input[name*="[id]"]').val() || 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -2777,15 +2824,12 @@ jQuery(document).ready(function ($) {
                 items.push(item);
             });
 
-            console.log('getCurrentNavigationItems: Final items collected:', items);
             return items;
         },
 
         // Add preset to DOM with unique ID management
         addPresetToDOM: function (preset) {
             console.log('addPresetToDOM called for preset:', preset.name);
-            console.log('addPresetToDOM: Preset items:', preset.items);
-            console.log('addPresetToDOM: Items enabled states:', preset.items.map(item => ({ id: item.id, label: item.label, enabled: item.enabled })));
             
             const presetsContainer = $('#wpbnp-custom-presets-list');
             const noPresetsMessage = presetsContainer.find('.wpbnp-no-presets');
