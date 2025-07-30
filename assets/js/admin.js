@@ -95,6 +95,9 @@ jQuery(document).ready(function ($) {
                 
                 // Clean up any orphaned configurations
                 this.cleanupOrphanedConfigurations();
+                
+                // Populate all preset selectors
+                this.populateAllPresetSelectors();
             }, 200);
         },
 
@@ -2906,6 +2909,9 @@ jQuery(document).ready(function ($) {
 
             presetsContainer.append(presetHtml);
             console.log('Preset added to DOM successfully:', preset.name, 'with ID:', presetId);
+            
+            // Update all preset selectors to include the new preset
+            this.updateAllPresetSelectors();
         },
 
         // Edit custom preset items
@@ -3397,6 +3403,7 @@ jQuery(document).ready(function ($) {
 
             // Always also check DOM for additional presets (might be newly created)
             const settingsPresetIds = presets.map(p => p.id);
+            
             $('.wpbnp-preset-item').each(function () {
                 const $item = $(this);
                 const presetId = $item.data('preset-id');
@@ -3658,6 +3665,26 @@ jQuery(document).ready(function ($) {
             });
             
             console.log('Cleanup completed');
+        },
+
+        // Populate all preset selectors on page load
+        populateAllPresetSelectors: function () {
+            const presetSelectors = $('.wpbnp-preset-selector');
+            
+            presetSelectors.each(function(index) {
+                const $selector = $(this);
+                WPBottomNavAdmin.populatePresetSelector($selector);
+            });
+        },
+
+        // Update all preset selectors (called when presets are created/updated)
+        updateAllPresetSelectors: function () {
+            const presetSelectors = $('.wpbnp-preset-selector');
+            
+            presetSelectors.each(function(index) {
+                const $selector = $(this);
+                WPBottomNavAdmin.populatePresetSelector($selector);
+            });
         },
 
         // Populate pages selector for new configurations
