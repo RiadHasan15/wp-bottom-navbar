@@ -92,6 +92,9 @@ jQuery(document).ready(function ($) {
                 
                 // Restore loaded preset items if any
                 this.restoreLoadedPresetItems();
+                
+                // Clean up any orphaned configurations
+                this.cleanupOrphanedConfigurations();
             }, 200);
         },
 
@@ -2343,9 +2346,38 @@ jQuery(document).ready(function ($) {
             $(document).on('click', '.wpbnp-config-delete', function (e) {
                 e.preventDefault();
                 if (confirm('Are you sure you want to delete this configuration?')) {
-                    $(this).closest('.wpbnp-config-item').fadeOut(() => {
-                        $(this).closest('.wpbnp-config-item').remove();
+                    const $configItem = $(this).closest('.wpbnp-config-item');
+                    const configId = $configItem.find('input[name*="[id]"]').val();
+                    
+                    console.log('Deleting configuration with ID:', configId);
+                    
+                    // Remove all form fields associated with this configuration
+                    $configItem.find('input, select, textarea').each(function() {
+                        const name = $(this).attr('name');
+                        if (name && name.includes(configId)) {
+                            console.log('Removing form field:', name);
+                            $(this).remove();
+                        }
+                    });
+                    
+                    // Remove any hidden fields that might be outside the config item
+                    $(`input[name*="[${configId}]"], select[name*="[${configId}]"], textarea[name*="[${configId}]"]`).remove();
+                    
+                    // Also remove hidden fields that are generated on other tabs
+                    // These have the pattern: settings[page_targeting][configurations][configId][...]
+                    $(`input[name*="settings[page_targeting][configurations][${configId}]"], 
+                       select[name*="settings[page_targeting][configurations][${configId}]"], 
+                       textarea[name*="settings[page_targeting][configurations][${configId}]"]`).remove();
+                    
+                    // Remove the configuration item from DOM
+                    $configItem.fadeOut(() => {
+                        $configItem.remove();
                         WPBottomNavAdmin.reindexConfigurations();
+                        
+                        // Save form state to ensure deletion is persisted
+                        WPBottomNavAdmin.saveFormState();
+                        
+                        console.log('Configuration deleted successfully');
                     });
                 }
             });
@@ -3569,19 +3601,63 @@ jQuery(document).ready(function ($) {
 
         // Reindex configurations after deletion
         reindexConfigurations: function () {
-            $('.wpbnp-config-item').each(function (index) {
-                $(this).find('input, select').each(function () {
+            console.log('Reindexing configurations...');
+            const configItems = $('.wpbnp-config-item');
+            console.log('Found', configItems.length, 'configuration items');
+            
+            configItems.each(function (index) {
+                const $configItem = $(this);
+                const configId = $configItem.find('input[name*="[id]"]').val();
+                console.log(`Reindexing config ${index}:`, configId);
+                
+                $configItem.find('input, select, textarea').each(function () {
                     const name = $(this).attr('name');
                     if (name && name.includes('[configurations][')) {
                         const newName = name.replace(/\[configurations\]\[\d+\]/, `[configurations][${index}]`);
+                        console.log(`Renaming field: ${name} -> ${newName}`);
                         $(this).attr('name', newName);
                     }
                 });
             });
 
-            if ($('.wpbnp-config-item').length === 0) {
+            if (configItems.length === 0) {
                 $('#wpbnp-configurations-list').html('<p class="wpbnp-no-configs">No configurations created yet. Click "Add Configuration" to get started.</p>');
+                console.log('No configurations left, showing empty state');
             }
+            
+            // Update form state after reindexing
+            this.saveFormState();
+        },
+
+        // Clean up orphaned configurations on page load
+        cleanupOrphanedConfigurations: function () {
+            console.log('Cleaning up orphaned configurations...');
+            
+            // Get all visible configuration IDs
+            const visibleConfigIds = [];
+            $('.wpbnp-config-item').each(function() {
+                const configId = $(this).find('input[name*="[id]"]').val();
+                if (configId) {
+                    visibleConfigIds.push(configId);
+                }
+            });
+            
+            console.log('Visible configuration IDs:', visibleConfigIds);
+            
+            // Find and remove hidden fields for configurations that don't exist in the DOM
+            $('input[name*="settings[page_targeting][configurations]"]').each(function() {
+                const name = $(this).attr('name');
+                const match = name.match(/settings\[page_targeting\]\[configurations\]\[([^\]]+)\]/);
+                if (match) {
+                    const configId = match[1];
+                    if (!visibleConfigIds.includes(configId)) {
+                        console.log('Removing orphaned hidden field for config:', configId, 'Field:', name);
+                        $(this).remove();
+                    }
+                }
+            });
+            
+            console.log('Cleanup completed');
         },
 
         // Populate pages selector for new configurations
