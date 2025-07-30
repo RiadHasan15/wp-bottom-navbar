@@ -218,29 +218,7 @@ function wpbnp_sanitize_settings($settings) {
         );
     }
     
-    // Custom presets (Pro feature)
-    if (isset($settings['custom_presets']) && is_array($settings['custom_presets'])) {
-        $sanitized['custom_presets'] = array(
-            'enabled' => !empty($settings['custom_presets']['enabled']),
-            'presets' => array()
-        );
-        
-        if (isset($settings['custom_presets']['presets']) && is_array($settings['custom_presets']['presets'])) {
-            foreach ($settings['custom_presets']['presets'] as $preset_id => $preset) {
-                if (is_array($preset) && !empty($preset['id']) && !empty($preset['name'])) {
-                    // Use the preset ID as the key to maintain consistency
-                    $sanitized_preset_id = sanitize_key($preset['id']);
-                    $sanitized['custom_presets']['presets'][$sanitized_preset_id] = array(
-                        'id' => $sanitized_preset_id,
-                        'name' => sanitize_text_field($preset['name']),
-                        'description' => sanitize_textarea_field($preset['description'] ?? ''),
-                        'created_at' => absint($preset['created_at'] ?? time()),
-                        'items' => is_array($preset['items']) ? $preset['items'] : array()
-                    );
-                }
-            }
-        }
-    }
+    // Custom presets (Pro feature) - REMOVED DUPLICATE SECTION
 
     // Page targeting settings (Pro feature)
     if (isset($settings['page_targeting']) && is_array($settings['page_targeting'])) {
@@ -296,6 +274,7 @@ function wpbnp_sanitize_settings($settings) {
     
     // Custom presets settings (Pro feature)
     if (isset($settings['custom_presets']) && is_array($settings['custom_presets'])) {
+        error_log('WPBNP: Processing custom presets - found ' . count($settings['custom_presets']['presets']) . ' presets');
         $sanitized['custom_presets'] = array(
             'enabled' => !empty($settings['custom_presets']['enabled']),
             'presets' => array()
@@ -303,6 +282,7 @@ function wpbnp_sanitize_settings($settings) {
         
         if (isset($settings['custom_presets']['presets']) && is_array($settings['custom_presets']['presets'])) {
             foreach ($settings['custom_presets']['presets'] as $preset_id => $preset) {
+                error_log('WPBNP: Processing preset ID: ' . $preset_id . ' with name: ' . ($preset['name'] ?? 'unknown'));
                 if (is_array($preset)) {
                     $sanitized_preset_id = sanitize_key($preset_id);
                     $sanitized_preset = array(
@@ -363,6 +343,7 @@ function wpbnp_sanitize_settings($settings) {
                 }
             }
         }
+        error_log('WPBNP: Final custom presets count: ' . count($sanitized['custom_presets']['presets']) . ' presets');
     }
     
     return apply_filters('wpbnp_sanitize_settings', $sanitized, $settings);
