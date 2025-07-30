@@ -620,6 +620,83 @@ jQuery(document).ready(function ($) {
                 });
             }
             
+            // Always also check for hidden fields even if visible configurations exist
+            // This ensures we get the most up-to-date data
+            const allHiddenConfigIds = new Set();
+            $('input[name*="settings[page_targeting][configurations]"][name*="[id]"]').each(function() {
+                const name = $(this).attr('name');
+                const match = name.match(/settings\[page_targeting\]\[configurations\]\[([^\]]+)\]\[id\]/);
+                if (match) {
+                    allHiddenConfigIds.add(match[1]);
+                }
+            });
+            
+            // Update existing configurations with hidden field data if available
+            configurations.forEach(config => {
+                if (allHiddenConfigIds.has(config.id)) {
+                    // Update with hidden field data
+                    const hiddenName = $(`input[name="settings[page_targeting][configurations][${config.id}][name]"]`).val();
+                    if (hiddenName) {
+                        config.name = hiddenName;
+                    }
+                    
+                    const hiddenPriority = parseInt($(`input[name="settings[page_targeting][configurations][${config.id}][priority]"]`).val());
+                    if (!isNaN(hiddenPriority)) {
+                        config.priority = hiddenPriority;
+                    }
+                    
+                    const hiddenPresetId = $(`input[name="settings[page_targeting][configurations][${config.id}][preset_id]"]`).val();
+                    if (hiddenPresetId) {
+                        config.preset_id = hiddenPresetId;
+                    }
+                    
+                    // Update conditions from hidden fields
+                    const hiddenPages = [];
+                    $(`input[name="settings[page_targeting][configurations][${config.id}][conditions][pages][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            hiddenPages.push(value);
+                        }
+                    });
+                    if (hiddenPages.length > 0) {
+                        config.conditions.pages = hiddenPages;
+                    }
+                    
+                    const hiddenPostTypes = [];
+                    $(`input[name="settings[page_targeting][configurations][${config.id}][conditions][post_types][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            hiddenPostTypes.push(value);
+                        }
+                    });
+                    if (hiddenPostTypes.length > 0) {
+                        config.conditions.post_types = hiddenPostTypes;
+                    }
+                    
+                    const hiddenCategories = [];
+                    $(`input[name="settings[page_targeting][configurations][${config.id}][conditions][categories][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            hiddenCategories.push(value);
+                        }
+                    });
+                    if (hiddenCategories.length > 0) {
+                        config.conditions.categories = hiddenCategories;
+                    }
+                    
+                    const hiddenUserRoles = [];
+                    $(`input[name="settings[page_targeting][configurations][${config.id}][conditions][user_roles][]"]`).each(function() {
+                        const value = $(this).val();
+                        if (value && value !== '') {
+                            hiddenUserRoles.push(value);
+                        }
+                    });
+                    if (hiddenUserRoles.length > 0) {
+                        config.conditions.user_roles = hiddenUserRoles;
+                    }
+                }
+            });
+            
             return configurations;
         },
 
@@ -898,13 +975,15 @@ jQuery(document).ready(function ($) {
                                 console.log('No custom presets in server response');
                             }
                             
-                            // CRITICAL: Restore page targeting configurations from server response
+                            // Update page targeting configurations from server response (but don't restore if they already exist)
                             if (this.settings.page_targeting && this.settings.page_targeting.configurations) {
-                                console.log('Restoring page targeting configurations from server response:', this.settings.page_targeting.configurations);
-                                // Add a small delay to ensure DOM is ready
-                                setTimeout(() => {
-                                    this.restorePageTargetingConfigurations(this.settings.page_targeting.configurations);
-                                }, 100);
+                                console.log('Page targeting configurations in server response:', this.settings.page_targeting.configurations);
+                                // Only restore if no configurations exist in DOM
+                                if ($('.wpbnp-config-item').length === 0) {
+                                    setTimeout(() => {
+                                        this.restorePageTargetingConfigurations(this.settings.page_targeting.configurations);
+                                    }, 100);
+                                }
                             } else {
                                 console.log('No page targeting configurations in server response');
                             }
@@ -1076,42 +1155,26 @@ jQuery(document).ready(function ($) {
         populateConfigurationSelectors: function ($config, configData) {
             // Populate pages selector
             const $pagesSelector = $config.find('select[name*="[conditions][pages][]"]');
-            if ($pagesSelector.length) {
-                if (configData.conditions && configData.conditions.pages && configData.conditions.pages.length > 0) {
-                    this.populatePagesSelector($pagesSelector, configData.conditions.pages);
-                } else {
-                    this.populatePagesSelector($pagesSelector, []); // Load empty options
-                }
+            if ($pagesSelector.length && configData.conditions && configData.conditions.pages && configData.conditions.pages.length > 0) {
+                this.populatePagesSelector($pagesSelector, configData.conditions.pages);
             }
             
             // Populate post types selector
             const $postTypesSelector = $config.find('select[name*="[conditions][post_types][]"]');
-            if ($postTypesSelector.length) {
-                if (configData.conditions && configData.conditions.post_types && configData.conditions.post_types.length > 0) {
-                    this.populatePostTypesSelector($postTypesSelector, configData.conditions.post_types);
-                } else {
-                    this.populatePostTypesSelector($postTypesSelector, []); // Load empty options
-                }
+            if ($postTypesSelector.length && configData.conditions && configData.conditions.post_types && configData.conditions.post_types.length > 0) {
+                this.populatePostTypesSelector($postTypesSelector, configData.conditions.post_types);
             }
             
             // Populate categories selector
             const $categoriesSelector = $config.find('select[name*="[conditions][categories][]"]');
-            if ($categoriesSelector.length) {
-                if (configData.conditions && configData.conditions.categories && configData.conditions.categories.length > 0) {
-                    this.populateCategoriesSelector($categoriesSelector, configData.conditions.categories);
-                } else {
-                    this.populateCategoriesSelector($categoriesSelector, []); // Load empty options
-                }
+            if ($categoriesSelector.length && configData.conditions && configData.conditions.categories && configData.conditions.categories.length > 0) {
+                this.populateCategoriesSelector($categoriesSelector, configData.conditions.categories);
             }
             
             // Populate user roles selector
             const $userRolesSelector = $config.find('select[name*="[conditions][user_roles][]"]');
-            if ($userRolesSelector.length) {
-                if (configData.conditions && configData.conditions.user_roles && configData.conditions.user_roles.length > 0) {
-                    this.populateUserRolesSelector($userRolesSelector, configData.conditions.user_roles);
-                } else {
-                    this.populateUserRolesSelector($userRolesSelector, []); // Load empty options
-                }
+            if ($userRolesSelector.length && configData.conditions && configData.conditions.user_roles && configData.conditions.user_roles.length > 0) {
+                this.populateUserRolesSelector($userRolesSelector, configData.conditions.user_roles);
             }
             
             // Populate preset selector

@@ -265,8 +265,74 @@ class WPBNP_Admin_UI {
                 $this->render_advanced_tab($settings);
                 break;
         }
+        
+        // Add hidden fields for page targeting configurations on all tabs except page-targeting
+        if ($tab !== 'page_targeting') {
+            $this->render_page_targeting_hidden_fields($settings);
+        }
     }
     
+    /**
+     * Render hidden fields for page targeting configurations
+     */
+    private function render_page_targeting_hidden_fields($settings) {
+        $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
+        $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
+        
+        if (!empty($configurations)) {
+            foreach ($configurations as $config_id => $config) {
+                // Add hidden fields for each configuration
+                ?>
+                <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][id]" value="<?php echo esc_attr($config_id); ?>">
+                <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][name]" value="<?php echo esc_attr($config['name'] ?? ''); ?>">
+                <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][priority]" value="<?php echo esc_attr($config['priority'] ?? 1); ?>">
+                <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][preset_id]" value="<?php echo esc_attr($config['preset_id'] ?? 'default'); ?>">
+                
+                <?php
+                // Add hidden fields for conditions
+                if (isset($config['conditions'])) {
+                    $conditions = $config['conditions'];
+                    
+                    // Pages
+                    if (isset($conditions['pages']) && is_array($conditions['pages'])) {
+                        foreach ($conditions['pages'] as $page_id) {
+                            ?>
+                            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][pages][]" value="<?php echo esc_attr($page_id); ?>">
+                            <?php
+                        }
+                    }
+                    
+                    // Post types
+                    if (isset($conditions['post_types']) && is_array($conditions['post_types'])) {
+                        foreach ($conditions['post_types'] as $post_type) {
+                            ?>
+                            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][post_types][]" value="<?php echo esc_attr($post_type); ?>">
+                            <?php
+                        }
+                    }
+                    
+                    // Categories
+                    if (isset($conditions['categories']) && is_array($conditions['categories'])) {
+                        foreach ($conditions['categories'] as $category_id) {
+                            ?>
+                            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][categories][]" value="<?php echo esc_attr($category_id); ?>">
+                            <?php
+                        }
+                    }
+                    
+                    // User roles
+                    if (isset($conditions['user_roles']) && is_array($conditions['user_roles'])) {
+                        foreach ($conditions['user_roles'] as $role) {
+                            ?>
+                            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][user_roles][]" value="<?php echo esc_attr($role); ?>">
+                            <?php
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Render items tab
      */
