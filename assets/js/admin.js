@@ -1076,26 +1076,42 @@ jQuery(document).ready(function ($) {
         populateConfigurationSelectors: function ($config, configData) {
             // Populate pages selector
             const $pagesSelector = $config.find('select[name*="[conditions][pages][]"]');
-            if ($pagesSelector.length && configData.conditions && configData.conditions.pages && configData.conditions.pages.length > 0) {
-                this.populatePagesSelector($pagesSelector, configData.conditions.pages);
+            if ($pagesSelector.length) {
+                if (configData.conditions && configData.conditions.pages && configData.conditions.pages.length > 0) {
+                    this.populatePagesSelector($pagesSelector, configData.conditions.pages);
+                } else {
+                    this.populatePagesSelector($pagesSelector, []); // Load empty options
+                }
             }
             
             // Populate post types selector
             const $postTypesSelector = $config.find('select[name*="[conditions][post_types][]"]');
-            if ($postTypesSelector.length && configData.conditions && configData.conditions.post_types && configData.conditions.post_types.length > 0) {
-                this.populatePostTypesSelector($postTypesSelector, configData.conditions.post_types);
+            if ($postTypesSelector.length) {
+                if (configData.conditions && configData.conditions.post_types && configData.conditions.post_types.length > 0) {
+                    this.populatePostTypesSelector($postTypesSelector, configData.conditions.post_types);
+                } else {
+                    this.populatePostTypesSelector($postTypesSelector, []); // Load empty options
+                }
             }
             
             // Populate categories selector
             const $categoriesSelector = $config.find('select[name*="[conditions][categories][]"]');
-            if ($categoriesSelector.length && configData.conditions && configData.conditions.categories && configData.conditions.categories.length > 0) {
-                this.populateCategoriesSelector($categoriesSelector, configData.conditions.categories);
+            if ($categoriesSelector.length) {
+                if (configData.conditions && configData.conditions.categories && configData.conditions.categories.length > 0) {
+                    this.populateCategoriesSelector($categoriesSelector, configData.conditions.categories);
+                } else {
+                    this.populateCategoriesSelector($categoriesSelector, []); // Load empty options
+                }
             }
             
             // Populate user roles selector
             const $userRolesSelector = $config.find('select[name*="[conditions][user_roles][]"]');
-            if ($userRolesSelector.length && configData.conditions && configData.conditions.user_roles && configData.conditions.user_roles.length > 0) {
-                this.populateUserRolesSelector($userRolesSelector, configData.conditions.user_roles);
+            if ($userRolesSelector.length) {
+                if (configData.conditions && configData.conditions.user_roles && configData.conditions.user_roles.length > 0) {
+                    this.populateUserRolesSelector($userRolesSelector, configData.conditions.user_roles);
+                } else {
+                    this.populateUserRolesSelector($userRolesSelector, []); // Load empty options
+                }
             }
             
             // Populate preset selector
@@ -2402,11 +2418,34 @@ jQuery(document).ready(function ($) {
 
                             $('#wpbnp-configurations-list').append(response.data.html);
 
-                            // Populate custom presets
+                            // Populate all selectors for the new configuration
                             const $newConfig = $('.wpbnp-config-item').last();
+                            
+                            // Populate preset selector
                             const newPresetSelector = $newConfig.find('.wpbnp-preset-selector');
                             if (newPresetSelector.length > 0) {
                                 this.populatePresetSelector(newPresetSelector);
+                            }
+                            
+                            // Populate all other selectors with empty options
+                            const $pagesSelector = $newConfig.find('select[name*="[conditions][pages][]"]');
+                            if ($pagesSelector.length > 0) {
+                                this.populatePagesSelector($pagesSelector, []);
+                            }
+                            
+                            const $postTypesSelector = $newConfig.find('select[name*="[conditions][post_types][]"]');
+                            if ($postTypesSelector.length > 0) {
+                                this.populatePostTypesSelector($postTypesSelector, []);
+                            }
+                            
+                            const $categoriesSelector = $newConfig.find('select[name*="[conditions][categories][]"]');
+                            if ($categoriesSelector.length > 0) {
+                                this.populateCategoriesSelector($categoriesSelector, []);
+                            }
+                            
+                            const $userRolesSelector = $newConfig.find('select[name*="[conditions][user_roles][]"]');
+                            if ($userRolesSelector.length > 0) {
+                                this.populateUserRolesSelector($userRolesSelector, []);
                             }
 
                             // Save form state to preserve the new configuration
