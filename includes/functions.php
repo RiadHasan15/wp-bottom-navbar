@@ -228,8 +228,10 @@ function wpbnp_sanitize_settings($settings) {
         if (isset($settings['custom_presets']['presets']) && is_array($settings['custom_presets']['presets'])) {
             foreach ($settings['custom_presets']['presets'] as $preset_id => $preset) {
                 if (is_array($preset) && !empty($preset['id']) && !empty($preset['name'])) {
-                    $sanitized['custom_presets']['presets'][$preset_id] = array(
-                        'id' => sanitize_key($preset['id']),
+                    // Use the preset ID as the key to maintain consistency
+                    $sanitized_preset_id = sanitize_key($preset['id']);
+                    $sanitized['custom_presets']['presets'][$sanitized_preset_id] = array(
+                        'id' => $sanitized_preset_id,
                         'name' => sanitize_text_field($preset['name']),
                         'description' => sanitize_textarea_field($preset['description'] ?? ''),
                         'created_at' => absint($preset['created_at'] ?? time()),

@@ -382,13 +382,13 @@ class WPBNP_Admin_UI {
             </div>
             
             <!-- Hidden inputs to store preset data -->
-            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][id]" value="<?php echo esc_attr($preset_id); ?>">
-            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][name]" value="<?php echo esc_attr($preset_name); ?>">
-            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][description]" value="<?php echo esc_attr($preset_description); ?>">
-            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][created_at]" value="<?php echo esc_attr($preset['created_at'] ?? time()); ?>">
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][id]" value="<?php echo esc_attr($preset_id); ?>">
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][name]" value="<?php echo esc_attr($preset_name); ?>">
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][description]" value="<?php echo esc_attr($preset_description); ?>">
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][created_at]" value="<?php echo esc_attr($preset['created_at'] ?? time()); ?>">
             
             <!-- Store items as JSON -->
-            <input type="hidden" name="settings[custom_presets][presets][<?php echo $index; ?>][items]" value="<?php echo esc_attr(json_encode($preset['items'] ?? array())); ?>">
+            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][items]" value="<?php echo esc_attr(json_encode($preset['items'] ?? array())); ?>">
         </div>
         <?php
     }

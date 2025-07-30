@@ -986,8 +986,21 @@ class WP_Bottom_Navigation_Pro {
         
         $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array();
         
+        // DEBUG: Log the incoming form data
+        error_log('WPBNP: Form data received: ' . print_r($_POST, true));
+        error_log('WPBNP: Settings data: ' . print_r($settings, true));
+        
         // CRITICAL: Handle custom presets data from form submission
-        if (isset($_POST['wpbnp_custom_presets_data'])) {
+        // First, check if custom presets are in the regular form data (from hidden inputs)
+        if (isset($settings['custom_presets']) && isset($settings['custom_presets']['presets'])) {
+            error_log('WPBNP: Custom presets found in form data: ' . count($settings['custom_presets']['presets']) . ' presets');
+            // Ensure enabled is set
+            if (!isset($settings['custom_presets']['enabled'])) {
+                $settings['custom_presets']['enabled'] = true;
+            }
+        }
+        // Also handle JSON data if sent separately
+        elseif (isset($_POST['wpbnp_custom_presets_data'])) {
             $custom_presets_data = wp_unslash($_POST['wpbnp_custom_presets_data']);
             $custom_presets = json_decode($custom_presets_data, true);
             
@@ -999,10 +1012,12 @@ class WP_Bottom_Navigation_Pro {
                 $settings['custom_presets']['presets'] = $custom_presets;
                 $settings['custom_presets']['enabled'] = true;
                 
-                error_log('WPBNP: Custom presets data saved: ' . count($custom_presets) . ' presets');
+                error_log('WPBNP: Custom presets data saved from JSON: ' . count($custom_presets) . ' presets');
             } else {
                 error_log('WPBNP: Error parsing custom presets data: ' . json_last_error_msg());
             }
+        } else {
+            error_log('WPBNP: No custom presets data found in form submission');
         }
         
         $sanitized_settings = wpbnp_sanitize_settings($settings);

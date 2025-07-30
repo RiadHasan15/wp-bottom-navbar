@@ -611,13 +611,17 @@ jQuery(document).ready(function ($) {
                 }
             });
 
-            // CRITICAL: Add custom presets data to form submission
+            // CRITICAL: Custom presets are already in the form as hidden fields
+            // No need to send JSON data separately - the form fields will handle it
             const customPresets = this.getCustomPresetsData();
-            if (customPresets.length > 0) {
-                formData.append('wpbnp_custom_presets_data', JSON.stringify(customPresets));
-                console.log('Added custom presets data to form submission:', customPresets);
-            } else {
-                console.log('No custom presets to save');
+            console.log('Custom presets in form:', customPresets.length, 'presets');
+            
+            // DEBUG: Log the form data being sent
+            console.log('Form data being sent:', formData);
+            for (let [key, value] of formData.entries()) {
+                if (key.includes('custom_presets')) {
+                    console.log('Custom preset field:', key, '=', value);
+                }
             }
 
             formData.append('action', 'wpbnp_save_settings');
