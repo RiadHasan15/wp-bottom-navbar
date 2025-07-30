@@ -949,7 +949,9 @@ class WP_Bottom_Navigation_Pro {
             ),
             'icon_libraries' => $icon_libraries,
             'presets' => wpbnp_get_presets(),
-            'settings' => wpbnp_get_settings()
+            'settings' => wpbnp_get_settings(),
+            'post_types' => get_post_types(array('public' => true), 'objects'),
+            'user_roles' => wp_roles()->get_names()
         ));
     }
     

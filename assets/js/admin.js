@@ -502,10 +502,8 @@ jQuery(document).ready(function ($) {
                 
                 // Collect selected pages - handle both multiselect and regular select
                 const pagesSelect = $config.find('select[name*="[conditions][pages][]"]');
-                console.log('Pages select found:', pagesSelect.length, 'elements');
                 if (pagesSelect.length > 0) {
                     const selectedPages = pagesSelect.val();
-                    console.log('Selected pages for config', configId, ':', selectedPages);
                     if (selectedPages) {
                         if (Array.isArray(selectedPages)) {
                             selectedPages.forEach(pageId => {
@@ -517,7 +515,6 @@ jQuery(document).ready(function ($) {
                             config.conditions.pages.push(selectedPages);
                         }
                     }
-                    console.log('Final pages array for config', configId, ':', config.conditions.pages);
                 }
                 
                 // Collect selected post types - handle both multiselect and regular select
@@ -1116,34 +1113,26 @@ jQuery(document).ready(function ($) {
         populateConfigurationSelectors: function ($config, configData) {
             // Populate pages selector
             const $pagesSelector = $config.find('select[name*="[conditions][pages][]"]');
-            if ($pagesSelector.length && configData.conditions.pages) {
-                configData.conditions.pages.forEach(pageId => {
-                    $pagesSelector.append(`<option value="${pageId}" selected>Page ${pageId}</option>`);
-                });
+            if ($pagesSelector.length && configData.conditions && configData.conditions.pages && configData.conditions.pages.length > 0) {
+                this.populatePagesSelector($pagesSelector, configData.conditions.pages);
             }
             
             // Populate post types selector
             const $postTypesSelector = $config.find('select[name*="[conditions][post_types][]"]');
-            if ($postTypesSelector.length && configData.conditions.post_types) {
-                configData.conditions.post_types.forEach(postType => {
-                    $postTypesSelector.append(`<option value="${postType}" selected>${postType}</option>`);
-                });
+            if ($postTypesSelector.length && configData.conditions && configData.conditions.post_types && configData.conditions.post_types.length > 0) {
+                this.populatePostTypesSelector($postTypesSelector, configData.conditions.post_types);
             }
             
             // Populate categories selector
             const $categoriesSelector = $config.find('select[name*="[conditions][categories][]"]');
-            if ($categoriesSelector.length && configData.conditions.categories) {
-                configData.conditions.categories.forEach(categoryId => {
-                    $categoriesSelector.append(`<option value="${categoryId}" selected>Category ${categoryId}</option>`);
-                });
+            if ($categoriesSelector.length && configData.conditions && configData.conditions.categories && configData.conditions.categories.length > 0) {
+                this.populateCategoriesSelector($categoriesSelector, configData.conditions.categories);
             }
             
             // Populate user roles selector
             const $userRolesSelector = $config.find('select[name*="[conditions][user_roles][]"]');
-            if ($userRolesSelector.length && configData.conditions.user_roles) {
-                configData.conditions.user_roles.forEach(role => {
-                    $userRolesSelector.append(`<option value="${role}" selected>${role}</option>`);
-                });
+            if ($userRolesSelector.length && configData.conditions && configData.conditions.user_roles && configData.conditions.user_roles.length > 0) {
+                this.populateUserRolesSelector($userRolesSelector, configData.conditions.user_roles);
             }
             
             // Populate preset selector
@@ -3787,6 +3776,108 @@ jQuery(document).ready(function ($) {
                 error: function () {
                     $selector.html('<option value="" disabled>Error loading categories</option>');
                 }
+            });
+        },
+
+        // Populate pages selector with selected values
+        populatePagesSelector: function ($selector, selectedPageIds) {
+            if (!$selector || !$selector.length) {
+                return;
+            }
+
+            // Make AJAX call to get pages
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_get_pages',
+                    nonce: wpbnp_admin.nonce
+                },
+                success: function (response) {
+                    if (response.success && response.data.pages) {
+                        $selector.empty();
+                        $selector.append('<option value="">Select pages...</option>');
+
+                        response.data.pages.forEach(function (page) {
+                            const isSelected = selectedPageIds.includes(page.ID.toString());
+                            $selector.append(`<option value="${page.ID}" ${isSelected ? 'selected' : ''}>${page.post_title}</option>`);
+                        });
+                    } else {
+                        $selector.html('<option value="" disabled>No pages found - Create some pages first</option>');
+                    }
+                },
+                error: function () {
+                    $selector.html('<option value="" disabled>Error loading pages</option>');
+                }
+            });
+        },
+
+        // Populate post types selector with selected values
+        populatePostTypesSelector: function ($selector, selectedPostTypes) {
+            if (!$selector || !$selector.length) {
+                return;
+            }
+
+            // Get post types from WordPress
+            const postTypes = wpbnp_admin.post_types || {};
+            $selector.empty();
+            $selector.append('<option value="">Select post types...</option>');
+
+            Object.keys(postTypes).forEach(function (postType) {
+                const postTypeObj = postTypes[postType];
+                const postTypeLabel = postTypeObj && postTypeObj.label ? postTypeObj.label : postType;
+                const isSelected = selectedPostTypes.includes(postType);
+                $selector.append(`<option value="${postType}" ${isSelected ? 'selected' : ''}>${postTypeLabel}</option>`);
+            });
+        },
+
+        // Populate categories selector with selected values
+        populateCategoriesSelector: function ($selector, selectedCategoryIds) {
+            if (!$selector || !$selector.length) {
+                return;
+            }
+
+            // Make AJAX call to get categories
+            $.ajax({
+                url: wpbnp_admin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'wpbnp_get_categories',
+                    nonce: wpbnp_admin.nonce
+                },
+                success: function (response) {
+                    if (response.success && response.data.categories) {
+                        $selector.empty();
+                        $selector.append('<option value="">Select categories...</option>');
+
+                        response.data.categories.forEach(function (category) {
+                            const isSelected = selectedCategoryIds.includes(category.term_id.toString());
+                            $selector.append(`<option value="${category.term_id}" ${isSelected ? 'selected' : ''}>${category.name}</option>`);
+                        });
+                    } else {
+                        $selector.html('<option value="" disabled>No categories found</option>');
+                    }
+                },
+                error: function () {
+                    $selector.html('<option value="" disabled>Error loading categories</option>');
+                }
+            });
+        },
+
+        // Populate user roles selector with selected values
+        populateUserRolesSelector: function ($selector, selectedUserRoles) {
+            if (!$selector || !$selector.length) {
+                return;
+            }
+
+            // Get user roles from WordPress
+            const userRoles = wpbnp_admin.user_roles || {};
+            $selector.empty();
+            $selector.append('<option value="">Select user roles...</option>');
+
+            Object.keys(userRoles).forEach(function (role) {
+                const isSelected = selectedUserRoles.includes(role);
+                $selector.append(`<option value="${role}" ${isSelected ? 'selected' : ''}>${userRoles[role]}</option>`);
             });
         }
     };
