@@ -1384,27 +1384,116 @@ class WP_Bottom_Navigation_Pro {
             'id' => $config_id,
             'name' => 'New Configuration',
             'priority' => 1,
-            'conditions' => array()
+            'preset_id' => 'default',
+            'conditions' => array(
+                'pages' => array(),
+                'post_types' => array(),
+                'categories' => array(),
+                'user_roles' => array()
+            )
         );
         
-        // Start output buffering to capture the rendered HTML
-        ob_start();
-        
-        // Include the admin UI class and render the configuration
-        require_once WPBNP_PLUGIN_DIR . 'admin/settings-ui.php';
-        $admin_ui = new WPBNP_Admin_UI();
-        
-        // Use reflection to access the private method
-        $reflection = new ReflectionClass($admin_ui);
-        $method = $reflection->getMethod('render_configuration_item');
-        $method->setAccessible(true);
-        $method->invoke($admin_ui, $config, $config_id); // Use config_id instead of config_index
-        
-        $html = ob_get_clean();
+        // Generate the HTML directly without using reflection
+        $html = $this->generate_configuration_html($config, $config_id);
         
         wp_send_json_success(array(
             'html' => $html
         ));
+    }
+    
+    /**
+     * Generate configuration HTML
+     */
+    private function generate_configuration_html($config, $config_id) {
+        $config_name = isset($config['name']) ? $config['name'] : __('Untitled Configuration', 'wp-bottom-navigation-pro');
+        $priority = isset($config['priority']) ? $config['priority'] : 1;
+        $preset_id = isset($config['preset_id']) ? $config['preset_id'] : 'default';
+        $conditions = isset($config['conditions']) ? $config['conditions'] : array();
+        
+        ob_start();
+        ?>
+        <div class="wpbnp-config-item" data-config-id="<?php echo esc_attr($config_id); ?>">
+            <div class="wpbnp-config-header">
+                <div class="wpbnp-config-title">
+                    <span class="wpbnp-config-name"><?php echo esc_html($config_name); ?></span>
+                    <span class="wpbnp-config-priority">Priority: <?php echo esc_html($priority); ?></span>
+                </div>
+                <div class="wpbnp-config-actions">
+                    <button type="button" class="wpbnp-config-toggle" title="<?php esc_attr_e('Expand/Collapse', 'wp-bottom-navigation-pro'); ?>">
+                        <span class="dashicons dashicons-arrow-down"></span>
+                    </button>
+                    <button type="button" class="wpbnp-config-delete" title="<?php esc_attr_e('Delete Configuration', 'wp-bottom-navigation-pro'); ?>">
+                        <span class="dashicons dashicons-trash"></span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="wpbnp-config-content" style="display: none;">
+                <div class="wpbnp-config-settings">
+                    <div class="wpbnp-field">
+                        <label><?php esc_html_e('Configuration Name', 'wp-bottom-navigation-pro'); ?></label>
+                        <input type="text" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][name]" 
+                               value="<?php echo esc_attr($config_name); ?>" placeholder="<?php esc_attr_e('Enter configuration name...', 'wp-bottom-navigation-pro'); ?>">
+                    </div>
+                    
+                    <div class="wpbnp-field">
+                        <label><?php esc_html_e('Priority', 'wp-bottom-navigation-pro'); ?></label>
+                        <input type="number" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][priority]" 
+                               value="<?php echo esc_attr($priority); ?>" min="1" max="100">
+                        <p class="description"><?php esc_html_e('Higher priority configurations will override lower ones when conditions match.', 'wp-bottom-navigation-pro'); ?></p>
+                    </div>
+                    
+                    <div class="wpbnp-targeting-conditions">
+                        <h4><?php esc_html_e('Display Conditions', 'wp-bottom-navigation-pro'); ?></h4>
+                        
+                        <div class="wpbnp-condition-group">
+                            <label><?php esc_html_e('Specific Pages', 'wp-bottom-navigation-pro'); ?></label>
+                            <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
+                                <option value=""><?php esc_html_e('Select pages...', 'wp-bottom-navigation-pro'); ?></option>
+                            </select>
+                        </div>
+                        
+                        <div class="wpbnp-condition-group">
+                            <label><?php esc_html_e('Post Types', 'wp-bottom-navigation-pro'); ?></label>
+                            <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][post_types][]" multiple class="wpbnp-multiselect">
+                                <option value=""><?php esc_html_e('Select post types...', 'wp-bottom-navigation-pro'); ?></option>
+                            </select>
+                        </div>
+                        
+                        <div class="wpbnp-condition-group">
+                            <label><?php esc_html_e('Categories', 'wp-bottom-navigation-pro'); ?></label>
+                            <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][categories][]" multiple class="wpbnp-multiselect">
+                                <option value=""><?php esc_html_e('Select categories...', 'wp-bottom-navigation-pro'); ?></option>
+                            </select>
+                        </div>
+                        
+                        <div class="wpbnp-condition-group">
+                            <label><?php esc_html_e('User Roles', 'wp-bottom-navigation-pro'); ?></label>
+                            <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][user_roles][]" multiple class="wpbnp-multiselect">
+                                <option value=""><?php esc_html_e('Select user roles...', 'wp-bottom-navigation-pro'); ?></option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="wpbnp-navigation-config">
+                        <h4><?php esc_html_e('Navigation Configuration', 'wp-bottom-navigation-pro'); ?></h4>
+                        
+                        <div class="wpbnp-field">
+                            <label><?php esc_html_e('Preset to Display', 'wp-bottom-navigation-pro'); ?></label>
+                            <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][preset_id]" class="wpbnp-preset-selector">
+                                <option value="default"><?php esc_html_e('Default Navigation (Items Tab)', 'wp-bottom-navigation-pro'); ?></option>
+                            </select>
+                            <p class="description"><?php esc_html_e('Choose which navigation preset to display when the conditions above are met.', 'wp-bottom-navigation-pro'); ?></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden fields -->
+            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][id]" value="<?php echo esc_attr($config_id); ?>">
+        </div>
+        <?php
+        return ob_get_clean();
     }
 }
 
