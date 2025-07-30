@@ -2675,7 +2675,10 @@ jQuery(document).ready(function ($) {
 
             // Get current navigation items
             const currentItems = this.getCurrentNavigationItems();
+            console.log('handleCreatePresetSubmit: Current items collected:', currentItems);
+            
             const itemsToInclude = currentItems; // Include all items
+            console.log('handleCreatePresetSubmit: Items to include in preset:', itemsToInclude);
 
             if (itemsToInclude.length === 0) {
                 this.showNotification('No items to include in the preset. Please add some navigation items first.', 'error');
@@ -2733,14 +2736,32 @@ jQuery(document).ready(function ($) {
         // Get current navigation items
         getCurrentNavigationItems: function () {
             const items = [];
-            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function () {
+            console.log('getCurrentNavigationItems: Starting to collect items...');
+            console.log('Total .wpbnp-nav-item-row elements found:', $('#wpbnp-items-list .wpbnp-nav-item-row').length);
+            
+            $('#wpbnp-items-list .wpbnp-nav-item-row').each(function (index) {
                 const $row = $(this);
+                const enabledInput = $row.find('input[name*="[enabled]"]');
+                // For hidden inputs, check the value instead of :checked
+                const enabledValue = enabledInput.attr('type') === 'hidden' ? 
+                    enabledInput.val() === '1' : 
+                    enabledInput.is(':checked');
+                
+                console.log(`Item ${index + 1}:`, {
+                    id: $row.find('input[name*="[id]"]').val(),
+                    label: $row.find('input[name*="[label]"]').val(),
+                    enabled: enabledValue,
+                    enabledInputType: enabledInput.attr('type'),
+                    enabledInputValue: enabledInput.val(),
+                    enabledInputChecked: enabledInput.is(':checked')
+                });
+                
                 const item = {
                     id: $row.find('input[name*="[id]"]').val() || 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                     label: $row.find('input[name*="[label]"]').val() || '',
                     icon: $row.find('input[name*="[icon]"]').val() || '',
                     url: $row.find('input[name*="[url]"]').val() || '',
-                    enabled: $row.find('input[name*="[enabled]"]').is(':checked'),
+                    enabled: enabledValue,
                     target: $row.find('select[name*="[target]"]').val() || '_self',
                     show_badge: $row.find('input[name*="[show_badge]"]').is(':checked'),
                     badge_type: $row.find('select[name*="[badge_type]"]').val() || 'count',
@@ -2756,12 +2777,15 @@ jQuery(document).ready(function ($) {
                 items.push(item);
             });
 
+            console.log('getCurrentNavigationItems: Final items collected:', items);
             return items;
         },
 
         // Add preset to DOM with unique ID management
         addPresetToDOM: function (preset) {
             console.log('addPresetToDOM called for preset:', preset.name);
+            console.log('addPresetToDOM: Preset items:', preset.items);
+            console.log('addPresetToDOM: Items enabled states:', preset.items.map(item => ({ id: item.id, label: item.label, enabled: item.enabled })));
             
             const presetsContainer = $('#wpbnp-custom-presets-list');
             const noPresetsMessage = presetsContainer.find('.wpbnp-no-presets');
