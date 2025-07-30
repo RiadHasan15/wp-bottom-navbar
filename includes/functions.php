@@ -281,12 +281,17 @@ function wpbnp_sanitize_settings($settings) {
         );
         
         if (isset($settings['custom_presets']['presets']) && is_array($settings['custom_presets']['presets'])) {
+            error_log('WPBNP: Raw presets array keys: ' . implode(', ', array_keys($settings['custom_presets']['presets'])));
+            error_log('WPBNP: Raw presets data: ' . print_r($settings['custom_presets']['presets'], true));
             foreach ($settings['custom_presets']['presets'] as $preset_id => $preset) {
                 error_log('WPBNP: Processing preset ID: ' . $preset_id . ' with name: ' . ($preset['name'] ?? 'unknown'));
                 if (is_array($preset)) {
-                    $sanitized_preset_id = sanitize_key($preset_id);
+                    // Use the preset's actual ID, not the array key
+                    $actual_preset_id = $preset['id'] ?? $preset_id;
+                    $sanitized_preset_id = sanitize_key($actual_preset_id);
+                    error_log('WPBNP: Original preset ID: ' . $actual_preset_id . ', Sanitized: ' . $sanitized_preset_id);
                     $sanitized_preset = array(
-                        'id' => sanitize_key($preset['id'] ?? $sanitized_preset_id),
+                        'id' => $sanitized_preset_id,
                         'name' => sanitize_text_field($preset['name'] ?? ''),
                         'description' => sanitize_text_field($preset['description'] ?? ''),
                         'created_at' => absint($preset['created_at'] ?? time()),
@@ -340,10 +345,12 @@ function wpbnp_sanitize_settings($settings) {
                     
                     $sanitized['custom_presets']['presets'][$sanitized_preset_id] = $sanitized_preset;
                     error_log('WPBNP: Saved preset: ' . $sanitized_preset['name'] . ' with ' . count($sanitized_preset['items']) . ' items');
+                    error_log('WPBNP: Current sanitized presets keys: ' . implode(', ', array_keys($sanitized['custom_presets']['presets'])));
                 }
             }
         }
         error_log('WPBNP: Final custom presets count: ' . count($sanitized['custom_presets']['presets']) . ' presets');
+        error_log('WPBNP: Final custom presets keys: ' . implode(', ', array_keys($sanitized['custom_presets']['presets'])));
     }
     
     return apply_filters('wpbnp_sanitize_settings', $sanitized, $settings);

@@ -990,6 +990,16 @@ class WP_Bottom_Navigation_Pro {
         error_log('WPBNP: Form data received: ' . print_r($_POST, true));
         error_log('WPBNP: Settings data: ' . print_r($settings, true));
         
+        // DEBUG: Specifically log custom presets data
+        if (isset($settings['custom_presets']) && isset($settings['custom_presets']['presets'])) {
+            error_log('WPBNP: Custom presets keys in form: ' . implode(', ', array_keys($settings['custom_presets']['presets'])));
+            foreach ($settings['custom_presets']['presets'] as $key => $preset) {
+                error_log('WPBNP: Preset key: ' . $key . ', name: ' . ($preset['name'] ?? 'unknown') . ', id: ' . ($preset['id'] ?? 'unknown'));
+            }
+        } else {
+            error_log('WPBNP: No custom presets found in form data');
+        }
+        
 
         
         // CRITICAL: Handle custom presets data from form submission
