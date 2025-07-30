@@ -276,7 +276,9 @@ class WPBNP_Admin_UI {
      * Render hidden fields for page targeting configurations
      */
     private function render_page_targeting_hidden_fields($settings) {
-        $page_targeting = isset($settings['page_targeting']) ? $settings['page_targeting'] : array();
+        // Get fresh settings from database to ensure we have the latest data
+        $fresh_settings = wpbnp_get_settings();
+        $page_targeting = isset($fresh_settings['page_targeting']) ? $fresh_settings['page_targeting'] : array();
         $configurations = isset($page_targeting['configurations']) ? $page_targeting['configurations'] : array();
         
         if (!empty($configurations)) {
