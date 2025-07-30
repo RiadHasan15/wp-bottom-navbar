@@ -443,6 +443,71 @@ jQuery(document).ready(function ($) {
             return formData;
         },
 
+        // Get page targeting configurations from DOM
+        getPageTargetingConfigurations: function () {
+            const configurations = [];
+            $('.wpbnp-config-item').each(function () {
+                const $config = $(this);
+                const configId = $config.data('config-id');
+                
+                if (!configId) {
+                    console.warn('Configuration item missing config-id');
+                    return;
+                }
+                
+                const config = {
+                    id: configId,
+                    name: $config.find('input[name*="[name]"]').val() || 'Untitled Configuration',
+                    priority: parseInt($config.find('input[name*="[priority]"]').val()) || 1,
+                    preset_id: $config.find('select[name*="[preset_id]"]').val() || 'default',
+                    conditions: {
+                        pages: [],
+                        post_types: [],
+                        categories: [],
+                        user_roles: []
+                    }
+                };
+                
+                // Collect selected pages
+                $config.find('select[name*="[conditions][pages][]"] option:selected').each(function () {
+                    const value = $(this).val();
+                    if (value && value !== '') {
+                        config.conditions.pages.push(value);
+                    }
+                });
+                
+                // Collect selected post types
+                $config.find('select[name*="[conditions][post_types][]"] option:selected').each(function () {
+                    const value = $(this).val();
+                    if (value && value !== '') {
+                        config.conditions.post_types.push(value);
+                    }
+                });
+                
+                // Collect selected categories
+                $config.find('select[name*="[conditions][categories][]"] option:selected').each(function () {
+                    const value = $(this).val();
+                    if (value && value !== '') {
+                        config.conditions.categories.push(value);
+                    }
+                });
+                
+                // Collect selected user roles
+                $config.find('select[name*="[conditions][user_roles][]"] option:selected').each(function () {
+                    const value = $(this).val();
+                    if (value && value !== '') {
+                        config.conditions.user_roles.push(value);
+                    }
+                });
+                
+                configurations.push(config);
+                console.log('Collected configuration:', config.name, 'with ID:', config.id);
+            });
+            
+            console.log('Total configurations collected:', configurations.length);
+            return configurations;
+        },
+
         // Get custom presets data from DOM with proper ID handling
         getCustomPresetsData: function () {
             const presets = [];
@@ -589,6 +654,40 @@ jQuery(document).ready(function ($) {
             const customPresets = this.getCustomPresetsData();
             console.log('Custom presets in form:', customPresets.length, 'presets');
             
+            // CRITICAL: Collect page targeting configurations from DOM and add to form data
+            const pageTargetingConfigs = this.getPageTargetingConfigurations();
+            console.log('Page targeting configurations in form:', pageTargetingConfigs.length, 'configs');
+            
+            // Add page targeting configurations to form data
+            pageTargetingConfigs.forEach((config, index) => {
+                formData.append(`settings[page_targeting][configurations][${config.id}][id]`, config.id);
+                formData.append(`settings[page_targeting][configurations][${config.id}][name]`, config.name);
+                formData.append(`settings[page_targeting][configurations][${config.id}][priority]`, config.priority);
+                formData.append(`settings[page_targeting][configurations][${config.id}][preset_id]`, config.preset_id);
+                
+                // Add conditions
+                if (config.conditions.pages && config.conditions.pages.length > 0) {
+                    config.conditions.pages.forEach(pageId => {
+                        formData.append(`settings[page_targeting][configurations][${config.id}][conditions][pages][]`, pageId);
+                    });
+                }
+                if (config.conditions.post_types && config.conditions.post_types.length > 0) {
+                    config.conditions.post_types.forEach(postType => {
+                        formData.append(`settings[page_targeting][configurations][${config.id}][conditions][post_types][]`, postType);
+                    });
+                }
+                if (config.conditions.categories && config.conditions.categories.length > 0) {
+                    config.conditions.categories.forEach(categoryId => {
+                        formData.append(`settings[page_targeting][configurations][${config.id}][conditions][categories][]`, categoryId);
+                    });
+                }
+                if (config.conditions.user_roles && config.conditions.user_roles.length > 0) {
+                    config.conditions.user_roles.forEach(role => {
+                        formData.append(`settings[page_targeting][configurations][${config.id}][conditions][user_roles][]`, role);
+                    });
+                }
+            });
+            
 
 
             formData.append('action', 'wpbnp_save_settings');
@@ -633,6 +732,17 @@ jQuery(document).ready(function ($) {
                             } else {
                                 console.log('No custom presets in server response');
                             }
+                            
+                            // CRITICAL: Restore page targeting configurations from server response
+                            if (this.settings.page_targeting && this.settings.page_targeting.configurations) {
+                                console.log('Restoring page targeting configurations from server response:', this.settings.page_targeting.configurations);
+                                // Add a small delay to ensure DOM is ready
+                                setTimeout(() => {
+                                    this.restorePageTargetingConfigurations(this.settings.page_targeting.configurations);
+                                }, 100);
+                            } else {
+                                console.log('No page targeting configurations in server response');
+                            }
                         } else {
                             console.warn('No settings data in server response');
                             // If no settings in response, merge current form data with existing settings
@@ -660,6 +770,182 @@ jQuery(document).ready(function ($) {
                     submitBtn.prop('disabled', false).text(originalText);
                 }
             });
+        },
+
+        // Restore page targeting configurations from server data
+        restorePageTargetingConfigurations: function (serverConfigurations) {
+            console.log('Restoring page targeting configurations from server data:', serverConfigurations);
+            
+            // Clear existing configurations in DOM
+            $('.wpbnp-config-item').remove();
+            
+            // Add no configurations message if no configurations
+            if (!serverConfigurations || (Array.isArray(serverConfigurations) && serverConfigurations.length === 0) || (typeof serverConfigurations === 'object' && Object.keys(serverConfigurations).length === 0)) {
+                $('#wpbnp-configurations-list').html('<div class="wpbnp-no-configs">No configurations created yet. Click "Add Configuration" to get started.</div>');
+                return;
+            }
+            
+            // Handle both array and object formats
+            const configsArray = Array.isArray(serverConfigurations) ? serverConfigurations : Object.values(serverConfigurations);
+            
+            // Add each configuration to DOM
+            configsArray.forEach(config => {
+                if (config.id && config.name) {
+                    console.log('Restoring configuration:', config.name, 'with ID:', config.id);
+                    this.addConfigurationToDOM(config);
+                }
+            });
+            
+            // Update all preset selectors
+            this.updateAllPresetSelectors();
+            
+            console.log('Page targeting configurations restored successfully');
+        },
+
+        // Add configuration to DOM
+        addConfigurationToDOM: function (config) {
+            console.log('addConfigurationToDOM called for config:', config.name);
+            
+            const configsContainer = $('#wpbnp-configurations-list');
+            const noConfigsMessage = configsContainer.find('.wpbnp-no-configs');
+
+            if (noConfigsMessage.length) {
+                noConfigsMessage.remove();
+            }
+
+            const configId = config.id;
+            const priority = config.priority || 1;
+
+            const configHtml = `
+                <div class="wpbnp-config-item" data-config-id="${configId}">
+                    <div class="wpbnp-config-header">
+                        <div class="wpbnp-config-title">
+                            <span class="wpbnp-config-name">${config.name}</span>
+                            <span class="wpbnp-config-priority">Priority: ${priority}</span>
+                        </div>
+                        <div class="wpbnp-config-actions">
+                            <button type="button" class="wpbnp-config-toggle" title="Expand/Collapse">
+                                <span class="dashicons dashicons-arrow-down"></span>
+                            </button>
+                            <button type="button" class="wpbnp-config-delete" title="Delete Configuration">
+                                <span class="dashicons dashicons-trash"></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="wpbnp-config-content" style="display: none;">
+                        <div class="wpbnp-config-settings">
+                            <div class="wpbnp-field">
+                                <label>Configuration Name</label>
+                                <input type="text" name="settings[page_targeting][configurations][${configId}][name]" 
+                                       value="${config.name}" placeholder="Enter configuration name...">
+                            </div>
+                            
+                            <div class="wpbnp-field">
+                                <label>Priority</label>
+                                <input type="number" name="settings[page_targeting][configurations][${configId}][priority]" 
+                                       value="${priority}" min="1" max="100">
+                                <p class="description">Higher priority configurations will override lower ones when conditions match.</p>
+                            </div>
+                            
+                            <div class="wpbnp-targeting-conditions">
+                                <h4>Display Conditions</h4>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Specific Pages</label>
+                                    <select name="settings[page_targeting][configurations][${configId}][conditions][pages][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select pages...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Post Types</label>
+                                    <select name="settings[page_targeting][configurations][${configId}][conditions][post_types][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select post types...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>Categories</label>
+                                    <select name="settings[page_targeting][configurations][${configId}][conditions][categories][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select categories...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="wpbnp-condition-group">
+                                    <label>User Roles</label>
+                                    <select name="settings[page_targeting][configurations][${configId}][conditions][user_roles][]" multiple class="wpbnp-multiselect">
+                                        <option value="">Select user roles...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="wpbnp-navigation-config">
+                                <h4>Navigation Configuration</h4>
+                                
+                                <div class="wpbnp-field">
+                                    <label>Preset to Display</label>
+                                    <select name="settings[page_targeting][configurations][${configId}][preset_id]" class="wpbnp-preset-selector">
+                                        <option value="default">Default Navigation (Items Tab)</option>
+                                    </select>
+                                    <p class="description">Choose which navigation preset to display when the conditions above are met.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden fields -->
+                    <input type="hidden" name="settings[page_targeting][configurations][${configId}][id]" value="${configId}">
+                </div>
+            `;
+
+            configsContainer.append(configHtml);
+            console.log('Configuration added to DOM successfully:', config.name, 'with ID:', configId);
+            
+            // Populate the selectors with data
+            const $newConfig = configsContainer.find(`[data-config-id="${configId}"]`);
+            this.populateConfigurationSelectors($newConfig, config);
+        },
+
+        // Populate configuration selectors with data
+        populateConfigurationSelectors: function ($config, configData) {
+            // Populate pages selector
+            const $pagesSelector = $config.find('select[name*="[conditions][pages][]"]');
+            if ($pagesSelector.length && configData.conditions.pages) {
+                configData.conditions.pages.forEach(pageId => {
+                    $pagesSelector.append(`<option value="${pageId}" selected>Page ${pageId}</option>`);
+                });
+            }
+            
+            // Populate post types selector
+            const $postTypesSelector = $config.find('select[name*="[conditions][post_types][]"]');
+            if ($postTypesSelector.length && configData.conditions.post_types) {
+                configData.conditions.post_types.forEach(postType => {
+                    $postTypesSelector.append(`<option value="${postType}" selected>${postType}</option>`);
+                });
+            }
+            
+            // Populate categories selector
+            const $categoriesSelector = $config.find('select[name*="[conditions][categories][]"]');
+            if ($categoriesSelector.length && configData.conditions.categories) {
+                configData.conditions.categories.forEach(categoryId => {
+                    $categoriesSelector.append(`<option value="${categoryId}" selected>Category ${categoryId}</option>`);
+                });
+            }
+            
+            // Populate user roles selector
+            const $userRolesSelector = $config.find('select[name*="[conditions][user_roles][]"]');
+            if ($userRolesSelector.length && configData.conditions.user_roles) {
+                configData.conditions.user_roles.forEach(role => {
+                    $userRolesSelector.append(`<option value="${role}" selected>${role}</option>`);
+                });
+            }
+            
+            // Populate preset selector
+            const $presetSelector = $config.find('.wpbnp-preset-selector');
+            if ($presetSelector.length && configData.preset_id) {
+                $presetSelector.val(configData.preset_id);
+            }
         },
 
         // Restore custom presets from server data
@@ -1790,6 +2076,12 @@ jQuery(document).ready(function ($) {
                 this.restoreCustomPresets(this.settings.custom_presets.presets);
             } else {
                 this.updateAllPresetSelectors();
+            }
+            
+            // CRITICAL: Load page targeting configurations from server data if available
+            if (this.settings && this.settings.page_targeting && this.settings.page_targeting.configurations) {
+                console.log('Loading page targeting configurations from settings:', this.settings.page_targeting.configurations);
+                this.restorePageTargetingConfigurations(this.settings.page_targeting.configurations);
             }
 
             // License activation modal
