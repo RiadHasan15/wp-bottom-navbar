@@ -2476,7 +2476,6 @@ jQuery(document).ready(function ($) {
                     <div class="wpbnp-modal">
                         <div class="wpbnp-modal-header">
                             <div class="wpbnp-modal-header-content">
-                                <div class="wpbnp-modal-icon">✨</div>
                                 <div class="wpbnp-modal-title">
                                     <h3>Create Custom Preset</h3>
                                     <p>Save your current navigation configuration as a reusable preset</p>
@@ -2493,7 +2492,6 @@ jQuery(document).ready(function ($) {
                             <form id="wpbnp-create-preset-form">
                                 <div class="wpbnp-form-section">
                                     <div class="wpbnp-section-header">
-                                        <div class="wpbnp-section-icon">📝</div>
                                         <div class="wpbnp-section-title">
                                             <h4>Preset Details</h4>
                                             <p>Give your preset a name and description</p>
@@ -2509,7 +2507,6 @@ jQuery(document).ready(function ($) {
                                             <input type="text" id="preset-name" name="preset-name" 
                                                    placeholder="e.g., Homepage Navigation, Mobile Menu, etc." 
                                                    required maxlength="50">
-                                            <div class="wpbnp-input-icon">📋</div>
                                         </div>
                                         <small class="wpbnp-help-text">This name will be displayed in the preset selector</small>
                                     </div>
@@ -2523,7 +2520,6 @@ jQuery(document).ready(function ($) {
                                             <textarea id="preset-description" name="preset-description" 
                                                       placeholder="Describe what this preset is for, when to use it, etc." 
                                                       rows="3" maxlength="200"></textarea>
-                                            <div class="wpbnp-input-icon">💭</div>
                                         </div>
                                         <small class="wpbnp-help-text">Help others understand when to use this preset</small>
                                     </div>
@@ -2531,7 +2527,6 @@ jQuery(document).ready(function ($) {
                                 
                                 <div class="wpbnp-form-section">
                                     <div class="wpbnp-section-header">
-                                        <div class="wpbnp-section-icon">🎯</div>
                                         <div class="wpbnp-section-title">
                                             <h4>Navigation Items</h4>
                                             <p>Preview of items that will be included in this preset</p>
@@ -2556,11 +2551,9 @@ jQuery(document).ready(function ($) {
                         <div class="wpbnp-modal-footer">
                             <div class="wpbnp-modal-actions">
                                 <button type="button" class="wpbnp-btn wpbnp-btn-secondary wpbnp-modal-cancel">
-                                    <span class="wpbnp-btn-icon">✕</span>
                                     <span class="wpbnp-btn-text">Cancel</span>
                                 </button>
                                 <button type="button" class="wpbnp-btn wpbnp-btn-primary wpbnp-create-preset-btn" disabled>
-                                    <span class="wpbnp-btn-icon">✨</span>
                                     <span class="wpbnp-btn-text">Create Preset</span>
                                     <span class="wpbnp-btn-loading" style="display: none;">
                                         <svg class="wpbnp-spinner" width="16" height="16" viewBox="0 0 24 24">

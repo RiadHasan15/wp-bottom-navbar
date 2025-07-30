@@ -1888,18 +1888,9 @@ input:checked + .wpbnp-toggle-slider:before {
 #wpbnp-edit-preset-modal .wpbnp-modal-header-content {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
     flex: 1;
     position: relative;
     z-index: 1;
-}
-
-#wpbnp-create-preset-modal .wpbnp-modal-icon,
-#wpbnp-edit-preset-modal .wpbnp-modal-icon {
-    font-size: 32px;
-    line-height: 1;
-    margin-top: 2px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
 #wpbnp-create-preset-modal .wpbnp-modal-title,
@@ -2013,18 +2004,7 @@ input:checked + .wpbnp-toggle-slider:before {
 
 #wpbnp-create-preset-modal .wpbnp-section-header,
 #wpbnp-edit-preset-modal .wpbnp-section-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
     margin-bottom: 20px;
-}
-
-#wpbnp-create-preset-modal .wpbnp-section-icon,
-#wpbnp-edit-preset-modal .wpbnp-section-icon {
-    font-size: 20px;
-    line-height: 1;
-    margin-top: 2px;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
 }
 
 #wpbnp-create-preset-modal .wpbnp-section-title,
@@ -2117,24 +2097,12 @@ input:checked + .wpbnp-toggle-slider:before {
     align-items: center;
 }
 
-#wpbnp-create-preset-modal .wpbnp-input-icon,
-#wpbnp-edit-preset-modal .wpbnp-input-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    color: #a0aec0;
-    pointer-events: none;
-    z-index: 2;
-}
-
 #wpbnp-create-preset-modal .wpbnp-form-group input[type="text"],
 #wpbnp-create-preset-modal .wpbnp-form-group textarea,
 #wpbnp-edit-preset-modal .wpbnp-form-group input[type="text"],
 #wpbnp-edit-preset-modal .wpbnp-form-group textarea {
     width: 100% !important;
-    padding: 12px 16px 12px 40px;
+    padding: 12px 16px;
     border: 2px solid #e2e8f0;
     border-radius: 12px;
     font-size: 14px;
@@ -2152,7 +2120,7 @@ input:checked + .wpbnp-toggle-slider:before {
 
 #wpbnp-create-preset-modal .wpbnp-form-group textarea,
 #wpbnp-edit-preset-modal .wpbnp-form-group textarea {
-    padding: 12px 16px 12px 40px;
+    padding: 12px 16px;
     resize: vertical;
     min-height: 80px;
 }
@@ -2167,12 +2135,7 @@ input:checked + .wpbnp-toggle-slider:before {
     background: #ffffff;
 }
 
-#wpbnp-create-preset-modal .wpbnp-form-group input[type="text"]:focus + .wpbnp-input-icon,
-#wpbnp-create-preset-modal .wpbnp-form-group textarea:focus + .wpbnp-input-icon,
-#wpbnp-edit-preset-modal .wpbnp-form-group input[type="text"]:focus + .wpbnp-input-icon,
-#wpbnp-edit-preset-modal .wpbnp-form-group textarea:focus + .wpbnp-input-icon {
-    color: #667eea;
-}
+
 
 #wpbnp-create-preset-modal .wpbnp-help-text,
 #wpbnp-edit-preset-modal .wpbnp-help-text {
@@ -2465,11 +2428,7 @@ input:checked + .wpbnp-toggle-slider:before {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-#wpbnp-create-preset-modal .wpbnp-btn-icon,
-#wpbnp-edit-preset-modal .wpbnp-btn-icon {
-    font-size: 16px;
-    line-height: 1;
-}
+
 
 #wpbnp-create-preset-modal .wpbnp-spinner,
 #wpbnp-edit-preset-modal .wpbnp-spinner {
