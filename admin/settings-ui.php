@@ -155,6 +155,23 @@ class WPBNP_Admin_UI {
                         <?php endforeach; ?>
                         <?php endif; ?>
                         
+                        <?php if ($this->current_tab !== 'items'): ?>
+                        <!-- Hidden fields to preserve custom presets on non-items tabs -->
+                        <?php 
+                        $custom_presets = isset($settings['custom_presets']) ? $settings['custom_presets'] : array();
+                        $presets = isset($custom_presets['presets']) ? $custom_presets['presets'] : array();
+                        foreach ($presets as $preset_id => $preset): ?>
+                            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][id]" value="<?php echo esc_attr($preset_id); ?>">
+                            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][name]" value="<?php echo esc_attr($preset['name'] ?? ''); ?>">
+                            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][description]" value="<?php echo esc_attr($preset['description'] ?? ''); ?>">
+                            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][created_at]" value="<?php echo esc_attr($preset['created_at'] ?? time()); ?>">
+                            <input type="hidden" name="settings[custom_presets][presets][<?php echo esc_attr($preset_id); ?>][items]" value="<?php echo esc_attr(json_encode($preset['items'] ?? array())); ?>">
+                        <?php endforeach; ?>
+                        
+                        <!-- Hidden field to enable custom presets -->
+                        <input type="hidden" name="settings[custom_presets][enabled]" value="<?php echo $this->is_pro_license_active() ? '1' : '0'; ?>">
+                        <?php endif; ?>
+                        
                         <div class="wpbnp-tab-content">
                             <?php $this->render_tab_content($this->current_tab, $settings); ?>
                         </div>

@@ -590,9 +590,15 @@ jQuery(document).ready(function ($) {
         // Get custom presets data from DOM with proper ID handling
         getCustomPresetsData: function () {
             const presets = [];
+            console.log('getCustomPresetsData: Starting to collect presets...');
+            console.log('Total .wpbnp-preset-item elements found:', $('.wpbnp-preset-item').length);
+            
+            // First, try to collect from visible DOM elements
             $('.wpbnp-preset-item').each(function () {
                 const $item = $(this);
                 const presetId = $item.data('preset-id');
+                
+                console.log('Processing visible preset item with preset-id:', presetId);
                 
                 const preset = {
                     id: presetId,
@@ -619,7 +625,51 @@ jQuery(document).ready(function ($) {
                 }
             });
 
-            console.log('Total presets collected:', presets.length);
+            console.log('Total presets collected from visible DOM:', presets.length);
+            
+            // If no presets found in visible DOM, try to collect from hidden fields
+            if (presets.length === 0) {
+                console.log('No visible presets found, checking hidden fields...');
+                
+                // Find all hidden fields for custom presets
+                const hiddenPresetIds = new Set();
+                $('input[name*="settings[custom_presets][presets]"][name*="[id]"]').each(function() {
+                    const name = $(this).attr('name');
+                    const match = name.match(/settings\[custom_presets\]\[presets\]\[([^\]]+)\]\[id\]/);
+                    if (match) {
+                        hiddenPresetIds.add(match[1]);
+                    }
+                });
+                
+                console.log('Found hidden preset IDs:', Array.from(hiddenPresetIds));
+                
+                // Collect presets from hidden fields
+                hiddenPresetIds.forEach(presetId => {
+                    const preset = {
+                        id: presetId,
+                        name: $(`input[name="settings[custom_presets][presets][${presetId}][name]"]`).val() || 'Untitled Preset',
+                        description: $(`input[name="settings[custom_presets][presets][${presetId}][description]"]`).val() || '',
+                        created_at: parseInt($(`input[name="settings[custom_presets][presets][${presetId}][created_at]"]`).val()) || Math.floor(Date.now() / 1000),
+                        items: []
+                    };
+                    
+                    // Get items from hidden field
+                    const itemsJson = $(`input[name="settings[custom_presets][presets][${presetId}][items]"]`).val();
+                    if (itemsJson) {
+                        try {
+                            preset.items = JSON.parse(itemsJson.replace(/&quot;/g, '"'));
+                        } catch (e) {
+                            console.warn('Failed to parse hidden preset items for preset', presetId, ':', e);
+                            preset.items = [];
+                        }
+                    }
+                    
+                    presets.push(preset);
+                    console.log('Collected hidden preset:', preset.name, 'with ID:', preset.id, 'items:', preset.items.length);
+                });
+            }
+            
+            console.log('Total presets collected (visible + hidden):', presets.length);
             return presets;
         },
 
@@ -730,8 +780,13 @@ jQuery(document).ready(function ($) {
 
             // CRITICAL: Custom presets are already in the form as hidden fields
             // No need to send JSON data separately - the form fields will handle it
+            console.log('Looking for custom presets in DOM...');
+            console.log('Found .wpbnp-preset-item elements:', $('.wpbnp-preset-item').length);
+            console.log('Found hidden custom preset fields:', $('input[name*="settings[custom_presets][presets]"][name*="[id]"]').length);
+            
             const customPresets = this.getCustomPresetsData();
             console.log('Custom presets in form:', customPresets.length, 'presets');
+            console.log('Custom presets found:', customPresets);
             
             // CRITICAL: Collect page targeting configurations from DOM and add to form data
             console.log('Looking for page targeting configurations in DOM...');
