@@ -218,6 +218,28 @@ function wpbnp_sanitize_settings($settings) {
         );
     }
     
+    // Custom presets (Pro feature)
+    if (isset($settings['custom_presets']) && is_array($settings['custom_presets'])) {
+        $sanitized['custom_presets'] = array(
+            'enabled' => !empty($settings['custom_presets']['enabled']),
+            'presets' => array()
+        );
+        
+        if (isset($settings['custom_presets']['presets']) && is_array($settings['custom_presets']['presets'])) {
+            foreach ($settings['custom_presets']['presets'] as $preset_id => $preset) {
+                if (is_array($preset) && !empty($preset['id']) && !empty($preset['name'])) {
+                    $sanitized['custom_presets']['presets'][$preset_id] = array(
+                        'id' => sanitize_key($preset['id']),
+                        'name' => sanitize_text_field($preset['name']),
+                        'description' => sanitize_textarea_field($preset['description'] ?? ''),
+                        'created_at' => absint($preset['created_at'] ?? time()),
+                        'items' => is_array($preset['items']) ? $preset['items'] : array()
+                    );
+                }
+            }
+        }
+    }
+
     // Page targeting settings (Pro feature)
     if (isset($settings['page_targeting']) && is_array($settings['page_targeting'])) {
         $sanitized['page_targeting'] = array(

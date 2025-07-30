@@ -443,35 +443,39 @@ jQuery(document).ready(function ($) {
             return formData;
         },
 
-        // Get custom presets data from DOM
+        // Get custom presets data from DOM with proper ID handling
         getCustomPresetsData: function () {
             const presets = [];
             $('.wpbnp-preset-item').each(function () {
                 const $item = $(this);
+                const presetId = $item.data('preset-id');
+                
                 const preset = {
-                    id: $item.data('preset-id'),
+                    id: presetId,
                     name: $item.find('.wpbnp-preset-name').text().trim(),
                     description: $item.find('.wpbnp-preset-description').text().trim() || '',
                     created_at: parseInt($item.find('input[name*="[created_at]"]').val()) || Math.floor(Date.now() / 1000),
                     items: []
                 };
 
-                // Get items from hidden input
-                const itemsJson = $item.find('input[name*="[items]"]').val();
+                // Get items from hidden input using the preset ID
+                const itemsJson = $item.find(`input[name="settings[custom_presets][presets][${presetId}][items]"]`).val();
                 if (itemsJson) {
                     try {
                         preset.items = JSON.parse(itemsJson.replace(/&quot;/g, '"'));
                     } catch (e) {
-                        console.warn('Failed to parse preset items:', e);
+                        console.warn('Failed to parse preset items for preset', presetId, ':', e);
                         preset.items = [];
                     }
                 }
 
                 if (preset.id && preset.name) {
                     presets.push(preset);
+                    console.log('Collected preset data:', preset.name, 'with ID:', preset.id, 'items:', preset.items.length);
                 }
             });
 
+            console.log('Total presets collected:', presets.length);
             return presets;
         },
 
@@ -612,6 +616,8 @@ jQuery(document).ready(function ($) {
             if (customPresets.length > 0) {
                 formData.append('wpbnp_custom_presets_data', JSON.stringify(customPresets));
                 console.log('Added custom presets data to form submission:', customPresets);
+            } else {
+                console.log('No custom presets to save');
             }
 
             formData.append('action', 'wpbnp_save_settings');
@@ -629,8 +635,11 @@ jQuery(document).ready(function ($) {
                 processData: false,
                 contentType: false,
                 success: (response) => {
+                    console.log('Server response:', response);
+                    
                     if (response.success) {
                         this.showNotification(wpbnp_admin.strings.saved || 'Settings saved successfully!', 'success');
+                        
                         // Update local settings from response
                         if (response.data && response.data.settings) {
                             this.settings = response.data.settings;
@@ -650,8 +659,11 @@ jQuery(document).ready(function ($) {
                                 setTimeout(() => {
                                     this.restoreCustomPresets(this.settings.custom_presets.presets);
                                 }, 100);
+                            } else {
+                                console.log('No custom presets in server response');
                             }
                         } else {
+                            console.warn('No settings data in server response');
                             // If no settings in response, merge current form data with existing settings
                             const currentFormData = this.getFormData();
                             // Update enabled state specifically
@@ -659,20 +671,51 @@ jQuery(document).ready(function ($) {
                                 this.settings.enabled = currentFormData['settings[enabled]'];
                             }
                         }
+                        
                         // Clear saved form state after successful save
                         localStorage.removeItem('wpbnp_form_state');
                         console.log('Settings saved and form state cleared');
                     } else {
-                        this.showNotification(response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings', 'error');
+                        const errorMessage = response.data ? response.data.message : wpbnp_admin.strings.error || 'Error saving settings';
+                        console.error('Server returned error:', errorMessage);
+                        this.showNotification(errorMessage, 'error');
                     }
                 },
-                error: () => {
-                    this.showNotification('Ajax error occurred', 'error');
+                error: (xhr, status, error) => {
+                    console.error('AJAX error:', {xhr, status, error});
+                    this.showNotification('Ajax error occurred: ' + error, 'error');
                 },
                 complete: () => {
                     submitBtn.prop('disabled', false).text(originalText);
                 }
             });
+        },
+
+        // Restore custom presets from server data
+        restoreCustomPresets: function (serverPresets) {
+            console.log('Restoring custom presets from server data:', serverPresets);
+            
+            // Clear existing presets in DOM
+            $('.wpbnp-preset-item').remove();
+            
+            // Add no presets message if no presets
+            if (!serverPresets || serverPresets.length === 0) {
+                $('#wpbnp-custom-presets-list').html('<div class="wpbnp-no-presets">No custom presets created yet.</div>');
+                return;
+            }
+            
+            // Add each preset to DOM
+            serverPresets.forEach(preset => {
+                if (preset.id && preset.name) {
+                    console.log('Restoring preset:', preset.name, 'with ID:', preset.id);
+                    this.addPresetToDOM(preset);
+                }
+            });
+            
+            // Update all preset selectors
+            this.updateAllPresetSelectors();
+            
+            console.log('Custom presets restored successfully');
         },
 
         // Reset settings
@@ -1767,6 +1810,14 @@ jQuery(document).ready(function ($) {
 
         // Initialize pro features
         initProFeatures: function () {
+            // CRITICAL: Load custom presets from server data if available
+            if (this.settings && this.settings.custom_presets && this.settings.custom_presets.presets) {
+                console.log('Loading custom presets from settings:', this.settings.custom_presets.presets);
+                this.restoreCustomPresets(this.settings.custom_presets.presets);
+            } else {
+                this.updateAllPresetSelectors();
+            }
+
             // License activation modal
             $(document).on('click', '#wpbnp-activate-license', function (e) {
                 e.preventDefault();
@@ -2282,7 +2333,7 @@ jQuery(document).ready(function ($) {
             return items;
         },
 
-        // Add preset to DOM
+        // Add preset to DOM with unique ID management
         addPresetToDOM: function (preset) {
             console.log('addPresetToDOM called for preset:', preset.name);
             
@@ -2293,7 +2344,8 @@ jQuery(document).ready(function ($) {
                 noPresetsMessage.remove();
             }
 
-            const index = $('.wpbnp-preset-item').length;
+            // Use preset ID as the unique identifier instead of index
+            const presetId = preset.id;
             const itemsCount = preset.items ? preset.items.length : 0;
             const createdDate = new Date(preset.created_at * 1000).toLocaleDateString('en-US', {
                 year: 'numeric',
@@ -2302,7 +2354,7 @@ jQuery(document).ready(function ($) {
             });
 
             const presetHtml = `
-                <div class="wpbnp-preset-item" data-preset-id="${preset.id}">
+                <div class="wpbnp-preset-item" data-preset-id="${presetId}">
                     <div class="wpbnp-preset-header">
                         <div class="wpbnp-preset-info">
                             <h4 class="wpbnp-preset-name">${preset.name}</h4>
@@ -2325,16 +2377,16 @@ jQuery(document).ready(function ($) {
                         </div>
                     </div>
                     
-                    <input type="hidden" name="settings[custom_presets][presets][${index}][id]" value="${preset.id}">
-                    <input type="hidden" name="settings[custom_presets][presets][${index}][name]" value="${preset.name}">
-                    <input type="hidden" name="settings[custom_presets][presets][${index}][description]" value="${preset.description || ''}">
-                    <input type="hidden" name="settings[custom_presets][presets][${index}][created_at]" value="${preset.created_at}">
-                    <input type="hidden" name="settings[custom_presets][presets][${index}][items]" value="${JSON.stringify(preset.items || []).replace(/"/g, '&quot;')}">
+                    <input type="hidden" name="settings[custom_presets][presets][${presetId}][id]" value="${presetId}">
+                    <input type="hidden" name="settings[custom_presets][presets][${presetId}][name]" value="${preset.name}">
+                    <input type="hidden" name="settings[custom_presets][presets][${presetId}][description]" value="${preset.description || ''}">
+                    <input type="hidden" name="settings[custom_presets][presets][${presetId}][created_at]" value="${preset.created_at}">
+                    <input type="hidden" name="settings[custom_presets][presets][${presetId}][items]" value="${JSON.stringify(preset.items || []).replace(/"/g, '&quot;')}">
                 </div>
             `;
 
             presetsContainer.append(presetHtml);
-            console.log('Preset added to DOM successfully:', preset.name);
+            console.log('Preset added to DOM successfully:', preset.name, 'with ID:', presetId);
         },
 
         // Edit custom preset items
