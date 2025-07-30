@@ -329,8 +329,8 @@ class WPBNP_Admin_UI {
                         <?php if (empty($presets)): ?>
                             <p class="wpbnp-no-presets"><?php esc_html_e('No custom presets created yet. Click "Create New Preset" to get started.', 'wp-bottom-navigation-pro'); ?></p>
                         <?php else: ?>
-                            <?php foreach ($presets as $index => $preset): ?>
-                                <?php $this->render_custom_preset_item($preset, $index); ?>
+                            <?php foreach ($presets as $preset_id => $preset): ?>
+                                <?php $this->render_custom_preset_item($preset, $preset_id); ?>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
@@ -346,8 +346,8 @@ class WPBNP_Admin_UI {
     /**
      * Render individual custom preset item
      */
-    private function render_custom_preset_item($preset, $index) {
-        $preset_id = $preset['id'] ?? '';
+    private function render_custom_preset_item($preset, $preset_id) {
+        $preset_id = $preset['id'] ?? $preset_id;
         $preset_name = $preset['name'] ?? 'Unnamed Preset';
         $preset_description = $preset['description'] ?? '';
         $items_count = count($preset['items'] ?? array());

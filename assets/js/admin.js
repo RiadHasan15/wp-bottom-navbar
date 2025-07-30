@@ -565,34 +565,7 @@ jQuery(document).ready(function ($) {
             }
         },
 
-        // Restore custom presets from saved data
-        restoreCustomPresets: function (presetsData) {
-            console.log('Restoring custom presets:', presetsData);
 
-            // Clear existing presets in DOM first
-            $('#wpbnp-custom-presets-list .wpbnp-preset-item').remove();
-
-            // Remove any existing "no presets" message
-            $('#wpbnp-custom-presets-list .wpbnp-no-presets').remove();
-
-            if (presetsData && presetsData.length > 0) {
-                // Add each preset back to DOM
-                presetsData.forEach(preset => {
-                    console.log('Adding preset to DOM:', preset.name);
-                    this.addPresetToDOM(preset);
-                });
-
-                // Update preset selectors
-                console.log('Updating preset selectors after restoration...');
-                this.updateAllPresetSelectors();
-
-                console.log(`${presetsData.length} custom presets restored successfully`);
-            } else {
-                // Show "no presets" message
-                $('#wpbnp-custom-presets-list').append('<p class="wpbnp-no-presets">No custom presets created yet. Click "Add Custom Preset" to get started.</p>');
-                console.log('No custom presets to restore');
-            }
-        },
 
         // Handle form submission
         handleFormSubmit: function (e) {
@@ -697,13 +670,16 @@ jQuery(document).ready(function ($) {
             $('.wpbnp-preset-item').remove();
             
             // Add no presets message if no presets
-            if (!serverPresets || serverPresets.length === 0) {
+            if (!serverPresets || (Array.isArray(serverPresets) && serverPresets.length === 0) || (typeof serverPresets === 'object' && Object.keys(serverPresets).length === 0)) {
                 $('#wpbnp-custom-presets-list').html('<div class="wpbnp-no-presets">No custom presets created yet.</div>');
                 return;
             }
             
+            // Handle both array and object formats
+            const presetsArray = Array.isArray(serverPresets) ? serverPresets : Object.values(serverPresets);
+            
             // Add each preset to DOM
-            serverPresets.forEach(preset => {
+            presetsArray.forEach(preset => {
                 if (preset.id && preset.name) {
                     console.log('Restoring preset:', preset.name, 'with ID:', preset.id);
                     this.addPresetToDOM(preset);

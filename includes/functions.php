@@ -302,10 +302,11 @@ function wpbnp_sanitize_settings($settings) {
         );
         
         if (isset($settings['custom_presets']['presets']) && is_array($settings['custom_presets']['presets'])) {
-            foreach ($settings['custom_presets']['presets'] as $preset) {
+            foreach ($settings['custom_presets']['presets'] as $preset_id => $preset) {
                 if (is_array($preset)) {
+                    $sanitized_preset_id = sanitize_key($preset_id);
                     $sanitized_preset = array(
-                        'id' => sanitize_key($preset['id'] ?? ''),
+                        'id' => sanitize_key($preset['id'] ?? $sanitized_preset_id),
                         'name' => sanitize_text_field($preset['name'] ?? ''),
                         'description' => sanitize_text_field($preset['description'] ?? ''),
                         'created_at' => absint($preset['created_at'] ?? time()),
@@ -357,7 +358,7 @@ function wpbnp_sanitize_settings($settings) {
                         }
                     }
                     
-                    $sanitized['custom_presets']['presets'][] = $sanitized_preset;
+                    $sanitized['custom_presets']['presets'][$sanitized_preset_id] = $sanitized_preset;
                     error_log('WPBNP: Saved preset: ' . $sanitized_preset['name'] . ' with ' . count($sanitized_preset['items']) . ' items');
                 }
             }
