@@ -988,26 +988,9 @@ class WP_Bottom_Navigation_Pro {
         
         $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array();
         
-        // DEBUG: Log the incoming form data
-        error_log('WPBNP: Form data received: ' . print_r($_POST, true));
-        error_log('WPBNP: Settings data: ' . print_r($settings, true));
-        
-        // DEBUG: Specifically log custom presets data
-        if (isset($settings['custom_presets']) && isset($settings['custom_presets']['presets'])) {
-            error_log('WPBNP: Custom presets keys in form: ' . implode(', ', array_keys($settings['custom_presets']['presets'])));
-            foreach ($settings['custom_presets']['presets'] as $key => $preset) {
-                error_log('WPBNP: Preset key: ' . $key . ', name: ' . ($preset['name'] ?? 'unknown') . ', id: ' . ($preset['id'] ?? 'unknown'));
-            }
-        } else {
-            error_log('WPBNP: No custom presets found in form data');
-        }
-        
-
-        
-        // CRITICAL: Handle custom presets data from form submission
+        // Handle custom presets data from form submission
         // First, check if custom presets are in the regular form data (from hidden inputs)
         if (isset($settings['custom_presets']) && isset($settings['custom_presets']['presets'])) {
-            error_log('WPBNP: Custom presets found in form data: ' . count($settings['custom_presets']['presets']) . ' presets');
             // Ensure enabled is set
             if (!isset($settings['custom_presets']['enabled'])) {
                 $settings['custom_presets']['enabled'] = true;
@@ -1025,20 +1008,7 @@ class WP_Bottom_Navigation_Pro {
                 }
                 $settings['custom_presets']['presets'] = $custom_presets;
                 $settings['custom_presets']['enabled'] = true;
-                
-                error_log('WPBNP: Custom presets data saved from JSON: ' . count($custom_presets) . ' presets');
-            } else {
-                error_log('WPBNP: Error parsing custom presets data: ' . json_last_error_msg());
             }
-        } else {
-            error_log('WPBNP: No custom presets data found in form submission');
-        }
-        
-        // DEBUG: Check page targeting data
-        if (isset($settings['page_targeting'])) {
-            error_log('WPBNP: Page targeting data found: ' . print_r($settings['page_targeting'], true));
-        } else {
-            error_log('WPBNP: No page targeting data found in form submission');
         }
         
         $sanitized_settings = wpbnp_sanitize_settings($settings);
@@ -1047,13 +1017,6 @@ class WP_Bottom_Navigation_Pro {
         
         // Get the complete updated settings
         $updated_settings = wpbnp_get_settings();
-        
-        // Debug: Log the custom presets in the response
-        if (isset($updated_settings['custom_presets'])) {
-            error_log('WPBNP: Response includes custom_presets: ' . count($updated_settings['custom_presets']['presets']) . ' presets');
-        } else {
-            error_log('WPBNP: Response does not include custom_presets');
-        }
         
         wp_send_json_success(array(
             'message' => __('Settings saved successfully!', 'wp-bottom-navigation-pro'),

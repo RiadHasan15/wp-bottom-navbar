@@ -466,18 +466,13 @@ jQuery(document).ready(function ($) {
         // Get page targeting configurations from DOM
         getPageTargetingConfigurations: function () {
             const configurations = [];
-            console.log('getPageTargetingConfigurations: Starting to collect configurations...');
-            console.log('Total .wpbnp-config-item elements found:', $('.wpbnp-config-item').length);
             
             // First, try to collect from visible DOM elements
             $('.wpbnp-config-item').each(function (index) {
                 const $config = $(this);
                 const configId = $config.data('config-id');
                 
-                console.log('Processing visible config item', index, 'with config-id:', configId);
-                
                 if (!configId) {
-                    console.warn('Configuration item missing config-id');
                     return;
                 }
                 
@@ -493,12 +488,6 @@ jQuery(document).ready(function ($) {
                         user_roles: []
                     }
                 };
-                
-                console.log('Collected config data for', configId, ':', {
-                    name: config.name,
-                    priority: config.priority,
-                    preset_id: config.preset_id
-                });
                 
                 // Collect selected pages - handle both multiselect and regular select
                 const pagesSelect = $config.find('select[name*="[conditions][pages][]"]');
@@ -569,15 +558,10 @@ jQuery(document).ready(function ($) {
                 }
                 
                 configurations.push(config);
-                console.log('Collected configuration:', config.name, 'with ID:', config.id);
             });
-            
-            console.log('Total configurations collected from visible DOM:', configurations.length);
             
             // If no configurations found in visible DOM, try to collect from hidden fields
             if (configurations.length === 0) {
-                console.log('No visible configurations found, checking hidden fields...');
-                
                 // Find all hidden fields for page targeting configurations
                 const hiddenConfigIds = new Set();
                 $('input[name*="settings[page_targeting][configurations]"][name*="[id]"]').each(function() {
@@ -587,8 +571,6 @@ jQuery(document).ready(function ($) {
                         hiddenConfigIds.add(match[1]);
                     }
                 });
-                
-                console.log('Found hidden config IDs:', Array.from(hiddenConfigIds));
                 
                 // Collect configurations from hidden fields
                 hiddenConfigIds.forEach(configId => {
@@ -635,11 +617,9 @@ jQuery(document).ready(function ($) {
                     });
                     
                     configurations.push(config);
-                    console.log('Collected hidden config:', config.name, 'with ID:', config.id);
                 });
             }
             
-            console.log('Total configurations collected (visible + hidden):', configurations.length);
             return configurations;
         },
 
@@ -836,32 +816,15 @@ jQuery(document).ready(function ($) {
 
             // CRITICAL: Custom presets are already in the form as hidden fields
             // No need to send JSON data separately - the form fields will handle it
-            console.log('Looking for custom presets in DOM...');
-            console.log('Found .wpbnp-preset-item elements:', $('.wpbnp-preset-item').length);
-            console.log('Found hidden custom preset fields:', $('input[name*="settings[custom_presets][presets]"][name*="[id]"]').length);
             
             const customPresets = this.getCustomPresetsData();
-            console.log('Custom presets in form:', customPresets.length, 'presets');
-            console.log('Custom presets found:', customPresets);
             
             // CRITICAL: Collect page targeting configurations from DOM and add to form data
-            console.log('Looking for page targeting configurations in DOM...');
-            console.log('Found .wpbnp-config-item elements:', $('.wpbnp-config-item').length);
-            console.log('Current tab:', window.location.hash);
-            console.log('All form elements:', $('#wpbnp-settings-form').find('input, select').length);
-            
-            $('.wpbnp-config-item').each(function(index) {
-                console.log('Config item', index, ':', $(this).data('config-id'), $(this).find('.wpbnp-config-name').text());
-                console.log('Config item HTML:', $(this).html().substring(0, 200) + '...');
-            });
             
             const pageTargetingConfigs = this.getPageTargetingConfigurations();
-            console.log('Page targeting configurations in form:', pageTargetingConfigs.length, 'configs');
-            console.log('Configurations found:', pageTargetingConfigs);
             
             // Add page targeting configurations to form data
             pageTargetingConfigs.forEach((config, index) => {
-                console.log('Adding config to form data:', config.id, config.name);
                 formData.append(`settings[page_targeting][configurations][${config.id}][id]`, config.id);
                 formData.append(`settings[page_targeting][configurations][${config.id}][name]`, config.name);
                 formData.append(`settings[page_targeting][configurations][${config.id}][priority]`, config.priority);
