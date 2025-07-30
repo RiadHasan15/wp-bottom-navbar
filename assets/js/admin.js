@@ -89,6 +89,9 @@ jQuery(document).ready(function ($) {
                         this.restoreFormState();
                     }, 100);
                 }
+                
+                // Restore loaded preset items if any
+                this.restoreLoadedPresetItems();
             }, 200);
         },
 
@@ -338,6 +341,17 @@ jQuery(document).ready(function ($) {
                     hiddenField.val(newState ? '1' : '0');
                     console.log('Updated hidden enabled field to:', newState);
                 }
+            });
+
+            // Handle preset update and cancel buttons
+            $(document).on('click', '.wpbnp-update-preset-btn', (e) => {
+                const presetId = $(e.target).data('preset-id');
+                this.updatePresetItems(presetId);
+            });
+
+            $(document).on('click', '.wpbnp-cancel-preset-edit', (e) => {
+                const presetId = $(e.target).data('preset-id');
+                this.cancelPresetEdit(presetId);
             });
         },
 
@@ -2807,35 +2821,15 @@ jQuery(document).ready(function ($) {
             const currentItems = JSON.parse(presetItem.find('input[name*="[items]"]').val() || '[]');
             const presetName = presetItem.find('.wpbnp-preset-name').text();
 
+            console.log('EditCustomPresetItems called for preset:', presetId, 'with items:', currentItems);
+
             // Show modal or interface to edit items
             if (confirm(`Edit navigation items for "${presetName}"?\n\nThis will temporarily load the current preset items into the main Items tab for editing. After making changes, come back and click "Update Preset Items" to save them.`)) {
                 // Load items into the main navigation items interface
                 this.loadItemsIntoMainInterface(currentItems);
 
-                // Switch to Items tab
-                const itemsTab = $('.wpbnp-tab').filter(function () {
-                    return $(this).attr('href') && $(this).attr('href').includes('tab=items');
-                });
-
-                if (itemsTab.length > 0) {
-                    // Use direct navigation instead of click to avoid potential issues
-                    const itemsHref = itemsTab.attr('href');
-                    console.log('Switching to Items tab:', itemsHref);
-                    window.location.href = itemsHref;
-                } else {
-                    // Fallback: try to find by text content and get its href
-                    const fallbackTab = $('.wpbnp-tab:contains("Items")').first();
-                    if (fallbackTab.length > 0 && fallbackTab.attr('href')) {
-                        console.log('Using fallback Items tab:', fallbackTab.attr('href'));
-                        window.location.href = fallbackTab.attr('href');
-                    } else {
-                        console.error('Could not find Items tab');
-                        this.showNotification('Could not switch to Items tab. Please click the Items tab manually.', 'error');
-                    }
-                }
-
                 // Show notification with instructions
-                this.showNotification(`✅ Preset items loaded into Items tab. Edit them, then return here and click "Update Preset Items".`, 'info', 8000);
+                this.showNotification(`✅ Preset items loaded into Items tab. Please click the "Items" tab to see and edit them.`, 'info', 8000);
 
                 // Add update button to preset
                 this.addUpdatePresetButton(presetId, presetName);
@@ -2844,16 +2838,57 @@ jQuery(document).ready(function ($) {
 
         // Load items into main interface for editing
         loadItemsIntoMainInterface: function (items) {
+            console.log('Loading items into main interface:', items);
+            
+            // Store the loaded items in localStorage so they persist across page reloads
+            localStorage.setItem('wpbnp_loaded_preset_items', JSON.stringify(items));
+            console.log('Stored loaded preset items in localStorage:', items);
+            
             // Clear existing items
             $('#wpbnp-items-list').empty();
 
             // Add each item to the main interface
             items.forEach((item, index) => {
-                this.addNavigationItem(item, index);
+                console.log('Adding item to main interface:', item);
+                this.addItemRow(item, index);
             });
 
             // Update the items counter if it exists
             this.updateItemsDisplay();
+            
+            console.log('Items loaded successfully. Total items in list:', $('#wpbnp-items-list .wpbnp-nav-item-row').length);
+        },
+
+        // Restore loaded preset items from localStorage
+        restoreLoadedPresetItems: function () {
+            const loadedItems = localStorage.getItem('wpbnp_loaded_preset_items');
+            if (loadedItems) {
+                try {
+                    const items = JSON.parse(loadedItems);
+                    console.log('Restoring loaded preset items from localStorage:', items);
+                    
+                    // Clear existing items
+                    $('#wpbnp-items-list').empty();
+
+                    // Add each item to the main interface
+                    items.forEach((item, index) => {
+                        console.log('Restoring item to main interface:', item);
+                        this.addItemRow(item, index);
+                    });
+
+                    // Update the items counter if it exists
+                    this.updateItemsDisplay();
+                    
+                    console.log('Loaded preset items restored successfully. Total items in list:', $('#wpbnp-items-list .wpbnp-nav-item-row').length);
+                    
+                    // Show notification that items were restored
+                    this.showNotification('✅ Preset items restored from previous session. You can now edit them.', 'info', 5000);
+                    
+                } catch (e) {
+                    console.error('Failed to parse loaded preset items:', e);
+                    localStorage.removeItem('wpbnp_loaded_preset_items');
+                }
+            }
         },
 
         // Add update button to preset
@@ -2879,6 +2914,60 @@ jQuery(document).ready(function ($) {
             `;
 
             presetItem.append(updateButton);
+        },
+
+        // Update preset items with current items from main interface
+        updatePresetItems: function (presetId) {
+            console.log('Updating preset items for preset:', presetId);
+            
+            // Get current items from main interface
+            const currentItems = this.getCurrentNavigationItems();
+            console.log('Current items from main interface:', currentItems);
+            
+            // Find the preset item
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            if (presetItem.length === 0) {
+                console.error('Preset item not found:', presetId);
+                this.showNotification('Error: Preset not found.', 'error');
+                return;
+            }
+            
+            // Update the hidden input with new items
+            const itemsInput = presetItem.find('input[name*="[items]"]');
+            itemsInput.val(JSON.stringify(currentItems));
+            
+            // Update the preset name display
+            const presetName = presetItem.find('.wpbnp-preset-name').text();
+            const itemsCount = currentItems.length;
+            presetItem.find('.wpbnp-preset-meta').text(`${itemsCount} items • Created ${new Date().toLocaleDateString()}`);
+            
+            // Remove the update button
+            presetItem.find('.wpbnp-update-preset-items').remove();
+            
+            // Clear loaded preset items from localStorage
+            localStorage.removeItem('wpbnp_loaded_preset_items');
+            
+            // Show success notification
+            this.showNotification(`✅ Preset "${presetName}" updated successfully with ${itemsCount} items!`, 'success');
+            
+            console.log('Preset items updated successfully');
+        },
+
+        // Cancel preset editing
+        cancelPresetEdit: function (presetId) {
+            console.log('Canceling preset edit for preset:', presetId);
+            
+            // Remove the update button
+            const presetItem = $(`.wpbnp-preset-item[data-preset-id="${presetId}"]`);
+            presetItem.find('.wpbnp-update-preset-items').remove();
+            
+            // Clear loaded preset items from localStorage
+            localStorage.removeItem('wpbnp_loaded_preset_items');
+            
+            // Show notification
+            this.showNotification('Preset editing canceled.', 'info');
+            
+            console.log('Preset editing canceled');
         },
 
         // Edit custom preset name/description
