@@ -986,9 +986,7 @@ class WP_Bottom_Navigation_Pro {
         
         $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array();
         
-        // DEBUG: Log the incoming form data
-        error_log('WPBNP: Form data received: ' . print_r($_POST, true));
-        error_log('WPBNP: Settings data: ' . print_r($settings, true));
+
         
         // CRITICAL: Handle custom presets data from form submission
         // First, check if custom presets are in the regular form data (from hidden inputs)
@@ -1410,7 +1408,7 @@ class WP_Bottom_Navigation_Pro {
         $reflection = new ReflectionClass($admin_ui);
         $method = $reflection->getMethod('render_configuration_item');
         $method->setAccessible(true);
-        $method->invoke($admin_ui, $config, $config_index);
+        $method->invoke($admin_ui, $config, $config_id); // Use config_id instead of config_index
         
         $html = ob_get_clean();
         

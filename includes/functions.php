@@ -251,10 +251,11 @@ function wpbnp_sanitize_settings($settings) {
         
         // Sanitize configurations
         if (isset($settings['page_targeting']['configurations']) && is_array($settings['page_targeting']['configurations'])) {
-            foreach ($settings['page_targeting']['configurations'] as $config) {
+            foreach ($settings['page_targeting']['configurations'] as $config_id => $config) {
                 if (is_array($config)) {
+                    $sanitized_config_id = sanitize_key($config_id);
                     $sanitized_config = array(
-                        'id' => sanitize_key($config['id'] ?? ''),
+                        'id' => sanitize_key($config['id'] ?? $sanitized_config_id),
                         'name' => sanitize_text_field($config['name'] ?? ''),
                         'priority' => absint($config['priority'] ?? 1),
                         'preset_id' => sanitize_key($config['preset_id'] ?? 'default'),
@@ -287,7 +288,7 @@ function wpbnp_sanitize_settings($settings) {
                         }
                     }
                     
-                    $sanitized['page_targeting']['configurations'][] = $sanitized_config;
+                    $sanitized['page_targeting']['configurations'][$sanitized_config_id] = $sanitized_config;
                 }
             }
         }

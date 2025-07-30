@@ -863,16 +863,16 @@ class WPBNP_Admin_UI {
             return;
         }
         
-        foreach ($configurations as $index => $config) {
-            $this->render_configuration_item($config, $index);
+        foreach ($configurations as $config_id => $config) {
+            $this->render_configuration_item($config, $config_id);
         }
     }
     
     /**
      * Render individual configuration item
      */
-    private function render_configuration_item($config, $index) {
-        $config_id = isset($config['id']) ? $config['id'] : 'config_' . $index;
+    private function render_configuration_item($config, $config_id) {
+        $config_id = isset($config['id']) ? $config['id'] : $config_id;
         $config_name = isset($config['name']) ? $config['name'] : __('Untitled Configuration', 'wp-bottom-navigation-pro');
         $priority = isset($config['priority']) ? $config['priority'] : 1;
         $conditions = isset($config['conditions']) ? $config['conditions'] : array();
@@ -898,13 +898,13 @@ class WPBNP_Admin_UI {
                 <div class="wpbnp-config-settings">
                     <div class="wpbnp-field">
                         <label><?php esc_html_e('Configuration Name', 'wp-bottom-navigation-pro'); ?></label>
-                        <input type="text" name="settings[page_targeting][configurations][<?php echo $index; ?>][name]" 
+                        <input type="text" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][name]" 
                                value="<?php echo esc_attr($config_name); ?>" placeholder="<?php esc_attr_e('Enter configuration name...', 'wp-bottom-navigation-pro'); ?>">
                     </div>
                     
                     <div class="wpbnp-field">
                         <label><?php esc_html_e('Priority', 'wp-bottom-navigation-pro'); ?></label>
-                        <input type="number" name="settings[page_targeting][configurations][<?php echo $index; ?>][priority]" 
+                        <input type="number" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][priority]" 
                                value="<?php echo esc_attr($priority); ?>" min="1" max="100">
                         <p class="description"><?php esc_html_e('Higher priority configurations will override lower ones when conditions match.', 'wp-bottom-navigation-pro'); ?></p>
                     </div>
@@ -914,22 +914,22 @@ class WPBNP_Admin_UI {
                         
                         <div class="wpbnp-condition-group">
                             <label><?php esc_html_e('Specific Pages', 'wp-bottom-navigation-pro'); ?></label>
-                            <?php $this->render_page_selector($conditions, $index); ?>
+                            <?php $this->render_page_selector($conditions, $config_id); ?>
                         </div>
                         
                         <div class="wpbnp-condition-group">
                             <label><?php esc_html_e('Post Types', 'wp-bottom-navigation-pro'); ?></label>
-                            <?php $this->render_post_type_selector($conditions, $index); ?>
+                            <?php $this->render_post_type_selector($conditions, $config_id); ?>
                         </div>
                         
                         <div class="wpbnp-condition-group">
                             <label><?php esc_html_e('Categories', 'wp-bottom-navigation-pro'); ?></label>
-                            <?php $this->render_category_selector($conditions, $index); ?>
+                            <?php $this->render_category_selector($conditions, $config_id); ?>
                         </div>
                         
                         <div class="wpbnp-condition-group">
                             <label><?php esc_html_e('User Roles', 'wp-bottom-navigation-pro'); ?></label>
-                            <?php $this->render_user_role_selector($conditions, $index); ?>
+                            <?php $this->render_user_role_selector($conditions, $config_id); ?>
                         </div>
                     </div>
                     
@@ -938,7 +938,7 @@ class WPBNP_Admin_UI {
                         
                         <div class="wpbnp-field">
                             <label><?php esc_html_e('Preset to Display', 'wp-bottom-navigation-pro'); ?></label>
-                            <?php $this->render_custom_preset_selector($config, $index); ?>
+                            <?php $this->render_custom_preset_selector($config, $config_id); ?>
                             <p class="description"><?php esc_html_e('Choose which navigation preset to display when the conditions above are met.', 'wp-bottom-navigation-pro'); ?></p>
                         </div>
                     </div>
@@ -946,7 +946,7 @@ class WPBNP_Admin_UI {
             </div>
             
             <!-- Hidden fields -->
-            <input type="hidden" name="settings[page_targeting][configurations][<?php echo $index; ?>][id]" value="<?php echo esc_attr($config_id); ?>">
+            <input type="hidden" name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][id]" value="<?php echo esc_attr($config_id); ?>">
         </div>
         <?php
     }
@@ -954,7 +954,7 @@ class WPBNP_Admin_UI {
     /**
      * Render page selector
      */
-    private function render_page_selector($conditions, $index) {
+    private function render_page_selector($conditions, $config_id) {
         $selected_pages = isset($conditions['pages']) ? $conditions['pages'] : array();
         
         // Get all pages first
@@ -999,7 +999,7 @@ class WPBNP_Admin_UI {
         }
         
         ?>
-        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
+        <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][pages][]" multiple class="wpbnp-multiselect">
             <?php if (empty($pages)): ?>
                 <option value="" disabled><?php esc_html_e('No pages found - Create some pages first', 'wp-bottom-navigation-pro'); ?></option>
             <?php else: ?>
@@ -1017,12 +1017,12 @@ class WPBNP_Admin_UI {
     /**
      * Render post type selector
      */
-    private function render_post_type_selector($conditions, $index) {
+    private function render_post_type_selector($conditions, $config_id) {
         $selected_post_types = isset($conditions['post_types']) ? $conditions['post_types'] : array();
         $post_types = get_post_types(array('public' => true), 'objects');
         
         ?>
-        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][post_types][]" multiple class="wpbnp-multiselect">
+        <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][post_types][]" multiple class="wpbnp-multiselect">
             <option value=""><?php esc_html_e('Select post types...', 'wp-bottom-navigation-pro'); ?></option>
             <?php foreach ($post_types as $post_type): ?>
                 <option value="<?php echo esc_attr($post_type->name); ?>" <?php selected(in_array($post_type->name, $selected_post_types)); ?>>
@@ -1036,12 +1036,12 @@ class WPBNP_Admin_UI {
     /**
      * Render category selector
      */
-    private function render_category_selector($conditions, $index) {
+    private function render_category_selector($conditions, $config_id) {
         $selected_categories = isset($conditions['categories']) ? $conditions['categories'] : array();
         $categories = get_categories();
         
         ?>
-        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][categories][]" multiple class="wpbnp-multiselect">
+        <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][categories][]" multiple class="wpbnp-multiselect">
             <option value=""><?php esc_html_e('Select categories...', 'wp-bottom-navigation-pro'); ?></option>
             <?php if (empty($categories)): ?>
                 <option value="" disabled><?php esc_html_e('No categories found', 'wp-bottom-navigation-pro'); ?></option>
@@ -1059,12 +1059,12 @@ class WPBNP_Admin_UI {
     /**
      * Render user role selector
      */
-    private function render_user_role_selector($conditions, $index) {
+    private function render_user_role_selector($conditions, $config_id) {
         $selected_roles = isset($conditions['user_roles']) ? $conditions['user_roles'] : array();
         $roles = wp_roles()->get_names();
         
         ?>
-        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][conditions][user_roles][]" multiple class="wpbnp-multiselect">
+        <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][conditions][user_roles][]" multiple class="wpbnp-multiselect">
             <option value=""><?php esc_html_e('Select user roles...', 'wp-bottom-navigation-pro'); ?></option>
             <?php foreach ($roles as $role_key => $role_name): ?>
                 <option value="<?php echo esc_attr($role_key); ?>" <?php selected(in_array($role_key, $selected_roles)); ?>>
@@ -1078,7 +1078,7 @@ class WPBNP_Admin_UI {
     /**
      * Render custom preset selector
      */
-    private function render_custom_preset_selector($config, $index) {
+    private function render_custom_preset_selector($config, $config_id) {
         $selected_preset = isset($config['preset_id']) ? $config['preset_id'] : 'default';
         $settings = wpbnp_get_settings();
         $custom_presets = isset($settings['custom_presets']['presets']) ? $settings['custom_presets']['presets'] : array();
@@ -1097,7 +1097,7 @@ class WPBNP_Admin_UI {
         }
         
         ?>
-        <select name="settings[page_targeting][configurations][<?php echo $index; ?>][preset_id]" class="wpbnp-preset-selector">
+        <select name="settings[page_targeting][configurations][<?php echo esc_attr($config_id); ?>][preset_id]" class="wpbnp-preset-selector">
             <option value="default" <?php selected($selected_preset, 'default'); ?>>
                 <?php esc_html_e('Default Navigation (Items Tab)', 'wp-bottom-navigation-pro'); ?>
             </option>
@@ -1124,7 +1124,7 @@ class WPBNP_Admin_UI {
         <script>
         jQuery(document).ready(function($) {
             // Ensure this specific selector gets populated
-            const $selector = $('select[name="settings[page_targeting][configurations][<?php echo $index; ?>][preset_id]"]');
+            const $selector = $('select[name="settings[page_targeting][configurations][<?php echo esc_js($config_id); ?>][preset_id]"]');
             if ($selector.length && typeof WPBottomNavAdmin !== 'undefined') {
                 setTimeout(() => {
                     WPBottomNavAdmin.populatePresetSelector($selector);

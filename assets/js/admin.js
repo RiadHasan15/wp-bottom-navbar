@@ -616,13 +616,7 @@ jQuery(document).ready(function ($) {
             const customPresets = this.getCustomPresetsData();
             console.log('Custom presets in form:', customPresets.length, 'presets');
             
-            // DEBUG: Log the form data being sent
-            console.log('Form data being sent:', formData);
-            for (let [key, value] of formData.entries()) {
-                if (key.includes('custom_presets')) {
-                    console.log('Custom preset field:', key, '=', value);
-                }
-            }
+
 
             formData.append('action', 'wpbnp_save_settings');
             formData.append('nonce', this.nonce);
