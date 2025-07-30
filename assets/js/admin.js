@@ -975,15 +975,13 @@ jQuery(document).ready(function ($) {
                                 console.log('No custom presets in server response');
                             }
                             
-                            // Update page targeting configurations from server response (but don't restore if they already exist)
+                            // Update page targeting configurations from server response
                             if (this.settings.page_targeting && this.settings.page_targeting.configurations) {
                                 console.log('Page targeting configurations in server response:', this.settings.page_targeting.configurations);
-                                // Only restore if no configurations exist in DOM
-                                if ($('.wpbnp-config-item').length === 0) {
-                                    setTimeout(() => {
-                                        this.restorePageTargetingConfigurations(this.settings.page_targeting.configurations);
-                                    }, 100);
-                                }
+                                // Always restore from server response to ensure data is up-to-date
+                                setTimeout(() => {
+                                    this.restorePageTargetingConfigurations(this.settings.page_targeting.configurations);
+                                }, 100);
                             } else {
                                 console.log('No page targeting configurations in server response');
                             }
@@ -1018,7 +1016,10 @@ jQuery(document).ready(function ($) {
 
         // Restore page targeting configurations from server data
         restorePageTargetingConfigurations: function (serverConfigurations) {
-            console.log('Restoring page targeting configurations from server data:', serverConfigurations);
+            console.log('=== DEBUG: restorePageTargetingConfigurations ===');
+            console.log('Server configurations:', serverConfigurations);
+            console.log('Current tab:', window.location.hash);
+            console.log('Existing config items in DOM:', $('.wpbnp-config-item').length);
             
             // Clear existing configurations in DOM
             $('.wpbnp-config-item').remove();
@@ -1035,7 +1036,7 @@ jQuery(document).ready(function ($) {
             // Add each configuration to DOM
             configsArray.forEach(config => {
                 if (config.id && config.name) {
-                    console.log('Restoring configuration:', config.name, 'with ID:', config.id);
+                    console.log('Restoring configuration:', config.name, 'with ID:', config.id, 'conditions:', config.conditions);
                     this.addConfigurationToDOM(config);
                 }
             });
@@ -1155,26 +1156,30 @@ jQuery(document).ready(function ($) {
         populateConfigurationSelectors: function ($config, configData) {
             // Populate pages selector
             const $pagesSelector = $config.find('select[name*="[conditions][pages][]"]');
-            if ($pagesSelector.length && configData.conditions && configData.conditions.pages && configData.conditions.pages.length > 0) {
-                this.populatePagesSelector($pagesSelector, configData.conditions.pages);
+            if ($pagesSelector.length) {
+                const selectedPages = configData.conditions && configData.conditions.pages ? configData.conditions.pages : [];
+                this.populatePagesSelector($pagesSelector, selectedPages);
             }
             
             // Populate post types selector
             const $postTypesSelector = $config.find('select[name*="[conditions][post_types][]"]');
-            if ($postTypesSelector.length && configData.conditions && configData.conditions.post_types && configData.conditions.post_types.length > 0) {
-                this.populatePostTypesSelector($postTypesSelector, configData.conditions.post_types);
+            if ($postTypesSelector.length) {
+                const selectedPostTypes = configData.conditions && configData.conditions.post_types ? configData.conditions.post_types : [];
+                this.populatePostTypesSelector($postTypesSelector, selectedPostTypes);
             }
             
             // Populate categories selector
             const $categoriesSelector = $config.find('select[name*="[conditions][categories][]"]');
-            if ($categoriesSelector.length && configData.conditions && configData.conditions.categories && configData.conditions.categories.length > 0) {
-                this.populateCategoriesSelector($categoriesSelector, configData.conditions.categories);
+            if ($categoriesSelector.length) {
+                const selectedCategories = configData.conditions && configData.conditions.categories ? configData.conditions.categories : [];
+                this.populateCategoriesSelector($categoriesSelector, selectedCategories);
             }
             
             // Populate user roles selector
             const $userRolesSelector = $config.find('select[name*="[conditions][user_roles][]"]');
-            if ($userRolesSelector.length && configData.conditions && configData.conditions.user_roles && configData.conditions.user_roles.length > 0) {
-                this.populateUserRolesSelector($userRolesSelector, configData.conditions.user_roles);
+            if ($userRolesSelector.length) {
+                const selectedUserRoles = configData.conditions && configData.conditions.user_roles ? configData.conditions.user_roles : [];
+                this.populateUserRolesSelector($userRolesSelector, selectedUserRoles);
             }
             
             // Populate preset selector
